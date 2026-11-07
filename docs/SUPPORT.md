@@ -25,7 +25,7 @@ Most problems already have an answer:
 | A reproducible app bug | [New issue → Bug Report](https://github.com/frankea/Whisky/issues/new/choose) |
 | A game that won't run right | [New issue → Game Compatibility Report](https://github.com/frankea/Whisky/issues/new/choose) |
 | An idea | [New issue → Feature Request](https://github.com/frankea/Whisky/issues/new/choose) |
-| A security report | See [`SECURITY.md`](../docs/SECURITY.md) — **do not** open a public issue |
+| A security report | See [`SECURITY.md`](../.github/SECURITY.md) — **do not** open a public issue |
 | A "how do I…" question | The troubleshooting docs and the Game Support wiki first |
 
 **Do not open issues on the archived [whisky-app/whisky](https://github.com/whisky-app/whisky) repo** —

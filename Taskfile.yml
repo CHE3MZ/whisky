@@ -19,3 +19,14 @@ tasks:
     silent: true
     cmds:
       - git-cliff --strip all -o docs/CHANGELOG.md
+  check-links:
+    desc: Lint links.
+    cmds:
+      - cmd: lychee .
+  scan:
+    desc: Run other ops tools on the repo.
+    cmds:
+      - cmd: opengrep scan
+      - cmd: osv-scanner scan .
+      - cmd: gitleaks git . --no-banner
+      - cmd: scorecard --local . --format json | gron
