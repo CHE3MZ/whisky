@@ -4,7 +4,7 @@ This document describes how to cut a release of the Whisky app and how to publis
 
 The fork uses two parallel artifact streams:
 
-- **App releases** (`app-vX.Y.Z`) — `Whisky-X.Y.Z.dmg`, signed and notarized for direct distribution.
+- **App releases** (`vX.Y.Z`) — `Whisky-X.Y.Z.dmg`, signed and notarized for direct distribution.
 - **Wine Libraries releases** (`vX.Y.Z`) — `Libraries.tar.gz` containing the Wine/DXVK runtime that the app downloads on first launch.
 
 Both live on GitHub Releases. Static metadata (version plist, Sparkle appcast) is served from GitHub Pages, which is **workflow-deployed** through `.github/workflows/Documentation.yml`. The `gh-pages` branch is unused; static files go in `dist/pages/`.
@@ -161,7 +161,7 @@ Edit `dist/pages/appcast.xml` and add a new `<item>` near the top of `<channel>`
     <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
     <description><![CDATA[<p>Release notes...</p>]]></description>
     <enclosure
-        url="https://github.com/frankea/Whisky/releases/download/app-vX.Y.Z/Whisky-X.Y.Z.dmg"
+        url="https://github.com/frankea/Whisky/releases/download/vX.Y.Z/Whisky-X.Y.Z.dmg"
         sparkle:edSignature="..."
         length="..."
         type="application/octet-stream" />
@@ -174,10 +174,10 @@ Edit `dist/pages/appcast.xml` and add a new `<item>` near the top of `<channel>`
 git add Whisky.xcodeproj/project.pbxproj dist/pages/appcast.xml
 git commit -m "release: X.Y.Z"
 git push
-git tag -a app-vX.Y.Z -m "Whisky X.Y.Z"
-git push origin app-vX.Y.Z
+git tag -a vX.Y.Z -m "Whisky X.Y.Z"
+git push origin vX.Y.Z
 
-gh release create app-vX.Y.Z \
+gh release create vX.Y.Z \
   --repo frankea/Whisky \
   --title "Whisky X.Y.Z" \
   --notes "..." \
@@ -188,7 +188,7 @@ The push to `main` triggers `.github/workflows/Documentation.yml`, which redeplo
 
 ### 7. Homebrew tap (automatic)
 
-Publishing the `app-vX.Y.Z` release fires `.github/workflows/UpdateHomebrewTap.yml`,
+Publishing the `vX.Y.Z` release fires `.github/workflows/UpdateHomebrewTap.yml`,
 which downloads the DMG, computes its sha256, and bumps the
 [frankea/homebrew-whisky](https://github.com/frankea/homebrew-whisky) cask so
 `brew install --cask frankea/whisky/whisky` tracks the new version. No manual edit needed.
@@ -246,7 +246,7 @@ their pinned versions, and where each comes from. When the runtime needs to chan
 - `https://frankea.github.io/Whisky/WhiskyWineVersion.plist` — Wine version metadata
 - `https://frankea.github.io/Whisky/appcast.xml` — Sparkle update feed
 - `https://github.com/frankea/Whisky/releases/download/vX.Y.Z/Libraries.tar.gz` — Wine binary archive
-- `https://github.com/frankea/Whisky/releases/download/app-vX.Y.Z/Whisky-X.Y.Z.dmg` — app DMG
+- `https://github.com/frankea/Whisky/releases/download/vX.Y.Z/Whisky-X.Y.Z.dmg` — app DMG
 
 ## Pitfalls
 

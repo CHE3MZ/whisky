@@ -74,7 +74,7 @@ python scripts/audit_upstream.py
 python scripts/audit_upstream.py --refresh
 
 # Show "newly addressed" against an older ref
-python scripts/audit_upstream.py --diff-against app-v3.0.1
+python scripts/audit_upstream.py --diff-against v3.0.1
 ```
 
 Outputs land under `.planning/audit/` (gitignored — local working notes):

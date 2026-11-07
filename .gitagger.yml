@@ -1,0 +1,23 @@
+scale: patch
+pre: stable
+format: auto
+custom: ""
+remote: origin
+push: true
+force: false
+require_clean: false
+doctor: false
+verbose: false
+message:
+  cmds:
+    - cmd: echo ""
+on:
+  failure:
+    - shell: sh
+      os: macos, linux
+      run:
+        - echo "Oops! Something went wrong..."
+    - shell: pwsh
+      os: windows
+      run:
+        - echo "Oops! Something went wrong..."

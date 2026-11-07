@@ -1,6 +1,6 @@
 name: Update Homebrew Tap
 
-# When an app release (app-vX.Y.Z) is published, bump the frankea/homebrew-whisky
+# When an app release (vX.Y.Z) is published, bump the frankea/homebrew-whisky
 # cask to the new version + DMG sha256 so `brew install --cask frankea/whisky/whisky`
 # always tracks the latest release without a manual edit.
 #
@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: App release tag to sync (e.g. app-v3.1.0)
+        description: App release tag to sync (e.g. v3.1.0)
         required: true
 
 permissions:
@@ -23,7 +23,7 @@ permissions:
 jobs:
   update-tap:
     # Only app releases; the Wine Libraries stream uses bare vX.Y.Z tags and has no cask.
-    if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'app-v') }}
+    if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'v') }}
     runs-on: ubuntu-latest
     steps:
       - name: Bump cask to the released version
@@ -38,7 +38,7 @@ jobs:
             exit 1
           fi
 
-          version="${TAG#app-v}"
+          version="${TAG#v}"
           # Strictly validate the version before it flows into URLs and the sed
           # expressions below — refuse anything that isn't a dotted numeric version.
           if ! printf '%s' "$version" | grep -qE '^[0-9]+(\.[0-9]+)*$'; then
