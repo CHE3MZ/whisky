@@ -1,0 +1,60 @@
+{
+  "originHash" : "b912b85f127fe72cded94f3b5a1ab3e591fa845a310c06ad873f4b28bb58f955",
+  "pins" : [
+    {
+      "identity" : "posthog-ios",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/PostHog/posthog-ios.git",
+      "state" : {
+        "revision" : "179438b8e0c9a357ab0caf453577f766ffddbcb3",
+        "version" : "3.59.3"
+      }
+    },
+    {
+      "identity" : "semanticversion",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/SwiftPackageIndex/SemanticVersion",
+      "state" : {
+        "revision" : "ea8eea9d89842a29af1b8e6c7677f1c86e72fa42",
+        "version" : "0.4.0"
+      }
+    },
+    {
+      "identity" : "sparkle",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/sparkle-project/Sparkle",
+      "state" : {
+        "revision" : "5581748cef2bae787496fe6d61139aebe0a451f6",
+        "version" : "2.8.1"
+      }
+    },
+    {
+      "identity" : "swift-argument-parser",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-argument-parser.git",
+      "state" : {
+        "revision" : "41982a3656a71c768319979febd796c6fd111d5c",
+        "version" : "1.5.0"
+      }
+    },
+    {
+      "identity" : "swift-docc-plugin",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/swiftlang/swift-docc-plugin",
+      "state" : {
+        "revision" : "3e4f133a77e644a5812911a0513aeb7288b07d06",
+        "version" : "1.4.5"
+      }
+    },
+    {
+      "identity" : "swift-docc-symbolkit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/swiftlang/swift-docc-symbolkit",
+      "state" : {
+        "revision" : "b45d1f2ed151d057b54504d653e0da5552844e34",
+        "version" : "1.0.0"
+      }
+    }
+  ],
+  "version" : 3
+}

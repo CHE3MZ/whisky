@@ -1,0 +1,31 @@
+name: Auto Assign
+
+on:
+  issues:
+    types: [opened]
+  # pull_request_target, not pull_request: fork PRs get a read-only token
+  # under pull_request, so addAssignees fails with a 403. This workflow
+  # never checks out PR code, so the privileged trigger is safe here.
+  pull_request_target:
+    types: [opened]
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  assign:
+    name: Assign
+    runs-on: ubuntu-latest
+    steps:
+      - name: Assign to maintainers
+        uses: actions/github-script@v9
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.rest.issues.addAssignees({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              assignees: ['frankea']
+            })

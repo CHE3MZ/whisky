@@ -1,0 +1,206 @@
+//
+//  BottleView.swift
+//  Whisky
+//
+//  This file is part of Whisky.
+//
+//  Whisky is free software: you can redistribute it and/or modify it under the terms
+//  of the GNU General Public License as published by the Free Software Foundation,
+//  either version 3 of the License, or (at your option) any later version.
+//
+//  Whisky is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+//  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+//  See the GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License along with Whisky.
+//  If not, see https://www.gnu.org/licenses/.
+//
+
+import SwiftUI
+import UniformTypeIdentifiers
+import WhiskyKit
+
+enum BottleStage {
+    case config
+    case programs
+    case processes
+    case gameConfigs
+}
+
+struct BottleView: View {
+    @ObservedObject var bottle: Bottle
+    @State private var path = NavigationPath()
+    @State private var programLoading: Bool = false
+    @State private var showWinetricksSheet: Bool = false
+    @State private var showDuplicate: Bool = false
+    @State private var toast: ToastData?
+
+    private let gridLayout = [GridItem(.adaptive(minimum: 100, maximum: .infinity))]
+
+    var body: some View {
+        NavigationStack(path: $path) {
+            ScrollView {
+                LazyVGrid(columns: gridLayout, alignment: .center) {
+                    ForEach(bottle.pinnedPrograms, id: \.id) { pinnedProgram in
+                        PinView(
+                            bottle: bottle,
+                            program: pinnedProgram.program,
+                            pin: pinnedProgram.pin,
+                            path: $path,
+                            toast: $toast
+                        )
+                    }
+                    PinAddView(bottle: bottle)
+                }
+                .padding()
+                Form {
+                    NavigationLink(value: BottleStage.programs) {
+                        Label("tab.programs", systemImage: "list.bullet")
+                    }
+                    .accessibilityIdentifier("nav.installedPrograms")
+                    NavigationLink(value: BottleStage.config) {
+                        Label("tab.config", systemImage: "gearshape")
+                    }
+                    .accessibilityIdentifier("nav.bottleConfiguration")
+                    NavigationLink(value: BottleStage.processes) {
+                        HStack {
+                            Label("tab.processes", systemImage: "hockey.puck.circle")
+                            let count = ProcessRegistry.shared.getProcessCount(for: bottle)
+                            if count > 0 {
+                                Text("\(count)")
+                                    .font(.caption2)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(.blue.opacity(0.15))
+                                    .clipShape(Capsule())
+                                    .foregroundStyle(.blue)
+                            }
+                        }
+                    }
+                    .accessibilityIdentifier("nav.runningProcesses")
+                    NavigationLink(value: BottleStage.gameConfigs) {
+                        Label("tab.gameConfigs", systemImage: "gamecontroller")
+                    }
+                    .accessibilityIdentifier("nav.gameConfigurations")
+                }
+                .formStyle(.grouped)
+                .scrollDisabled(true)
+            }
+            .bottomBar {
+                BottleActionBar(
+                    bottle: bottle,
+                    showWinetricksSheet: $showWinetricksSheet,
+                    programLoading: $programLoading,
+                    toast: $toast,
+                    onLaunch: updateStartMenu
+                )
+            }
+            .task {
+                await updateStartMenu()
+            }
+            .disabled(!bottle.isAvailable)
+            .navigationTitle(bottle.settings.name)
+            .navigationSubtitle(
+                bottle.settings.graphicsBackend == .recommended
+                    ? String(
+                        localized: "bottle.subtitle.autoBackend \(GraphicsBackendResolver.resolve().displayName)"
+                    )
+                    : ""
+            )
+            .accessibilityIdentifier("bottleDetail")
+            .toast($toast)
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button("button.duplicateBottle", systemImage: "doc.on.doc") {
+                        showDuplicate = true
+                    }
+                    .disabled(bottle.inFlight)
+                }
+            }
+            .sheet(isPresented: $showWinetricksSheet) {
+                WinetricksView(bottle: bottle)
+            }
+            .sheet(isPresented: $showDuplicate) {
+                RenameView(
+                    "duplicate.bottle.title",
+                    name: BottleOperations.nextDuplicateName(
+                        baseName: bottle.settings.name,
+                        existingNames: BottleVM.shared.bottles.map(\.settings.name)
+                    ),
+                    confirmTitle: "duplicate.bottle.confirm"
+                ) { newName in
+                    Task {
+                        do {
+                            _ = try await bottle.duplicate(newName: newName)
+                            await MainActor.run {
+                                withAnimation {
+                                    toast = ToastData(
+                                        message: String(
+                                            format: String(localized: "status.duplicateSuccess %@"),
+                                            newName
+                                        ),
+                                        style: .success
+                                    )
+                                }
+                            }
+                        } catch {
+                            await MainActor.run {
+                                withAnimation {
+                                    toast = ToastData(
+                                        message: String(
+                                            format: String(localized: "status.duplicateFailed %@"),
+                                            error.localizedDescription
+                                        ),
+                                        style: .error
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            .onChange(of: bottle.settings) { oldValue, newValue in
+                guard oldValue != newValue else { return }
+                // Trigger a reload
+                BottleVM.shared.bottles = BottleVM.shared.bottles
+            }
+            .navigationDestination(for: BottleStage.self) { stage in
+                switch stage {
+                case .config:
+                    ConfigView(bottle: bottle)
+                case .programs:
+                    ProgramsView(
+                        bottle: bottle, path: $path
+                    )
+                case .processes:
+                    RunningProcessesView(bottle: bottle)
+                case .gameConfigs:
+                    GameConfigurationView(bottle: bottle)
+                }
+            }
+            .navigationDestination(for: Program.self) { program in
+                ProgramView(program: program)
+            }
+        }
+    }
+}
+
+extension BottleView {
+    private func updateStartMenu() async {
+        await bottle.updateInstalledPrograms()
+
+        let startMenuPrograms = bottle.getStartMenuPrograms()
+        for startMenuProgram in startMenuPrograms {
+            for program in bottle.programs where
+                // For some godforsaken reason "foo/bar" != "foo/Bar" so...
+                program.url.path().caseInsensitiveCompare(startMenuProgram.url.path()) == .orderedSame {
+                // Skip programs that are already pinned, but keep processing the
+                // rest. Using `return` here would stop pinning every remaining
+                // start-menu program after the first already-pinned one.
+                guard !bottle.settings.pins.contains(where: { $0.url == program.url }) else { continue }
+                // Setting `pinned` appends the pin to the bottle's settings.
+                program.pinned = true
+            }
+        }
+    }
+}

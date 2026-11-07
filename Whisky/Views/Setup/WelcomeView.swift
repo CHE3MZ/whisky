@@ -1,0 +1,200 @@
+//
+//  WelcomeView.swift
+//  Whisky
+//
+//  This file is part of Whisky.
+//
+//  Whisky is free software: you can redistribute it and/or modify it under the terms
+//  of the GNU General Public License as published by the Free Software Foundation,
+//  either version 3 of the License, or (at your option) any later version.
+//
+//  Whisky is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+//  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+//  See the GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License along with Whisky.
+//  If not, see https://www.gnu.org/licenses/.
+//
+
+import SwiftUI
+import WhiskyKit
+
+struct WelcomeView: View {
+    @State var rosettaInstalled: Bool?
+    @State var whiskyWineInstalled: Bool?
+    @State var shouldCheckInstallStatus: Bool = false
+    @AppStorage(Telemetry.consentDefaultsKey) private var telemetryConsentRaw: String = Telemetry.ConsentState
+        .undecided.rawValue
+    @Binding var path: [SetupStage]
+    @Binding var showSetup: Bool
+    var firstTime: Bool
+
+    /// Opt-in checkbox state; writing records the explicit choice.
+    private var telemetryOptIn: Binding<Bool> {
+        Binding(
+            get: { telemetryConsentRaw == Telemetry.ConsentState.granted.rawValue },
+            set: { Telemetry.setConsent(granted: $0) }
+        )
+    }
+
+    var body: some View {
+        VStack {
+            VStack {
+                if firstTime {
+                    Text("setup.welcome")
+                        .font(.title)
+                        .fontWeight(.bold)
+                    Text("setup.welcome.subtitle")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                } else {
+                    Text("setup.title")
+                        .font(.title)
+                        .fontWeight(.bold)
+                    Text("setup.subtitle")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            .padding(.horizontal)
+            Spacer()
+            Form {
+                InstallStatusView(
+                    isInstalled: $rosettaInstalled,
+                    shouldCheckInstallStatus: $shouldCheckInstallStatus,
+                    name: "Rosetta"
+                )
+                InstallStatusView(
+                    isInstalled: $whiskyWineInstalled,
+                    shouldCheckInstallStatus: $shouldCheckInstallStatus,
+                    showUninstall: true,
+                    name: "WhiskyWine"
+                )
+            }
+            .formStyle(.grouped)
+            .scrollDisabled(true)
+            .onAppear {
+                checkInstallStatus()
+            }
+            .onChange(of: shouldCheckInstallStatus) {
+                checkInstallStatus()
+            }
+            Spacer()
+            // Shown unconditionally on the welcome screen, which is reached on a
+            // genuine first run: SetupView only skips this screen once telemetry
+            // consent is decided, so a first-run user always sees this opt-in.
+            Toggle(isOn: telemetryOptIn) {
+                Text("setup.telemetry.consent")
+                    .font(.caption)
+            }
+            .toggleStyle(.checkbox)
+            .help("setup.telemetry.consent.help")
+            .padding(.bottom, 4)
+            HStack {
+                if let rosettaInstalled,
+                   let whiskyWineInstalled {
+                    if !rosettaInstalled || !whiskyWineInstalled {
+                        Button("setup.quit") {
+                            exit(0)
+                        }
+                        .keyboardShortcut(.cancelAction)
+                    }
+                    Spacer()
+                    Button(rosettaInstalled && whiskyWineInstalled ? "setup.done" : "setup.next") {
+                        if !rosettaInstalled {
+                            path.append(.rosetta)
+                            return
+                        }
+
+                        if !whiskyWineInstalled {
+                            path.append(.whiskyWineDownload)
+                            return
+                        }
+
+                        showSetup = false
+                    }
+                    .keyboardShortcut(.defaultAction)
+                }
+            }
+        }
+        .frame(width: 400, height: 230)
+    }
+
+    func checkInstallStatus() {
+        rosettaInstalled = Rosetta2.isRosettaInstalled
+        whiskyWineInstalled = WhiskyWineInstaller.isWhiskyWineInstalled()
+    }
+}
+
+struct InstallStatusView: View {
+    @Binding var isInstalled: Bool?
+    @Binding var shouldCheckInstallStatus: Bool
+    @State var showUninstall: Bool = false
+    @State var name: String
+    @State var text: String = .init(localized: "setup.install.checking")
+
+    var body: some View {
+        HStack {
+            Group {
+                if let installed = isInstalled {
+                    Circle()
+                        .foregroundColor(installed ? .green : .red)
+                } else {
+                    ProgressView()
+                        .controlSize(.small)
+                }
+            }
+            .frame(width: 10)
+            Text(String(format: text, name))
+            Spacer()
+            if let installed = isInstalled {
+                if installed, showUninstall {
+                    Button("setup.uninstall") {
+                        uninstall()
+                    }
+                }
+            }
+        }
+        .onChange(of: isInstalled) {
+            if let installed = isInstalled {
+                if installed {
+                    text = String(localized: "setup.install.installed")
+                } else {
+                    text = String(localized: "setup.install.notInstalled")
+                }
+            } else {
+                text = String(localized: "setup.install.checking")
+            }
+        }
+    }
+
+    func uninstall() {
+        if name == "WhiskyWine" {
+            uninstallWhiskyWineWithOptionalBottles()
+        }
+
+        shouldCheckInstallStatus.toggle()
+    }
+
+    /// Asks the user whether to also delete bottles + tracking metadata, then
+    /// performs the requested level of cleanup. Whisky-Wine-only is the
+    /// default; "Remove everything" is a destructive escape hatch.
+    private func uninstallWhiskyWineWithOptionalBottles() {
+        let alert = NSAlert()
+        alert.alertStyle = .warning
+        alert.messageText = String(localized: "setup.uninstall.confirm.title")
+        alert.informativeText = String(localized: "setup.uninstall.confirm.body")
+        alert.addButton(withTitle: String(localized: "setup.uninstall.confirm.runtimeOnly"))
+        alert.addButton(withTitle: String(localized: "setup.uninstall.confirm.everything"))
+        alert.addButton(withTitle: String(localized: "setup.uninstall.confirm.cancel"))
+
+        switch alert.runModal() {
+        case .alertFirstButtonReturn:
+            WhiskyWineInstaller.uninstall()
+        case .alertSecondButtonReturn:
+            WhiskyWineInstaller.uninstallAll()
+        default:
+            break
+        }
+    }
+}

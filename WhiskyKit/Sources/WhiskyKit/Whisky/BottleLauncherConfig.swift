@@ -1,0 +1,135 @@
+//
+//  BottleLauncherConfig.swift
+//  WhiskyKit
+//
+//  This file is part of Whisky.
+//
+//  Whisky is free software: you can redistribute it and/or modify it under the terms
+//  of the GNU General Public License as published by the Free Software Foundation,
+//  either version 3 of the License, or (at your option) any later version.
+//
+//  Whisky is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+//  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+//  See the GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License along with Whisky.
+//  If not, see https://www.gnu.org/licenses/.
+//
+
+import Foundation
+
+/// Configuration settings for game launcher compatibility.
+///
+/// This configuration section addresses frankea/Whisky#41 (tracking issue) and
+/// ~100 related upstream issues with Steam, Rockstar, EA App, Epic, and other platforms.
+///
+/// ## Overview
+///
+/// Game launchers have specific requirements for locale settings, GPU detection,
+/// and network configuration. This system provides both automatic detection and
+/// manual override capabilities.
+///
+/// ## Dual-Mode System
+///
+/// 1. **Auto-Detection Mode** (`launcherMode == .auto`):
+///    - Automatically detects launcher type when programs run
+///    - Applies optimized settings based on executable name/path
+///
+/// 2. **Manual Override Mode** (`launcherMode == .manual`):
+///    - User explicitly selects launcher type
+///    - Forces specific configuration regardless of program
+///
+/// ## Example
+///
+/// ```swift
+/// var config = BottleLauncherConfig()
+/// config.compatibilityMode = true
+/// config.launcherMode = .manual
+/// config.detectedLauncher = .steam
+/// ```
+public struct BottleLauncherConfig: Codable, Equatable {
+    /// Whether launcher compatibility mode is enabled.
+    ///
+    /// When enabled, the system applies launcher-specific optimizations
+    /// based on either auto-detection or manual selection.
+    var compatibilityMode: Bool = false
+
+    /// The launcher detection mode (auto or manual).
+    var launcherMode: LauncherMode = .auto
+
+    /// Manually selected launcher type (used when `launcherMode` is `.manual`).
+    var detectedLauncher: LauncherType?
+
+    /// Locale override for launcher compatibility.
+    ///
+    /// Most launchers (Steam, EA App, Epic) work best with `en_US.UTF-8`
+    /// to avoid steamwebhelper crashes and date/time parsing issues.
+    var launcherLocale: Locales = .auto
+
+    /// Whether to enable GPU spoofing for launcher compatibility checks.
+    ///
+    /// Helps launchers pass "GPU not supported" checks by reporting
+    /// high-end NVIDIA GPU capabilities.
+    var gpuSpoofing: Bool = true
+
+    /// GPU vendor to spoof when `gpuSpoofing` is enabled.
+    var gpuVendor: GPUVendor = .nvidia
+
+    /// Network timeout in milliseconds for launcher downloads.
+    ///
+    /// Addresses Steam download stalls at 99% and connection timeouts.
+    /// Default: 60000ms (60 seconds)
+    var networkTimeout: Int = 60_000
+
+    /// Whether to automatically apply DXVK when launcher requires it.
+    ///
+    /// Some launchers (Rockstar) will not render UI without DXVK.
+    var autoEnableDXVK: Bool = true
+
+    /// The last ``LauncherBackendMigration`` this bottle has been through.
+    ///
+    /// A bottle created by this version starts at the current one, since the
+    /// profile it migrates from was never applied to it. A file without the
+    /// key predates the migration and decodes as `0`.
+    var backendMigration: Int = LauncherBackendMigration.current
+
+    /// Whether the graphics settings should say the migration put the bottle
+    /// back on Recommended, until the user dismisses it or picks a backend.
+    var backendResetNotice: Bool = false
+
+    /// Whether the bottle is on DXVK because a launcher profile switched it
+    /// there from Recommended, rather than because the user picked it.
+    ///
+    /// Set where the Steam profile has to switch the whole bottle, which is on
+    /// a runtime without the D3DMetal payload. Once the payload is installed,
+    /// ``LauncherBackendMigration`` puts such a bottle back on Recommended and
+    /// Steam keeps DXVK per executable. Any other change of backend clears it.
+    var backendSwitchedByLauncher: Bool = false
+
+    public init() {}
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.compatibilityMode = try container.decodeIfPresent(Bool.self, forKey: .compatibilityMode) ?? false
+        self.launcherMode = container.decodeLenientIfPresent(LauncherMode.self, forKey: .launcherMode) ?? .auto
+        self.detectedLauncher = container.decodeLenientIfPresent(LauncherType.self, forKey: .detectedLauncher)
+        self.launcherLocale = container.decodeLenientIfPresent(Locales.self, forKey: .launcherLocale) ?? .auto
+        self.gpuSpoofing = try container.decodeIfPresent(Bool.self, forKey: .gpuSpoofing) ?? true
+        self.gpuVendor = container.decodeLenientIfPresent(GPUVendor.self, forKey: .gpuVendor) ?? .nvidia
+        self.networkTimeout = try container.decodeIfPresent(Int.self, forKey: .networkTimeout) ?? 60_000
+        self.autoEnableDXVK = try container.decodeIfPresent(Bool.self, forKey: .autoEnableDXVK) ?? true
+        self.backendMigration = try container.decodeIfPresent(Int.self, forKey: .backendMigration) ?? 0
+        self.backendResetNotice = try container.decodeIfPresent(Bool.self, forKey: .backendResetNotice) ?? false
+        self.backendSwitchedByLauncher = try container.decodeIfPresent(
+            Bool.self, forKey: .backendSwitchedByLauncher
+        ) ?? false
+    }
+}
+
+/// Launcher detection mode for dual-mode configuration system.
+public enum LauncherMode: String, Codable, CaseIterable, Sendable {
+    /// Automatically detect launcher type from executable path/name
+    case auto
+    /// Use manually specified launcher type
+    case manual
+}

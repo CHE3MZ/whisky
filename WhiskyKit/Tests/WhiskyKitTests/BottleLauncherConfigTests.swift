@@ -1,0 +1,185 @@
+//
+//  BottleLauncherConfigTests.swift
+//  WhiskyKitTests
+//
+//  This file is part of Whisky.
+//
+//  Whisky is free software: you can redistribute it and/or modify it under the terms
+//  of the GNU General Public License as published by the Free Software Foundation,
+//  either version 3 of the License, or (at your option) any later version.
+//
+//  Whisky is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+//  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+//  See the GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License along with Whisky.
+//  If not, see https://www.gnu.org/licenses/.
+//
+
+@testable import WhiskyKit
+import XCTest
+
+final class BottleLauncherConfigTests: XCTestCase {
+    func testDefaultLauncherConfig() {
+        let config = BottleLauncherConfig()
+
+        XCTAssertFalse(config.compatibilityMode)
+        XCTAssertEqual(config.launcherMode, .auto)
+        XCTAssertNil(config.detectedLauncher)
+        XCTAssertEqual(config.launcherLocale, .auto)
+        XCTAssertTrue(config.gpuSpoofing)
+        XCTAssertEqual(config.gpuVendor, .nvidia)
+        XCTAssertEqual(config.networkTimeout, 60_000)
+        XCTAssertTrue(config.autoEnableDXVK)
+    }
+
+    func testLauncherConfigCodable() throws {
+        var config = BottleLauncherConfig()
+        config.compatibilityMode = true
+        config.launcherMode = .manual
+        config.detectedLauncher = .steam
+        config.launcherLocale = .english
+        config.gpuVendor = .amd
+        config.networkTimeout = 90_000
+
+        // Encode
+        let encoder = PropertyListEncoder()
+        let data = try encoder.encode(config)
+
+        // Decode
+        let decoder = PropertyListDecoder()
+        let decoded = try decoder.decode(BottleLauncherConfig.self, from: data)
+
+        XCTAssertEqual(decoded.compatibilityMode, true)
+        XCTAssertEqual(decoded.launcherMode, .manual)
+        XCTAssertEqual(decoded.detectedLauncher, .steam)
+        XCTAssertEqual(decoded.launcherLocale, .english)
+        XCTAssertEqual(decoded.gpuVendor, .amd)
+        XCTAssertEqual(decoded.networkTimeout, 90_000)
+    }
+
+    func testLauncherModeEnum() {
+        XCTAssertEqual(LauncherMode.auto.rawValue, "auto")
+        XCTAssertEqual(LauncherMode.manual.rawValue, "manual")
+
+        // Test all cases present
+        let allCases = LauncherMode.allCases
+        XCTAssertEqual(allCases.count, 2)
+        XCTAssertTrue(allCases.contains(.auto))
+        XCTAssertTrue(allCases.contains(.manual))
+    }
+
+    func testBottleSettingsIncludesLauncherConfig() {
+        let settings = BottleSettings()
+
+        // Test default values are accessible
+        XCTAssertFalse(settings.launcherCompatibilityMode)
+        XCTAssertEqual(settings.launcherMode, .auto)
+        XCTAssertNil(settings.detectedLauncher)
+        XCTAssertTrue(settings.gpuSpoofing)
+        XCTAssertEqual(settings.gpuVendor, .nvidia)
+    }
+
+    func testBottleSettingsLauncherConfigModification() {
+        var settings = BottleSettings()
+
+        // Modify launcher settings
+        settings.launcherCompatibilityMode = true
+        settings.launcherMode = .manual
+        settings.detectedLauncher = .rockstar
+        settings.launcherLocale = .english
+        settings.gpuSpoofing = false
+        settings.networkTimeout = 120_000
+
+        // Verify changes
+        XCTAssertTrue(settings.launcherCompatibilityMode)
+        XCTAssertEqual(settings.launcherMode, .manual)
+        XCTAssertEqual(settings.detectedLauncher, .rockstar)
+        XCTAssertEqual(settings.launcherLocale, .english)
+        XCTAssertFalse(settings.gpuSpoofing)
+        XCTAssertEqual(settings.networkTimeout, 120_000)
+    }
+
+    func testEnvironmentVariablesWithLauncherCompatibility() {
+        var settings = BottleSettings()
+        settings.launcherCompatibilityMode = true
+        settings.detectedLauncher = .steam
+        settings.launcherLocale = .english
+        settings.gpuSpoofing = true
+
+        var env: [String: String] = [:]
+        settings.environmentVariables(wineEnv: &env)
+
+        // Should include Steam-specific fixes
+        XCTAssertEqual(env["STEAM_DISABLE_CEF_SANDBOX"], "1")
+
+        // Should include locale override (with .UTF-8 suffix, critical for steamwebhelper)
+        XCTAssertEqual(env["LC_ALL"], "en_US.UTF-8")
+        XCTAssertEqual(env["LC_TIME"], "C")
+
+        // Should include GPU spoofing
+        XCTAssertNotNil(env["MESA_GL_VERSION_OVERRIDE"])
+        XCTAssertNotNil(env["MESA_GLSL_VERSION_OVERRIDE"])
+    }
+
+    func testEnvironmentVariablesWithoutLauncherCompatibility() {
+        var settings = BottleSettings()
+        settings.launcherCompatibilityMode = false
+
+        var env: [String: String] = [:]
+        settings.environmentVariables(wineEnv: &env)
+
+        // Should not include launcher-specific fixes
+        XCTAssertNil(env["STEAM_DISABLE_CEF_SANDBOX"])
+        // GPU spoofing should not be applied if launcher compat is off
+    }
+
+    func testNetworkTimeoutConfiguration() {
+        var settings = BottleSettings()
+        settings.launcherCompatibilityMode = true
+        settings.networkTimeout = 45_000
+
+        var env: [String: String] = [:]
+        settings.environmentVariables(wineEnv: &env)
+
+        // Should include custom network timeout
+        XCTAssertEqual(env["WINHTTP_CONNECT_TIMEOUT"], "45000")
+        XCTAssertEqual(env["WINHTTP_RECEIVE_TIMEOUT"], "90000") // 2x connect timeout
+    }
+
+    func testAutoEnableDXVKForRockstar() {
+        var settings = BottleSettings()
+        settings.launcherCompatibilityMode = true
+        settings.detectedLauncher = .rockstar
+        settings.autoEnableDXVK = true
+        settings.dxvk = false // Explicitly disabled
+
+        var env: [String: String] = [:]
+        settings.environmentVariables(wineEnv: &env)
+
+        // Should still enable DXVK overrides because Rockstar requires it
+        // DLL overrides are now composed per-DLL via DLLOverrideResolver (sorted alphabetically).
+        // No runtime under test means no GPTK payload, so d3d12 is left alone.
+        XCTAssertEqual(env["WINEDLLOVERRIDES"], "d3d10core=n,b;d3d11=n,b;d3d9=n,b;dxgi=n,b")
+
+        // With the payload deployed the launcher's DXVK preset turns d3d12 off, as the bottle's does.
+        var builder = EnvironmentBuilder()
+        let launcherOverrides = settings.populateLauncherManagedLayer(builder: &builder, builtinD3D12IsD3DMetal: true)
+        XCTAssertEqual(launcherOverrides.first { $0.entry.dllName == "d3d12" }?.entry.mode, .disabled)
+    }
+
+    func testNoInventedNetworkVariables() {
+        var settings = BottleSettings()
+        settings.launcherCompatibilityMode = true
+
+        var env: [String: String] = [:]
+        settings.environmentVariables(wineEnv: &env)
+
+        // These exist in no Wine or WineCX source, so setting them was
+        // decoration; launcher compatibility must not bring them back.
+        XCTAssertNil(env["WINE_ENABLE_SSL"])
+        XCTAssertNil(env["WINE_SSL_VERSION_MIN"])
+        XCTAssertNil(env["WINE_MAX_CONNECTIONS_PER_SERVER"])
+        XCTAssertNil(env["WINE_FORCE_HTTP11"])
+    }
+}
