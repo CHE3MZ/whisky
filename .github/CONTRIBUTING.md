@@ -16,16 +16,15 @@ Every Whisky commit is automatically linted using SwiftLint. You can run these c
 
 We use [SwiftFormat](https://github.com/nicklockwood/SwiftFormat) to maintain consistent code formatting. This is enforced in CI alongside SwiftLint.
 
-**Required Version: 0.58.7**
-
-Using a different version may produce different formatting results. CI uses this exact version.
 
 #### Installation
 
 **Option 1: Homebrew (latest version)**
 ```bash
 brew install swiftformat
-swiftformat --version  # Verify version matches 0.58.7
+brew install swiftlint
+swiftformat --version
+swiftlint --version
 ```
 
 **Option 2: Download specific version (recommended)**
@@ -35,13 +34,11 @@ unzip swiftformat.zip
 sudo mv swiftformat /usr/local/bin/
 ```
 
-**Option 3: Nix**
+**Option 3: Brewfile**
 
-If you use Nix, the repository flake provides a dev shell with SwiftFormat
-pinned to exactly the version above (plus SwiftLint):
+You can use the brewfile in the project to install the tools.
 ```bash
-nix develop
-swiftformat --version  # 0.58.7
+brew bundle
 ```
 
 #### Usage
