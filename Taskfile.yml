@@ -1,0 +1,21 @@
+version: '3'
+
+env:
+  RUST_LOG: off
+
+tasks:
+  default:
+    desc: Default Task
+    silent: true
+    cmds:
+      - task --list
+  cliff:
+    desc: Run git cliff
+    silent: true
+    cmds:
+      - git-cliff --unreleased --strip all
+  changelog:
+    desc: Generate changelog
+    silent: true
+    cmds:
+      - git-cliff --strip all -o docs/CHANGELOG.md

@@ -141,7 +141,7 @@ one file, [`Whisky/Utils/Telemetry.swift`](Whisky/Utils/Telemetry.swift), with
 every automatic-capture feature of the analytics SDK disabled and no person
 profile ever created (`identify()` is never called). Each event also carries the
 SDK's standard context — app and macOS version, hardware model, locale, and more;
-see [SECURITY.md](SECURITY.md) for the full list. Like any HTTPS request,
+see [SECURITY.md](.github/SECURITY.md) for the full list. Like any HTTPS request,
 PostHog's ingestion sees the connecting IP (GeoIP enrichment is disabled); none
 of this is tied to your identity.
 

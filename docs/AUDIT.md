@@ -20,7 +20,6 @@ means different things in different buckets.
 
 | Status | What it really means |
 |---|---|
-| `addressed-direct` | The issue number is cited in CHANGELOG, code, docs, or a commit message. **High confidence.** |
 | `addressed-categorical` | The issue's symptom class maps to a shipped v1.0 requirement category. **Infrastructure exists** (e.g. the troubleshooting wizard, dependency installer, crash classifier) — but for any specific user, that infrastructure still has to surface the right remediation in their specific case. Not equivalent to "verified fixed for this issue." |
 | `wont-fix-out-of-scope` | Wine internals, anti-cheat, kernel, mobile, niche corporate apps. Not addressable from the app side. |
 | `unverified` | Body too incoherent to triage, or genuinely needs reproduction. **Honest bucket.** |
@@ -91,15 +90,10 @@ Outputs land under `.planning/audit/` (gitignored — local working notes):
 
 Going forward, the workflow is:
 
-1. **Cite issues in commits and CHANGELOG.** Use the form
-   `Closes whisky-app/whisky#NNN` or
-   `(Closes whisky-app/whisky#NNN, whisky-app/whisky#MMM)`. The audit's
-   citation grep covers `git log --all` and the source tree, so the
-   issue moves from `unverified` to `addressed-direct` automatically.
-2. **Add a GameDB entry** when fixing a per-game crash with a config
+1. **Add a GameDB entry** when fixing a per-game crash with a config
    recipe. Set `referenceURL` to the upstream issue URL and the audit
    picks it up as a direct citation.
-3. **Use `overrides.json`** for issues fixed by inherited Wine/MoltenVK
+2. **Use `overrides.json`** for issues fixed by inherited Wine/MoltenVK
    uplifts where there's no organic citation.
 
 ## Limitations

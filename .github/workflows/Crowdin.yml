@@ -36,7 +36,7 @@ jobs:
             echo "configured=true" >> "$GITHUB_OUTPUT"
           else
             echo "configured=false" >> "$GITHUB_OUTPUT"
-            echo "::notice::CROWDIN_PROJECT_ID secret is not set — skipping sync. See CONTRIBUTING.md for setup."
+            echo "::notice::CROWDIN_PROJECT_ID secret is not set — skipping sync. See .github/CONTRIBUTING.md for setup."
           fi
 
       - name: Checkout

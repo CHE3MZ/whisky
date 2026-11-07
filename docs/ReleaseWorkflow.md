@@ -121,11 +121,7 @@ Update both fields in `Whisky.xcodeproj/project.pbxproj` (every occurrence):
 - `MARKETING_VERSION = X.Y.Z;` — user-visible version.
 - `CURRENT_PROJECT_VERSION = N;` — Sparkle build number, must increment monotonically.
 
-### 2. Update the changelog
-
-Move items from `[Unreleased]` to a new `[X.Y.Z] - YYYY-MM-DD (App)` section in `CHANGELOG.md`.
-
-### 3. Build, sign, notarize, package
+### 2. Build, sign, notarize, package
 
 ```sh
 scripts/release.sh X.Y.Z
@@ -175,7 +171,7 @@ Edit `dist/pages/appcast.xml` and add a new `<item>` near the top of `<channel>`
 ### 6. Commit, tag, and release
 
 ```sh
-git add Whisky.xcodeproj/project.pbxproj CHANGELOG.md dist/pages/appcast.xml
+git add Whisky.xcodeproj/project.pbxproj dist/pages/appcast.xml
 git commit -m "release: X.Y.Z"
 git push
 git tag -a app-vX.Y.Z -m "Whisky X.Y.Z"

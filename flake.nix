@@ -14,7 +14,7 @@
       ];
       forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f nixpkgs.legacyPackages.${system});
 
-      # CONTRIBUTING.md requires this exact version; CI lints with it too.
+      # .github/CONTRIBUTING.md requires this exact version; CI lints with it too.
       swiftformatVersion = "0.58.7";
       # Current SwiftLint release. CI's action bundles its own build, so lint
       # results are close but not guaranteed identical; the SwiftFormat pin is

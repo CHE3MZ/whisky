@@ -81,30 +81,9 @@ through the Crowdin project rather than opening a PR here.
 
 ## Changelog
 
-We maintain a [CHANGELOG.md](CHANGELOG.md) following the [Keep a Changelog](https://keepachangelog.com/) format. When making user-facing changes, please update the changelog under the `[Unreleased]` section.
-
-### Citing upstream issues
-
-When a change closes or addresses an issue from the archived upstream
-repository [whisky-app/whisky](https://github.com/whisky-app/whisky),
-cite it in the CHANGELOG entry **and** the commit message using the
-fully-qualified form:
-
-```
-(Closes whisky-app/whisky#1234, whisky-app/whisky#1235)
-```
-
-The per-issue audit (`scripts/audit_upstream.py`, see
-[docs/AUDIT.md](docs/AUDIT.md)) greps the source tree and `git log` for
-this exact pattern. Bare `#1234` doesn't count — the audit needs the
-`whisky-app/whisky` prefix on each number to disambiguate from this
-fork's own issue numbers.
-
-For per-game compatibility fixes that are config-only, add or update the
-matching entry in
-`WhiskyKit/Sources/WhiskyKit/GameDatabase/Resources/GameDB.json` and
-include the upstream issue URL in the entry's `provenance.referenceURL`
-field — the audit picks up that URL form too.
+We maintain a [CHANGELOG](docs/CHANGELOG.md) following the [Conventional 
+Commits](https://www.conventionalcommits.org/) format. In order to update the 
+[CHANGELOG](docs/CHANGELOG.md), run `task changelog` and commit the file.
 
 ## Secret scanning
 
@@ -203,6 +182,5 @@ Once your pull request passes CI checks (SwiftLint, SwiftFormat, and builds), it
 - [ ] SwiftFormat clean (`swiftformat --lint .`)
 - [ ] SwiftLint clean (build shows no violations)
 - [ ] Documentation updated (if adding features)
-- [ ] Changelog updated (if user-facing changes)
 
 Thank you for contributing to Whisky!

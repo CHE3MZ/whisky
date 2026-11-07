@@ -232,7 +232,7 @@ def collect_citations() -> dict[int, list[dict]]:
     """Return {issue_number: [{type, path, line, excerpt}, ...]}."""
     citations: dict[int, list[dict]] = defaultdict(list)
     grep_paths = [
-        "CHANGELOG.md", "README.md", "docs", ".planning",
+        "README.md", "docs", ".planning",
         "Whisky", "WhiskyKit", "WhiskyCmd", "scripts",
     ]
     existing = [p for p in grep_paths if (REPO_ROOT / p).exists()]
@@ -714,10 +714,6 @@ def render_report(
     lines.append("")
     lines.append(f"Categories with all v1.0 requirements shipped: {', '.join(fully_shipped) or '—'}")
     lines.append("")
-    cited_in_changelog = sum(
-        1 for c in classifications
-        if any(ev.get("path", "").startswith("CHANGELOG") for ev in c.evidence)
-    )
     git_log_hits = sum(
         1 for c in classifications
         if any(ev.get("type") == "git-log" for ev in c.evidence)
@@ -725,7 +721,6 @@ def render_report(
     overridden = sum(1 for c in classifications if c.overridden)
     llm_touched = sum(1 for c in classifications if c.llm_used)
     lines.append(
-        f"Citation breakdown: **{cited_in_changelog}** in CHANGELOG, "
         f"**{git_log_hits}** in git log, "
         f"**{overridden}** manual overrides, "
         f"**{llm_touched}** LLM-classified."

@@ -60,7 +60,7 @@ every install through a normal app update, with no runtime re-download.
 - **D3DMetal (GPTK):** Apple ships it as a Game Porting Toolkit download with no GitHub release feed, so
   it is **tracked manually** — check Apple's GPTK page when a new GPTK lands.
 - **Security:** a critical Wine/DXVK CVE should trigger an out-of-band runtime rebuild + app release.
-  See `SECURITY.md`.
+  See [`SECURITY.md`](../docs/SECURITY.md).
 - **winetricks:** releases roughly monthly; tracked manually (no feed in `RuntimeTrack.yml`). Bump when a
   needed verb's download URL breaks or a new component is required — it rides an app release, not a runtime one.
 
