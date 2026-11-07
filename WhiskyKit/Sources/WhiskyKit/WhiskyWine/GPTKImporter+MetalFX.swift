@@ -48,7 +48,7 @@ import os.log
 ///
 /// Fixing that means a real `nvapi64` for the game but not for the launcher
 /// helper, so a per-exe `AppDefaults` override rather than the environment every
-/// child inherits. Left to a follow-up, which is why frankea/Whisky#198 stays
+/// child inherits. Left to a follow-up, which is why CHE3MZ/whisky#198 stays
 /// open.
 extension GPTKImporter {
     /// Apple's bridge under the name the payload ships it as.

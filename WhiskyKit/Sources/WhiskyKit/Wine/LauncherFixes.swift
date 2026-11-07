@@ -26,7 +26,7 @@ import os.log
 /// Detection itself lives in ``LauncherType/detect(from:)``; this type owns the
 /// per-launcher settings profile and the rules for when it may be applied
 /// automatically, addressing compatibility issues documented in
-/// frankea/Whisky#41.
+/// CHE3MZ/whisky#41.
 ///
 /// There are two entry points with deliberately different gating:
 ///

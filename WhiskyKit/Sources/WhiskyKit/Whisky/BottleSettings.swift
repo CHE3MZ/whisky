@@ -544,7 +544,7 @@ public struct BottleSettings: Codable, Equatable {
     /// Whether launcher compatibility mode is enabled.
     ///
     /// When enabled, applies launcher-specific optimizations for Steam,
-    /// Rockstar, EA App, Epic Games, and other platforms (frankea/Whisky#41).
+    /// Rockstar, EA App, Epic Games, and other platforms (CHE3MZ/whisky#41).
     public var launcherCompatibilityMode: Bool {
         get { launcherConfig.compatibilityMode }
         set { launcherConfig.compatibilityMode = newValue }
@@ -641,7 +641,7 @@ public struct BottleSettings: Codable, Equatable {
     /// Whether controller compatibility mode is enabled.
     ///
     /// When enabled, applies workarounds for common controller detection
-    /// and mapping issues on macOS (frankea/Whisky#42).
+    /// and mapping issues on macOS (CHE3MZ/whisky#42).
     public var controllerCompatibilityMode: Bool {
         get { inputConfig.controllerCompatibilityMode }
         set { inputConfig.controllerCompatibilityMode = newValue }
@@ -1008,7 +1008,7 @@ public struct BottleSettings: Codable, Equatable {
 
     /// Populates the ``EnvironmentLayer/launcherManaged`` layer with launcher compatibility fixes.
     ///
-    /// This method implements the dual-mode launcher compatibility system from frankea/Whisky#41:
+    /// This method implements the dual-mode launcher compatibility system from CHE3MZ/whisky#41:
     /// - Merges launcher-specific environment overrides
     /// - Applies locale fixes for steamwebhelper crashes
     /// - Configures GPU spoofing for launcher checks

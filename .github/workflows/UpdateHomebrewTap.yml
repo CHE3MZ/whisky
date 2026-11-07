@@ -1,7 +1,7 @@
 name: Update Homebrew Tap
 
 # When an app release (vX.Y.Z) is published, bump the frankea/homebrew-whisky
-# cask to the new version + DMG sha256 so `brew install --cask frankea/whisky/whisky`
+# cask to the new version + DMG sha256 so `brew install --cask CHE3MZ/whisky/whisky`
 # always tracks the latest release without a manual edit.
 #
 # Requires a repository secret BREW_TOKEN: a personal access token (classic `repo`,
@@ -45,7 +45,7 @@ jobs:
             echo "::error::Refusing to sync: '${version}' (from tag '${TAG}') is not a dotted numeric version."
             exit 1
           fi
-          url="https://github.com/frankea/Whisky/releases/download/${TAG}/Whisky-${version}.dmg"
+          url="https://github.com/CHE3MZ/whisky/releases/download/${TAG}/Whisky-${version}.dmg"
           echo "Syncing tap to ${version} from ${url}"
 
           curl -fSL "$url" -o whisky.dmg

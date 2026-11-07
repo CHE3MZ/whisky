@@ -9,22 +9,22 @@ Most problems already have an answer:
 
 1. **Make sure you're running this fork.** The default `brew install --cask whisky` installs the
    **archived original** (last updated April 2025), *not* this fork. This fork is
-   `brew install --cask frankea/whisky/whisky`, or the DMG from
-   [Releases](https://github.com/frankea/Whisky/releases/latest). Check **Whisky → About** — bugs in
+   `brew install --cask CHE3MZ/whisky/whisky`, or the DMG from
+   [Releases](https://github.com/CHE3MZ/whisky/releases/latest). Check **Whisky → About** — bugs in
    the archived original can't be fixed here.
-2. **Search [existing issues](https://github.com/frankea/Whisky/issues?q=is%3Aissue).**
+2. **Search [existing issues](https://github.com/CHE3MZ/whisky/issues?q=is%3Aissue).**
 3. **Check the troubleshooting docs:**
    [Launcher](LauncherTroubleshooting.md) · [Steam](SteamCompatibility.md) · [Stability](StabilityTroubleshooting.md).
-4. **For a specific game**, check the [Game Support wiki](https://github.com/frankea/Whisky/wiki/Game-Support)
+4. **For a specific game**, check the [Game Support wiki](https://github.com/CHE3MZ/whisky/wiki/Game-Support)
    and use the **Game Compatibility Report** template.
 
 ## Where to go
 
 | You have… | Go to |
 |-----------|-------|
-| A reproducible app bug | [New issue → Bug Report](https://github.com/frankea/Whisky/issues/new/choose) |
-| A game that won't run right | [New issue → Game Compatibility Report](https://github.com/frankea/Whisky/issues/new/choose) |
-| An idea | [New issue → Feature Request](https://github.com/frankea/Whisky/issues/new/choose) |
+| A reproducible app bug | [New issue → Bug Report](https://github.com/CHE3MZ/whisky/issues/new/choose) |
+| A game that won't run right | [New issue → Game Compatibility Report](https://github.com/CHE3MZ/whisky/issues/new/choose) |
+| An idea | [New issue → Feature Request](https://github.com/CHE3MZ/whisky/issues/new/choose) |
 | A security report | See [`SECURITY.md`](../.github/SECURITY.md) — **do not** open a public issue |
 | A "how do I…" question | The troubleshooting docs and the Game Support wiki first |
 

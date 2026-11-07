@@ -18,7 +18,7 @@
 
 import Foundation
 
-/// Diagnostic utilities for troubleshooting critical stability issues (frankea/Whisky#40).
+/// Diagnostic utilities for troubleshooting critical stability issues (CHE3MZ/whisky#40).
 ///
 /// Goals:
 /// - Keep output bounded (safe to paste into GitHub issues).

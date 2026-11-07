@@ -17,14 +17,14 @@
 <meta property="og:url" content="https://frankea.github.io/Whisky/">
 <meta property="og:title" content="Whisky — Run Windows games and apps on macOS via Wine">
 <meta property="og:description" content="Native SwiftUI Wine wrapper for macOS with DXMT and DXVK backends. Active community fork of the archived whisky-app/whisky.">
-<meta property="og:image" content="https://raw.githubusercontent.com/frankea/Whisky/main/images/og-card.png">
+<meta property="og:image" content="https://raw.githubusercontent.com/CHE3MZ/whisky/master/images/og-card.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Whisky — Run Windows games and apps on macOS, using Wine. Apple Silicon, macOS 15+, GPL v3.">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Whisky — Run Windows games and apps on macOS via Wine">
 <meta name="twitter:description" content="Native SwiftUI Wine wrapper for macOS with DXMT and DXVK backends. Active community fork of the archived whisky-app/whisky.">
-<meta name="twitter:image" content="https://raw.githubusercontent.com/frankea/Whisky/main/images/og-card.png">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/CHE3MZ/whisky/master/images/og-card.png">
 
 <!-- JSON-LD -->
 <script type="application/ld+json">
@@ -37,8 +37,8 @@
   "applicationSubCategory": "Wine wrapper",
   "softwareVersion": "3.6.0",
   "license": "https://www.gnu.org/licenses/gpl-3.0.html",
-  "downloadUrl": "https://github.com/frankea/Whisky/releases/latest",
-  "url": "https://github.com/frankea/Whisky",
+  "downloadUrl": "https://github.com/CHE3MZ/whisky/releases/latest",
+  "url": "https://github.com/CHE3MZ/whisky",
   "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
 }
 </script>
@@ -139,20 +139,20 @@ img.screenshot {
 <p>Whisky is a native macOS app that wraps Wine with a clean SwiftUI interface. It ships the DXMT (Direct3D 11 to Metal) and DXVK (Direct3D to Vulkan) graphics translation layers, and includes built-in compatibility for Steam, Epic, EA App, Battle.net, and other launchers.</p>
 
 <div class="notice">
-<strong>Active community fork.</strong> The original <a href="https://github.com/whisky-app/whisky">whisky-app/whisky</a> was archived in April 2025. This fork, maintained by <a href="https://github.com/frankea">@frankea</a>, continues development. Not affiliated with the original project or getwhisky.app.
+<strong>Active community fork.</strong> The original <a href="https://github.com/whisky-app/whisky">whisky-app/whisky</a> was archived in April 2025. This fork, maintained by <a href="https://github.com/CHE3MZ">@CHE3MZ</a>, continues development. Not affiliated with the original project or getwhisky.app.
 </div>
 
 <p>
-  <a class="cta" href="https://github.com/frankea/Whisky/releases/latest">Download for macOS</a>
-  <a class="cta secondary" href="https://github.com/frankea/Whisky">View on GitHub</a>
+  <a class="cta" href="https://github.com/CHE3MZ/whisky/releases/latest">Download for macOS</a>
+  <a class="cta secondary" href="https://github.com/CHE3MZ/whisky">View on GitHub</a>
 </p>
 
-<img class="screenshot" src="https://raw.githubusercontent.com/frankea/Whisky/main/images/new-bottle-screenshot.png" alt="Creating a new Wine bottle in Whisky" loading="lazy" width="1200">
-<img class="screenshot" src="https://raw.githubusercontent.com/frankea/Whisky/main/images/config-screenshot.png" alt="Whisky bottle configuration — graphics backend, Wine, and performance settings" loading="lazy" width="1200">
+<img class="screenshot" src="https://raw.githubusercontent.com/CHE3MZ/whisky/master/images/new-bottle-screenshot.png" alt="Creating a new Wine bottle in Whisky" loading="lazy" width="1200">
+<img class="screenshot" src="https://raw.githubusercontent.com/CHE3MZ/whisky/master/images/config-screenshot.png" alt="Whisky bottle configuration — graphics backend, Wine, and performance settings" loading="lazy" width="1200">
 
 <h2>Install via Homebrew</h2>
-<pre><code>brew install --cask frankea/whisky/whisky</code></pre>
-<p class="muted">Note: the default <code>brew install --cask whisky</code> still installs the archived original. Use the qualified <code>frankea/whisky/whisky</code> form for this fork.</p>
+<pre><code>brew install --cask CHE3MZ/whisky/whisky</code></pre>
+<p class="muted">Note: the default <code>brew install --cask whisky</code> still installs the archived original. Use the qualified <code>CHE3MZ/whisky/whisky</code> form for this fork.</p>
 
 <h2>Requirements</h2>
 <ul>
@@ -188,20 +188,20 @@ img.screenshot {
   <li><strong>2026-06-14: Whisky 3.5.0 released.</strong> Optional menu bar extra, inline descriptions across bottle configuration, and program scanning off the main thread.</li>
   <li><strong>2026-06-13: Whisky 3.4.0 released.</strong> DXMT arrives as a selectable per-bottle graphics backend, alongside Wine Libraries 3.1.1.</li>
 </ul>
-<p class="muted">Full history in the <a href="https://github.com/frankea/Whisky/blob/main/docs/CHANGELOG.md">changelog</a>. Release announcements also ship in-app via Sparkle.</p>
+<p class="muted">Full history in the <a href="https://github.com/CHE3MZ/whisky/blob/master/docs/CHANGELOG.md">changelog</a>. Release announcements also ship in-app via Sparkle.</p>
 
 <h2>Documentation</h2>
 <ul>
   <li><a href="documentation/whiskykit/">WhiskyKit API documentation</a> — DocC-generated reference for the framework</li>
-  <li><a href="https://github.com/frankea/Whisky/blob/main/docs/AUDIT.md">Upstream issue audit</a> — per-issue accounting against the archived upstream</li>
-  <li><a href="https://github.com/frankea/Whisky/blob/main/docs/LauncherTroubleshooting.md">Launcher troubleshooting</a></li>
-  <li><a href="https://github.com/frankea/Whisky/blob/main/docs/StabilityTroubleshooting.md">Stability troubleshooting</a></li>
-  <li><a href="https://github.com/frankea/Whisky/blob/main/WhiskyKit/Sources/WhiskyKit/GameDatabase/Resources/GameDB.json">Bundled game configurations</a> — 80+ curated per-game setups, browsable in-app under Game Configurations</li>
+  <li><a href="https://github.com/CHE3MZ/whisky/blob/master/docs/AUDIT.md">Upstream issue audit</a> — per-issue accounting against the archived upstream</li>
+  <li><a href="https://github.com/CHE3MZ/whisky/blob/master/docs/LauncherTroubleshooting.md">Launcher troubleshooting</a></li>
+  <li><a href="https://github.com/CHE3MZ/whisky/blob/master/docs/StabilityTroubleshooting.md">Stability troubleshooting</a></li>
+  <li><a href="https://github.com/CHE3MZ/whisky/blob/master/WhiskyKit/Sources/WhiskyKit/GameDatabase/Resources/GameDB.json">Bundled game configurations</a> — 80+ curated per-game setups, browsable in-app under Game Configurations</li>
 </ul>
 
 <hr>
 
-<p class="muted">Whisky is GPL v3 licensed. Source code, releases, and issue tracker on <a href="https://github.com/frankea/Whisky">GitHub</a>. Whisky is possible thanks to <a href="https://github.com/Gcenx/DXVK-macOS">DXVK-macOS</a>, <a href="https://github.com/marzent/wine-msync">msync</a>, <a href="https://github.com/KhronosGroup/MoltenVK">MoltenVK</a>, <a href="https://github.com/sparkle-project/Sparkle">Sparkle</a>, <a href="https://www.codeweavers.com/crossover">CrossOver</a>, and Apple's D3DMetal.</p>
+<p class="muted">Whisky is GPL v3 licensed. Source code, releases, and issue tracker on <a href="https://github.com/CHE3MZ/whisky">GitHub</a>. Whisky is possible thanks to <a href="https://github.com/Gcenx/DXVK-macOS">DXVK-macOS</a>, <a href="https://github.com/marzent/wine-msync">msync</a>, <a href="https://github.com/KhronosGroup/MoltenVK">MoltenVK</a>, <a href="https://github.com/sparkle-project/Sparkle">Sparkle</a>, <a href="https://www.codeweavers.com/crossover">CrossOver</a>, and Apple's D3DMetal.</p>
 
 </main>
 </body>

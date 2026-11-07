@@ -17,15 +17,15 @@ there's no pointer to this fork.
 **Action — open a PR against [homebrew/homebrew-cask](https://github.com/Homebrew/homebrew-cask)** to add
 a successor pointer. Realistic asks, easiest first:
 
-> The `whisky` cask is already deprecated (unmaintained, 2025-04-09). `frankea/Whisky` is an actively
+> The `whisky` cask is already deprecated (unmaintained, 2025-04-09). `CHE3MZ/whisky` is an actively
 > maintained fork (signed + notarized DMGs, in-app Sparkle updates). Requesting one of:
-> (a) add a `caveats` note pointing users to `brew install --cask frankea/whisky/whisky`;
+> (a) add a `caveats` note pointing users to `brew install --cask CHE3MZ/whisky/whisky`;
 > (b) repoint the cask's `url`/`homepage` to the fork's releases; or
 > (c) `disable!` the cask with that pointer.
 
 The `caveats`-pointer ask (a) is the lowest-friction and most likely to be accepted; a full repoint (b)
 is more sensitive. Until then, keep the README's "Getting the right Whisky" warning prominent and the
-qualified tap (`frankea/whisky/whisky`) as the documented path.
+qualified tap (`CHE3MZ/whisky/whisky`) as the documented path.
 
 ## 2. Search & domain
 
@@ -37,7 +37,7 @@ qualified tap (`frankea/whisky/whisky`) as the documented path.
   `dist/pages/` and the Pages custom-domain setting. Marginal alone (~5-10%), meaningful **only** paired
   with backlinks below.
 - **Action:** ask the archived `whisky-app` org (Isaac) whether the archived repo's README / getwhisky.app
-  can carry a one-line "no longer maintained — see frankea/Whisky" pointer. A single backlink from the
+  can carry a one-line "no longer maintained — see CHE3MZ/whisky" pointer. A single backlink from the
   canonical domain is worth more than any on-page tweak.
 
 ## 3. Community presence (backlinks + word of mouth)

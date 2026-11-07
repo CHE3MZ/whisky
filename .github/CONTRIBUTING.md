@@ -85,7 +85,7 @@ Commits](https://www.conventionalcommits.org/) format. In order to update the
 ## Secret scanning
 
 CI runs [TruffleHog](https://github.com/trufflesecurity/trufflehog) against
-every PR and every push to `main`, configured to **only fail on verified
+every PR and every push to `master`, configured to **only fail on verified
 secrets** (i.e., the credential is real and currently active). Compiled
 binaries in the bundled Wine libraries trigger false positives on byte
 patterns that match Box/Eraser/NPM token formats, but those are unverified
@@ -95,8 +95,8 @@ To scan locally before pushing:
 
 ```bash
 brew install trufflehog
-./scripts/scan-secrets.sh        # scans HEAD vs origin/main
-./scripts/scan-secrets.sh main   # scans HEAD vs local main
+./scripts/scan-secrets.sh        # scans HEAD vs origin/master
+./scripts/scan-secrets.sh master   # scans HEAD vs local master
 ```
 
 If the scan fails on a real secret, **rotate the credential first** (treat

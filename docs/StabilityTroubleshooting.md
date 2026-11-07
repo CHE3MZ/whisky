@@ -1,6 +1,6 @@
 # Stability Troubleshooting Guide
 
-**Feature:** Stability Troubleshooting (frankea/Whisky#40)  
+**Feature:** Stability Troubleshooting (CHE3MZ/whisky#40)  
 **Last Updated:** January 13, 2026
 
 ---
@@ -25,7 +25,7 @@ Use this guide for reports like:
 
 ### 1) Stability Diagnostics Report (If Available)
 
-If you're on a build that includes the Stability Diagnostics button (see `frankea/Whisky#56`), collect this report first:
+If you're on a build that includes the Stability Diagnostics button (see `CHE3MZ/whisky#56`), collect this report first:
 
 1. Open the affected bottle
 2. Go to **Config**

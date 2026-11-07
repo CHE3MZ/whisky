@@ -7,20 +7,20 @@ on:
   # paths-ignore skips a run only when *every* changed file matches, so a PR that
   # also touches code still runs the full suite.
   #
-  # NOTE: `main` has no required status checks today, so a skipped docs PR simply
+  # NOTE: `master` has no required status checks today, so a skipped docs PR simply
   # reports no checks and stays mergeable. If branch protection is ever added that
   # *requires* these checks by name, note that the ui-test job is also gated by
   # the `changes` job below and a skipped run reports no status — required-check
   # names would need a carve-out for it.
   push:
-    branches: [main]
+    branches: [master]
     paths-ignore: &docs-paths
       - '**.md'
       - 'docs/**'
       - 'images/**'
       - 'LICENSE'
   pull_request:
-    branches: [main]
+    branches: [master]
     paths-ignore: *docs-paths
   workflow_dispatch:
 
@@ -89,7 +89,7 @@ jobs:
 
   # Detects which areas a PR touches so macOS jobs can be skipped when they
   # can't be affected. Runs on every event; the outputs are only consulted for
-  # pull requests (pushes to main always run everything).
+  # pull requests (pushes to master always run everything).
   changes:
     name: Detect changed areas
     runs-on: ubuntu-latest
@@ -199,7 +199,7 @@ jobs:
   #
   # Skipped on PRs that don't touch the app target, the UI tests, or the
   # project file: WhiskyKit-only PRs are covered by the unit-test job and the
-  # app still compiles in `build`. Pushes to main always run the full suite,
+  # app still compiles in `build`. Pushes to master always run the full suite,
   # so a Kit change that alters UI behavior is still caught post-merge.
   ui-test:
     name: WhiskyUITests

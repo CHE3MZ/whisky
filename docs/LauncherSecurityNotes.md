@@ -1,6 +1,6 @@
 # Launcher Compatibility Security Considerations
 
-**Feature:** Launcher Compatibility System (frankea/Whisky#41)  
+**Feature:** Launcher Compatibility System (CHE3MZ/whisky#41)  
 **Component:** CEF Sandbox Disable  
 **Date:** January 12, 2026
 
@@ -118,7 +118,7 @@ The CEF sandbox **cannot function under Wine** because:
 - ✅ Clear documentation of trade-off
 
 **Cons:**
-- ❌ Defeats purpose of frankea/Whisky#41 (fix launcher issues)
+- ❌ Defeats purpose of CHE3MZ/whisky#41 (fix launcher issues)
 - ❌ Steam won't work out-of-box (~50 user-facing issues)
 - ❌ Users frustrated: "Why doesn't Steam work?"
 - ❌ Requires technical knowledge to enable

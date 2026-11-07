@@ -161,7 +161,7 @@ Edit `dist/pages/appcast.xml` and add a new `<item>` near the top of `<channel>`
     <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
     <description><![CDATA[<p>Release notes...</p>]]></description>
     <enclosure
-        url="https://github.com/frankea/Whisky/releases/download/vX.Y.Z/Whisky-X.Y.Z.dmg"
+        url="https://github.com/CHE3MZ/whisky/releases/download/vX.Y.Z/Whisky-X.Y.Z.dmg"
         sparkle:edSignature="..."
         length="..."
         type="application/octet-stream" />
@@ -178,7 +178,7 @@ git tag -a vX.Y.Z -m "Whisky X.Y.Z"
 git push origin vX.Y.Z
 
 gh release create vX.Y.Z \
-  --repo frankea/Whisky \
+  --repo CHE3MZ/whisky \
   --title "Whisky X.Y.Z" \
   --notes "..." \
   build/release/Whisky-X.Y.Z.dmg
@@ -191,7 +191,7 @@ The push to `main` triggers `.github/workflows/Documentation.yml`, which redeplo
 Publishing the `vX.Y.Z` release fires `.github/workflows/UpdateHomebrewTap.yml`,
 which downloads the DMG, computes its sha256, and bumps the
 [frankea/homebrew-whisky](https://github.com/frankea/homebrew-whisky) cask so
-`brew install --cask frankea/whisky/whisky` tracks the new version. No manual edit needed.
+`brew install --cask CHE3MZ/whisky/whisky` tracks the new version. No manual edit needed.
 
 This requires a one-time repository secret **`BREW_TOKEN`** — a personal access token
 (classic `repo`, or fine-grained with **Contents: write**) for `frankea/homebrew-whisky`;
@@ -245,8 +245,8 @@ their pinned versions, and where each comes from. When the runtime needs to chan
 
 - `https://frankea.github.io/Whisky/WhiskyWineVersion.plist` — Wine version metadata
 - `https://frankea.github.io/Whisky/appcast.xml` — Sparkle update feed
-- `https://github.com/frankea/Whisky/releases/download/vX.Y.Z/Libraries.tar.gz` — Wine binary archive
-- `https://github.com/frankea/Whisky/releases/download/vX.Y.Z/Whisky-X.Y.Z.dmg` — app DMG
+- `https://github.com/CHE3MZ/whisky/releases/download/vX.Y.Z/Libraries.tar.gz` — Wine binary archive
+- `https://github.com/CHE3MZ/whisky/releases/download/vX.Y.Z/Whisky-X.Y.Z.dmg` — app DMG
 
 ## Pitfalls
 

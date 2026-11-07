@@ -24,7 +24,7 @@ import Foundation
 /// installer process exits. The vc_redist installer is known to hang under
 /// wine after installing successfully, so the runtime can be fully present
 /// while the log (and thus verb-based detection) says it is not
-/// (frankea/Whisky#233).
+/// (CHE3MZ/whisky#233).
 ///
 /// The probe keys on `system32/mfc140.dll`. Wine never ships mfc140.dll as
 /// a builtin, so it only appears after a real redist install; msvcp140.dll

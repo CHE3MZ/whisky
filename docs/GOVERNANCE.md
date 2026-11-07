@@ -6,7 +6,7 @@ this project carries the same structural risk.
 
 ## Who maintains this
 
-Whisky (this fork) is maintained by **one person**, [@frankea](https://github.com/frankea), who holds
+Whisky (this fork) is maintained by **one person**, [@CHE3MZ](https://github.com/CHE3MZ), who holds
 final authority over the repository, releases, and the signing identity. Since August 2026,
 [@dappermint](https://github.com/dappermint) serves as **project member (triage)**: they triage issues,
 review pull requests, and help manage the tracker, but hold no commit access and no release capability.
@@ -34,7 +34,7 @@ building and signing it.
 
 ## What that means for you
 
-- **Releases depend on one person's availability.** If @frankea is unavailable for a stretch, expect
+- **Releases depend on one person's availability.** If @CHE3MZ is unavailable for a stretch, expect
   no new releases until they're back. Existing installs keep working.
 - **Bug triage is best-effort.** See [`SUPPORT.md`](SUPPORT.md) for what to realistically expect.
 - **The runtime is consumed, not owned.** Whisky bundles Wine/DXVK/D3DMetal/DXMT binaries from upstream

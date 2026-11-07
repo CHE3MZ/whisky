@@ -22,10 +22,10 @@
                     <li><strong>Games start and render</strong>: driver-version checks pass under D3DMetal, DirectX 12 games run in DXVK and DXMT bottles, and bottles keep their profile across Wine lineages.</li>
                     <li><strong>Settings that did nothing now do</strong>: audio driver and latency, the test tone, kill-on-quit, and game configuration backends.</li>
                 </ul>
-                <p>See the <a href="https://github.com/frankea/Whisky/releases/tag/app-v3.7.0">release notes</a> for the full changelog.</p>
+                <p>See the <a href="https://github.com/CHE3MZ/whisky/releases/tag/app-v3.7.0">release notes</a> for the full changelog.</p>
             ]]></description>
             <enclosure
-                url="https://github.com/frankea/Whisky/releases/download/app-v3.7.0/Whisky-3.7.0.dmg"
+                url="https://github.com/CHE3MZ/whisky/releases/download/app-v3.7.0/Whisky-3.7.0.dmg"
                 sparkle:edSignature="ul8kHIerjiEueE4lgGWuvZPHIOtqx0BebRmBwm7SFnXQPgjz7WS98xM+cTHh7iz9ndwGMukH1iquEHBTqRmIBA=="
                 length="10753689"
                 type="application/octet-stream" />
@@ -45,10 +45,10 @@
                     <li><strong>Resumable downloads</strong>: interrupted runtime downloads continue where they left off and retry transient failures.</li>
                     <li><strong>Smarter defaults with D3DMetal</strong>: Recommended sends Chromium-based launchers to DXVK while their games still get D3DMetal.</li>
                 </ul>
-                <p>See the <a href="https://github.com/frankea/Whisky/releases/tag/app-v3.6.1">release notes</a> for the full changelog.</p>
+                <p>See the <a href="https://github.com/CHE3MZ/whisky/releases/tag/app-v3.6.1">release notes</a> for the full changelog.</p>
             ]]></description>
             <enclosure
-                url="https://github.com/frankea/Whisky/releases/download/app-v3.6.1/Whisky-3.6.1.dmg"
+                url="https://github.com/CHE3MZ/whisky/releases/download/app-v3.6.1/Whisky-3.6.1.dmg"
                 sparkle:edSignature="fp6SF8/VSwU6h4d6XMz/80O1xVHIgy5cryRbGsRmvIxf5RLXVWGa0bi//QX/LnZC5IYMa6QEJ0gXF3DZF+dBBw=="
                 length="10206943"
                 type="application/octet-stream" />
@@ -70,10 +70,10 @@
                     <li><strong>Faster sidebar</strong>: the running-status probe no longer writes a log file per check, eliminating ~1440 stray log files per idle bottle per day.</li>
                     <li><strong>Safer bottle operations</strong>: failed moves roll back cleanly, and busy bottles can no longer be mutated mid-export or mid-duplicate.</li>
                 </ul>
-                <p>See the <a href="https://github.com/frankea/Whisky/releases/tag/app-v3.6.0">release notes</a> for the full changelog.</p>
+                <p>See the <a href="https://github.com/CHE3MZ/whisky/releases/tag/app-v3.6.0">release notes</a> for the full changelog.</p>
             ]]></description>
             <enclosure
-                url="https://github.com/frankea/Whisky/releases/download/app-v3.6.0/Whisky-3.6.0.dmg"
+                url="https://github.com/CHE3MZ/whisky/releases/download/app-v3.6.0/Whisky-3.6.0.dmg"
                 sparkle:edSignature="lZMKgbC7etZC9B3yfd7ao4n3gB/NdkzlFoMOSr3Cxy7EjnTUnKgO92R2II/+bb89/nt8juCp+lq5bHH7xCsKBA=="
                 length="10097105"
                 type="application/octet-stream" />
@@ -93,10 +93,10 @@
                     <li><strong>Lost bottles are recovered</strong>: bottles on disk that aren't in your library — after a reset registry or a restored backup — are detected at startup and offered for one-click re-import. A damaged bottle list is also backed up and recovered instead of being wiped.</li>
                     <li><strong>Safer engine extraction</strong>: archives are unpacked and audited in a staging area, so a rejected archive leaves your existing installation untouched.</li>
                 </ul>
-                <p>See the <a href="https://github.com/frankea/Whisky/releases/tag/app-v3.5.2">release notes</a> for the full changelog.</p>
+                <p>See the <a href="https://github.com/CHE3MZ/whisky/releases/tag/app-v3.5.2">release notes</a> for the full changelog.</p>
             ]]></description>
             <enclosure
-                url="https://github.com/frankea/Whisky/releases/download/app-v3.5.2/Whisky-3.5.2.dmg"
+                url="https://github.com/CHE3MZ/whisky/releases/download/app-v3.5.2/Whisky-3.5.2.dmg"
                 sparkle:edSignature="WNCu8XR9RSmYfsZT6CO+OnFo7T+ehgLNSebQWDhaFVSUhh7DcEK7fZZvWEfgvG6mspv1AEUD+2HT4MJE9wXdCw=="
                 length="9333250"
                 type="application/octet-stream" />
@@ -112,10 +112,10 @@
                 <ul>
                     <li><strong>Dependency installs fixed</strong>: installing components like the Visual C++ runtime, .NET, DirectX, and fonts (and the Winetricks verb browser) failed on a clean install because the <code>winetricks</code> tool was never bundled. It — and its verb catalog — now ship inside the app, so dependency installation works with no extra setup.</li>
                 </ul>
-                <p>See the <a href="https://github.com/frankea/Whisky/releases/tag/app-v3.5.1">release notes</a> for the full changelog.</p>
+                <p>See the <a href="https://github.com/CHE3MZ/whisky/releases/tag/app-v3.5.1">release notes</a> for the full changelog.</p>
             ]]></description>
             <enclosure
-                url="https://github.com/frankea/Whisky/releases/download/app-v3.5.1/Whisky-3.5.1.dmg"
+                url="https://github.com/CHE3MZ/whisky/releases/download/app-v3.5.1/Whisky-3.5.1.dmg"
                 sparkle:edSignature="zMMDJ99vi/kDl8hNaPfuT1bqxKNAFHS5qlYexIh6K3KIozMscK4BVO3G3/BbBDR9hHOt5kGNhBnfYu5sSvBCAA=="
                 length="9286465"
                 type="application/octet-stream" />
@@ -134,10 +134,10 @@
                     <li>Scanning a bottle for installed programs now runs off the main thread, so opening or switching to a large bottle no longer hitches the UI.</li>
                     <li>Gentler update reminders: a scheduled background check that finds a new version shows a Dock badge and an "Install Update…" menu item instead of a focus-stealing dialog.</li>
                 </ul>
-                <p>See the <a href="https://github.com/frankea/Whisky/releases/tag/app-v3.5.0">release notes</a> for the full changelog.</p>
+                <p>See the <a href="https://github.com/CHE3MZ/whisky/releases/tag/app-v3.5.0">release notes</a> for the full changelog.</p>
             ]]></description>
             <enclosure
-                url="https://github.com/frankea/Whisky/releases/download/app-v3.5.0/Whisky-3.5.0.dmg"
+                url="https://github.com/CHE3MZ/whisky/releases/download/app-v3.5.0/Whisky-3.5.0.dmg"
                 sparkle:edSignature="70TN4bpEjjU7SdlhNwIqP88ll7QkQPgAFNr1VNPiPdv5r8MOvbk73O0mxHCX6q4CGLu7kzn7LGw6Mdk44dFSDw=="
                 length="9067079"
                 type="application/octet-stream" />
@@ -156,10 +156,10 @@
                     <li>Per-program graphics overrides now reliably win over the bottle's setting.</li>
                     <li>A launch error for a program opened from Finder now surfaces as a notification instead of failing silently.</li>
                 </ul>
-                <p>See the <a href="https://github.com/frankea/Whisky/releases/tag/app-v3.4.0">release notes</a> for the full changelog.</p>
+                <p>See the <a href="https://github.com/CHE3MZ/whisky/releases/tag/app-v3.4.0">release notes</a> for the full changelog.</p>
             ]]></description>
             <enclosure
-                url="https://github.com/frankea/Whisky/releases/download/app-v3.4.0/Whisky-3.4.0.dmg"
+                url="https://github.com/CHE3MZ/whisky/releases/download/app-v3.4.0/Whisky-3.4.0.dmg"
                 sparkle:edSignature="yplZQrTb16jrfuJnSTQsP5PE8uHppVdO+yZpJeQUuXvnqadc2M6gTc7xbWtDpB6JwisAOzFmhN+ji64oz5EpDA=="
                 length="9035558"
                 type="application/octet-stream" />
@@ -179,10 +179,10 @@
                     <li>Hardened icon and thumbnail extraction against crafted or corrupt Windows executables that could previously crash or hang the parser.</li>
                     <li>Optional, <strong>opt-in</strong> anonymous usage telemetry (off by default) to surface first-run install failures — no personal data, paths, or error text is ever sent.</li>
                 </ul>
-                <p>See the <a href="https://github.com/frankea/Whisky/releases/tag/app-v3.3.0">release notes</a> for the full changelog.</p>
+                <p>See the <a href="https://github.com/CHE3MZ/whisky/releases/tag/app-v3.3.0">release notes</a> for the full changelog.</p>
             ]]></description>
             <enclosure
-                url="https://github.com/frankea/Whisky/releases/download/app-v3.3.0/Whisky-3.3.0.dmg"
+                url="https://github.com/CHE3MZ/whisky/releases/download/app-v3.3.0/Whisky-3.3.0.dmg"
                 sparkle:edSignature="aZLZZgc1MRj3ZRiTY2kJerE3JMG+lq7R7r9GfD1J6eZS5lpYW/bEnp5ZiyhP/0AHUQYbJEDZUKJR2JNIYhkUDQ=="
                 length="9005652"
                 type="application/octet-stream" />
@@ -202,10 +202,10 @@
                     <li>A half-installed runtime is now detected and prompts a clean re-install instead of leaving every bottle to fail with cryptic Wine errors.</li>
                     <li>Bottle-creation error messages are now localizable.</li>
                 </ul>
-                <p>See the <a href="https://github.com/frankea/Whisky/releases/tag/app-v3.2.0">release notes</a> for the full changelog.</p>
+                <p>See the <a href="https://github.com/CHE3MZ/whisky/releases/tag/app-v3.2.0">release notes</a> for the full changelog.</p>
             ]]></description>
             <enclosure
-                url="https://github.com/frankea/Whisky/releases/download/app-v3.2.0/Whisky-3.2.0.dmg"
+                url="https://github.com/CHE3MZ/whisky/releases/download/app-v3.2.0/Whisky-3.2.0.dmg"
                 sparkle:edSignature="OVPbzjcAElM42lbI3A2yWIX+PdzN6RkEsP/iRWRqfxqh07O1FVmWB4gOvuyyukIdQ1V3QQ/pr3hc7joTOSjnBQ=="
                 length="8562282"
                 type="application/octet-stream" />
@@ -224,10 +224,10 @@
                     <li>~50 new bundled GameDB entries with one-click recommended configs (now 79 titles).</li>
                     <li>Wine inherits the host timezone; display sleep is suppressed during play; host fonts are copied so Unity titles render text.</li>
                 </ul>
-                <p>See the <a href="https://github.com/frankea/Whisky/releases/tag/app-v3.1.0">release notes</a> for the full changelog.</p>
+                <p>See the <a href="https://github.com/CHE3MZ/whisky/releases/tag/app-v3.1.0">release notes</a> for the full changelog.</p>
             ]]></description>
             <enclosure
-                url="https://github.com/frankea/Whisky/releases/download/app-v3.1.0/Whisky-3.1.0.dmg"
+                url="https://github.com/CHE3MZ/whisky/releases/download/app-v3.1.0/Whisky-3.1.0.dmg"
                 sparkle:edSignature="mQ7sWt+LFJjhRrKUO7w9Jnaz9YkxjvX5GraRBy4I2pK3y1Z8nmcVeSMza5jsvLGo7mpBszlbRcQ1DfcTYNDpDw=="
                 length="8564044"
                 type="application/octet-stream" />
@@ -240,10 +240,10 @@
             <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
             <description><![CDATA[
                 <p>Fixes a pipe deadlock in <code>Tar.validateArchivePaths</code> that caused the WhiskyWine installer to hang at "Installing WhiskyWine — Almost there." Tar's verbose listing for the 313 MB Libraries archive overflowed the OS pipe buffer; Whisky now drains the pipe before waiting for tar to exit.</p>
-                <p>See the <a href="https://github.com/frankea/Whisky/releases/tag/app-v3.0.1">release notes</a> for the full changelog.</p>
+                <p>See the <a href="https://github.com/CHE3MZ/whisky/releases/tag/app-v3.0.1">release notes</a> for the full changelog.</p>
             ]]></description>
             <enclosure
-                url="https://github.com/frankea/Whisky/releases/download/app-v3.0.1/Whisky-3.0.1.dmg"
+                url="https://github.com/CHE3MZ/whisky/releases/download/app-v3.0.1/Whisky-3.0.1.dmg"
                 sparkle:edSignature="NJLtJug+5JkHnY8+2lFsUB8qa9ImVyqg9zAWSQC18SaNkusqOn+l3/6PpN/WgLyDbTmlzSrYwIs2WWUvGwneCg=="
                 length="8456935"
                 type="application/octet-stream" />

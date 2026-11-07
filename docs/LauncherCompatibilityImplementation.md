@@ -2,7 +2,6 @@
 
 **Date:** January 12, 2026  
 **Branch:** `feature/launcher-compatibility-system`  
-**Pull Request:** #53  
 **Issue:** #41 - Steam & Game Launcher Issues
 
 ## Executive Summary
@@ -603,6 +602,5 @@ The launcher compatibility system represents a significant improvement to Whisky
 ---
 
 **Implementation completed:** January 12, 2026  
-**Branch:** `feature/launcher-compatibility-system`  
-**Pull Request:** #53 - https://github.com/frankea/Whisky/pull/53  
+**Branch:** `feature/launcher-compatibility-system`   
 **Commit:** 88016fbe

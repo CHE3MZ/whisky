@@ -24,11 +24,11 @@ import Foundation
 /// Neither interposer just forwards to Apple's DLL. The D3D12 one answers on
 /// Apple's export ordinals and patches itself into the game's command lists,
 /// the DXGI one rewrites the adapter's vtable. Both were written and measured
-/// against GPTK 4.0 beta 2 (frankea/Whisky#163), and that does not carry over
+/// against GPTK 4.0 beta 2 (CHE3MZ/whisky#163), and that does not carry over
 /// to other payloads: with GPTK 3.0 the DXGI interposer's `VirtualProtect` on
 /// the adapter vtable fails with error 87 and the driver version is never
 /// answered, and Red Dead Redemption 2 crashes at startup with the D3D12 one in
-/// the slot (frankea/Whisky#276).
+/// the slot (CHE3MZ/whisky#276).
 extension GPTKImporter {
     /// The D3DMetal builds the interposers were validated on, as Apple's
     /// `CFBundleShortVersionString` spells them.

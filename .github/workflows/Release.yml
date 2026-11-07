@@ -23,4 +23,4 @@ jobs:
         run: |
           echo "Release $TAG_NAME published"
           echo "Distribution: GitHub Releases and the frankea/homebrew-whisky tap"
-          echo "Download: https://github.com/frankea/Whisky/releases"
+          echo "Download: https://github.com/CHE3MZ/whisky/releases"

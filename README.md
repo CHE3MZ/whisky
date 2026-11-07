@@ -5,15 +5,15 @@
 
   > **Active community fork.** The original [whisky-app/whisky](https://github.com/whisky-app/whisky)
   > was archived on April 9, 2025 with a final maintenance notice. This fork, maintained by
-  > [@frankea](https://github.com/frankea), continues development — addressing the backlog of
+  > [@CHE3MZ](https://github.com/CHE3MZ), continues development — addressing the backlog of
   > upstream issues and adding new functionality. Not affiliated with the original project or
   > getwhisky.app.
 
-  ![](https://img.shields.io/github/actions/workflow/status/frankea/Whisky/CI.yml?style=for-the-badge&label=CI)
-  [![](https://img.shields.io/codecov/c/github/frankea/Whisky?style=for-the-badge&logo=codecov&label=Coverage&flag=whiskykit)](https://codecov.io/gh/frankea/Whisky)
-  [![](https://img.shields.io/github/downloads/frankea/Whisky/total?style=for-the-badge&logo=github&label=Downloads)](https://github.com/frankea/Whisky/releases)
-  [![](https://img.shields.io/github/downloads/frankea/Whisky/latest/total?style=for-the-badge&label=Latest)](https://github.com/frankea/Whisky/releases/latest)
-  [![](https://img.shields.io/github/issues/frankea/Whisky?style=for-the-badge)](https://github.com/frankea/Whisky/issues)
+  ![](https://img.shields.io/github/actions/workflow/status/CHE3MZ/whisky/CI.yml?style=for-the-badge&label=CI)
+  [![](https://img.shields.io/codecov/c/github/CHE3MZ/whisky?style=for-the-badge&logo=codecov&label=Coverage&flag=whiskykit)](https://codecov.io/gh/CHE3MZ/whisky)
+  [![](https://img.shields.io/github/downloads/CHE3MZ/whisky/total?style=for-the-badge&logo=github&label=Downloads)](https://github.com/CHE3MZ/whisky/releases)
+  [![](https://img.shields.io/github/downloads/CHE3MZ/whisky/latest/total?style=for-the-badge&label=Latest)](https://github.com/CHE3MZ/whisky/releases/latest)
+  [![](https://img.shields.io/github/issues/CHE3MZ/whisky?style=for-the-badge)](https://github.com/CHE3MZ/whisky/issues)
   [![Documentation](https://img.shields.io/badge/Documentation-DocC-blue?style=for-the-badge)](https://frankea.github.io/Whisky/documentation/whiskykit/)
 </div>
 
@@ -58,16 +58,16 @@ Whisky provides a clean and easy-to-use graphical wrapper for Wine built in nati
 ### Homebrew (recommended)
 
 ```sh
-brew install --cask frankea/whisky/whisky
+brew install --cask CHE3MZ/whisky/whisky
 ```
 
 This taps [frankea/homebrew-whisky](https://github.com/frankea/homebrew-whisky) and installs the latest signed/notarized DMG. `brew upgrade --cask` picks up new releases.
 
-> The default `brew install --cask whisky` still installs the **archived original** (last release April 2025) and always will until that cask is updated. Use the qualified `frankea/whisky/whisky` form to get this fork.
+> The default `brew install --cask whisky` still installs the **archived original** (last release April 2025) and always will until that cask is updated. Use the qualified `CHE3MZ/whisky/whisky` form to get this fork.
 
 ### Manual
 
-1. Download the latest **[Whisky-X.Y.Z.dmg](https://github.com/frankea/Whisky/releases/latest)** (signed and notarized — Gatekeeper-approved).
+1. Download the latest **[Whisky-X.Y.Z.dmg](https://github.com/CHE3MZ/whisky/releases/latest)** (signed and notarized — Gatekeeper-approved).
 2. Open the DMG and drag **Whisky.app** to **/Applications**.
 3. Launch Whisky. On first run it downloads the Wine runtime (~330 MB) and sets up your default bottle.
 
@@ -79,7 +79,7 @@ The original [whisky-app/whisky](https://github.com/whisky-app/whisky) was archi
 
 To switch:
 
-1. Install this fork: `brew install --cask frankea/whisky/whisky` or follow the manual steps above.
+1. Install this fork: `brew install --cask CHE3MZ/whisky/whisky` or follow the manual steps above.
 2. Open it and choose **File → Migrate from the Original Whisky**. It finds the bottles the original app left in `~/Library/Containers/com.isaacmarovitz.Whisky/` and imports the ones you pick. Bottles are referenced **in place** — nothing is moved or copied — so the original app keeps working if you'd like to keep it around.
 3. *(Optional)* Once you're happy, remove the original app: drag **/Applications/Whisky.app** to the Trash, or `brew uninstall --cask whisky` if you installed it via Homebrew. Your bottles stay put.
 
@@ -87,7 +87,7 @@ The original app uses a different bundle identifier (`com.franke.Whisky` here vs
 
 ## Uninstalling
 
-Dragging **Whisky.app** to the Trash (or `brew uninstall --cask frankea/whisky/whisky`) removes the app but leaves the Wine runtime, your bottles, and app data behind — by design, so reinstalling doesn't re-download ~330 MB or lose your bottles.
+Dragging **Whisky.app** to the Trash (or `brew uninstall --cask CHE3MZ/whisky/whisky`) removes the app but leaves the Wine runtime, your bottles, and app data behind — by design, so reinstalling doesn't re-download ~330 MB or lose your bottles.
 
 > ⚠️ **Back up your bottles first if you want to keep them.** Removing the container below deletes every bottle stored in its default location. Bottles you created in a custom folder live wherever you put them — check **Bottle → Reveal in Finder** before deleting anything.
 
@@ -95,7 +95,7 @@ To remove Whisky **completely**, delete the app and then these paths (all under 
 
 ```sh
 # 1. The app itself
-rm -rf "/Applications/Whisky.app"          # or: brew uninstall --cask frankea/whisky/whisky
+rm -rf "/Applications/Whisky.app"          # or: brew uninstall --cask CHE3MZ/whisky/whisky
 
 # 2. Bottles + bottle list (default bottle location is inside this container)
 rm -rf ~/Library/Containers/com.franke.Whisky
@@ -163,7 +163,7 @@ WhiskyKit, the core framework powering Whisky, has comprehensive API documentati
 - **[Steam Compatibility Guide](docs/SteamCompatibility.md)** - Detailed guide for Steam on Whisky
 - **[Stability Troubleshooting](docs/StabilityTroubleshooting.md)** - Diagnose crashes, freezes, reboots, and kernel panics
 - **Controller Issues** - Enable "Controller Compatibility Mode" in Bottle Config → Controller & Input
-- **[Game Configurations](https://github.com/frankea/Whisky/blob/main/WhiskyKit/Sources/WhiskyKit/GameDatabase/Resources/GameDB.json)** - 80+ curated per-game compatibility configs, also browsable in-app under Game Configurations
+- **[Game Configurations](https://github.com/CHE3MZ/whisky/blob/master/WhiskyKit/Sources/WhiskyKit/GameDatabase/Resources/GameDB.json)** - 80+ curated per-game compatibility configs, also browsable in-app under Game Configurations
 
 ### Upstream issue audit
 
@@ -179,7 +179,7 @@ The Coverage badge above is scoped to the **`whiskykit` flag** — line
 coverage of the framework that holds the bottle, Wine, GameDB, and
 PE-parser logic, measured by `swift test --enable-code-coverage` per
 [`.github/workflows/CI.yml`](.github/workflows/CI.yml). The blended
-project-wide number on the [Codecov dashboard](https://codecov.io/gh/frankea/Whisky)
+project-wide number on the [Codecov dashboard](https://codecov.io/gh/CHE3MZ/whisky)
 reads much lower because it averages in the SwiftUI app target, which
 only receives best-effort UI-test coverage. Read the badge as
 "WhiskyKit unit-test coverage," not full-app coverage.

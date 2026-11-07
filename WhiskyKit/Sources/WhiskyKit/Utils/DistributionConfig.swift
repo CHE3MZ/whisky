@@ -26,7 +26,7 @@ public enum DistributionConfig {
     public static let versionPlistURL = "\(baseURL)/WhiskyWineVersion.plist"
 
     /// Base URL for GitHub Releases downloads
-    public static let releasesBaseURL = "https://github.com/frankea/Whisky/releases/download"
+    public static let releasesBaseURL = "https://github.com/CHE3MZ/whisky/releases/download"
 
     /// URL for the Sparkle appcast feed
     public static let appcastURL = "\(baseURL)/appcast.xml"
