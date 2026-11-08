@@ -20,6 +20,7 @@
 # Prerequisites:
 #   - Developer ID Application certificate installed in Keychain
 #   - notarytool credentials stored under profile name "AC_PASSWORD"
+#   - create-dmg (npm install --global create-dmg, Node.js 20+)
 #
 # Usage: scripts/release.sh <version>
 # Example: scripts/release.sh 3.0.0
@@ -28,6 +29,13 @@ set -euo pipefail
 
 VERSION="${1:?usage: scripts/release.sh <version>}"
 NOTARY_PROFILE="${NOTARY_PROFILE:-AC_PASSWORD}"
+ARCHIVE_CODE_SIGN_STYLE="${ARCHIVE_CODE_SIGN_STYLE:-Automatic}"
+ARCHIVE_CODE_SIGN_IDENTITY="${ARCHIVE_CODE_SIGN_IDENTITY:-Apple Development}"
+
+if ! command -v create-dmg >/dev/null 2>&1; then
+    echo "error: create-dmg not found. Install it with: npm install --global create-dmg (Node.js 20+)" >&2
+    exit 1
+fi
 
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 BUILD_DIR="$PROJECT_DIR/build/release"
@@ -39,6 +47,13 @@ cd "$PROJECT_DIR"
 mkdir -p "$BUILD_DIR"
 
 echo "==> Archiving Whisky $VERSION"
+ARCHIVE_SIGNING_ARGS=(
+    CODE_SIGN_STYLE="$ARCHIVE_CODE_SIGN_STYLE"
+    CODE_SIGN_IDENTITY="$ARCHIVE_CODE_SIGN_IDENTITY"
+)
+if [ "$ARCHIVE_CODE_SIGN_STYLE" = "Manual" ]; then
+    ARCHIVE_SIGNING_ARGS+=(PROVISIONING_PROFILE_SPECIFIER="")
+fi
 xcodebuild \
     -project Whisky.xcodeproj \
     -scheme Whisky \
@@ -46,6 +61,7 @@ xcodebuild \
     -destination 'generic/platform=macOS' \
     -archivePath "$ARCHIVE_PATH" \
     -allowProvisioningUpdates \
+    "${ARCHIVE_SIGNING_ARGS[@]}" \
     archive
 
 echo "==> Exporting and re-signing with Developer ID"
@@ -63,13 +79,20 @@ APP_PATH="$EXPORT_PATH/Whisky.app"
 echo "==> Verifying signature"
 codesign --verify --deep --strict --verbose=2 "$APP_PATH"
 
-echo "==> Building DMG"
-rm -f "$DMG_PATH"
-hdiutil create \
-    -volname "Whisky" \
-    -srcfolder "$APP_PATH" \
-    -ov -format UDZO \
-    "$DMG_PATH"
+echo "==> Building styled DMG with create-dmg"
+rm -f "$DMG_PATH" "$BUILD_DIR/Whisky.dmg"
+create-dmg \
+    "$APP_PATH" \
+    "$BUILD_DIR" \
+    --overwrite \
+    --no-version-in-filename \
+    --no-code-sign \
+    --dmg-title="Whisky"
+[ -f "$BUILD_DIR/Whisky.dmg" ] || {
+    echo "error: create-dmg did not produce $BUILD_DIR/Whisky.dmg" >&2
+    exit 1
+}
+mv "$BUILD_DIR/Whisky.dmg" "$DMG_PATH"
 
 echo "==> Signing DMG"
 codesign --sign "Developer ID Application" --timestamp "$DMG_PATH"

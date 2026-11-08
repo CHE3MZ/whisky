@@ -35,6 +35,36 @@ Apple's notary service needs an app-specific password.
    ```
 3. The release script reads this profile by name (`AC_PASSWORD`). The signing team is `UYNK59NFK8`, set in the Xcode project and `scripts/exportOptions.plist`.
 
+### create-dmg
+
+The release script builds a styled DMG with [create-dmg](https://github.com/sindresorhus/create-dmg) (background, Applications shortcut, and icon layout). Install Node.js 20 or later, then:
+
+```sh
+npm install --global create-dmg
+```
+
+### Release workflow secrets
+
+Pushing an `app-vX.Y.Z` tag runs `.github/workflows/Release.yml` on a `macos-26` runner. Add these repository secrets under **Settings → Secrets and variables → Actions**:
+
+| Secret | Purpose |
+| --- | --- |
+| `DEVELOPER_ID_CERTIFICATE_P12` | base64 of a Developer ID Application `.p12` |
+| `DEVELOPER_ID_CERTIFICATE_PASSWORD` | password for that `.p12` |
+| `KEYCHAIN_PASSWORD` | any random password for the temporary CI keychain |
+| `APPLE_ID` | Apple ID for notarytool |
+| `APPLE_APP_SPECIFIC_PASSWORD` | app-specific password for notarytool |
+| `APPLE_TEAM_ID` | optional; defaults to `UYNK59NFK8` |
+| `BREW_TOKEN` | personal access token for the Homebrew tap workflow |
+
+CI archives with manual Developer ID signing (`ARCHIVE_CODE_SIGN_STYLE=Manual`, `ARCHIVE_CODE_SIGN_IDENTITY=Developer ID Application`), so only the Developer ID certificate is needed there. The local fallback below still archives with Apple Development signing and re-signs on export.
+
+Encode a `.p12` for the secret with:
+
+```sh
+base64 -i certificate.p12 | pbcopy
+```
+
 ### Sparkle EdDSA keys
 
 A keypair is needed to sign appcast entries. Sparkle's `generate_keys` tool ships with the Sparkle SPM package; after building Whisky once, find it at:
@@ -112,7 +142,25 @@ The printed `sparkle:edSignature` **and** the printed `length` must both exactly
 2. Open the `.p12` to install the Developer ID identity into the login keychain.
 3. Re-create the notary profile with `xcrun notarytool store-credentials AC_PASSWORD …` (see One-time setup).
 
-## App release
+## Automated release
+
+1. Bump `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` in `Whisky.xcodeproj/project.pbxproj`.
+2. Run `task changelog` and commit `docs/CHANGELOG.md`.
+3. Commit and push to `master`.
+4. Push an `app-vX.Y.Z` tag:
+   ```sh
+   git tag -a app-vX.Y.Z -m "Whisky X.Y.Z"
+   git push origin app-vX.Y.Z
+   ```
+5. The `Release` workflow runs on `macos-26`, builds/signs/notarizes/staples the DMG with `create-dmg`, and creates the GitHub Release with `Whisky-X.Y.Z.dmg`.
+6. After the workflow finishes, add the appcast entry from the published DMG (see **Manual app release → 5. Add an appcast entry** below) and commit it to `master`; Pages deploys through `Documentation.yml`.
+7. The Homebrew tap updates automatically when the release is published.
+
+> The Sparkle appcast is not updated by the release workflow yet. Existing installs will not see the update until the appcast entry is committed.
+
+## Manual app release (fallback)
+
+> This local flow is a fallback. Pushing an `app-v...` tag also starts the automated `Release` workflow, so use one path or the other.
 
 ### 1. Bump versions
 
@@ -133,10 +181,10 @@ scripts/release.sh X.Y.Z
 
 The script:
 
-1. Archives the app (Apple Development signing during archive — automatic provisioning handles cert resolution).
+1. Archives the app (Apple Development by default; CI overrides to manual Developer ID signing).
 2. Re-signs on export with **Developer ID Application** per `scripts/exportOptions.plist`.
 3. Verifies the signature with `codesign --verify --deep --strict`.
-4. Builds a UDZO disk image with `hdiutil`.
+4. Builds a styled DMG with `create-dmg` (background, Applications shortcut, and icon layout).
 5. Signs the DMG with the Developer ID Application certificate.
 6. Submits the DMG to Apple's notary service and waits for the verdict (typically 5–15 minutes).
 7. Staples the notarization ticket.
