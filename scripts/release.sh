@@ -20,23 +20,20 @@
 # Prerequisites:
 #   - Developer ID Application certificate installed in Keychain
 #   - notarytool credentials stored under profile name "AC_PASSWORD"
-#   - DEVELOPMENT_TEAM set to your 10-character Apple Developer team ID
 #
-# Usage: DEVELOPMENT_TEAM=ABCDE12345 scripts/release.sh <version>
-# Example: DEVELOPMENT_TEAM=ABCDE12345 scripts/release.sh 3.0.0
+# Usage: scripts/release.sh <version>
+# Example: scripts/release.sh 3.0.0
 
 set -euo pipefail
 
 VERSION="${1:?usage: scripts/release.sh <version>}"
 NOTARY_PROFILE="${NOTARY_PROFILE:-AC_PASSWORD}"
-: "${DEVELOPMENT_TEAM:?Set DEVELOPMENT_TEAM to your 10-character Apple Developer team ID}"
 
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 BUILD_DIR="$PROJECT_DIR/build/release"
 ARCHIVE_PATH="$BUILD_DIR/Whisky.xcarchive"
 EXPORT_PATH="$BUILD_DIR/export"
 DMG_PATH="$BUILD_DIR/Whisky-$VERSION.dmg"
-EXPORT_OPTIONS="$BUILD_DIR/exportOptions.plist"
 
 cd "$PROJECT_DIR"
 mkdir -p "$BUILD_DIR"
@@ -49,17 +46,15 @@ xcodebuild \
     -destination 'generic/platform=macOS' \
     -archivePath "$ARCHIVE_PATH" \
     -allowProvisioningUpdates \
-    DEVELOPMENT_TEAM="$DEVELOPMENT_TEAM" \
     archive
 
 echo "==> Exporting and re-signing with Developer ID"
 rm -rf "$EXPORT_PATH"
-sed "s/__DEVELOPMENT_TEAM__/${DEVELOPMENT_TEAM}/" scripts/exportOptions.plist > "$EXPORT_OPTIONS"
 xcodebuild \
     -exportArchive \
     -archivePath "$ARCHIVE_PATH" \
     -exportPath "$EXPORT_PATH" \
-    -exportOptionsPlist "$EXPORT_OPTIONS" \
+    -exportOptionsPlist scripts/exportOptions.plist \
     -allowProvisioningUpdates
 
 APP_PATH="$EXPORT_PATH/Whisky.app"

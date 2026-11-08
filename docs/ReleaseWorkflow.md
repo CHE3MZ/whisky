@@ -26,15 +26,14 @@ A Developer ID Application certificate is required to ship a Gatekeeper-friendly
 Apple's notary service needs an app-specific password.
 
 1. Generate one at <https://appleid.apple.com> → **Sign-In and Security → App-Specific Passwords**.
-2. Store it as a notarytool keychain profile, exporting `DEVELOPMENT_TEAM` first:
+2. Store it as a notarytool keychain profile:
    ```sh
-   export DEVELOPMENT_TEAM=ABCDE12345  # your 10-character Apple Developer team ID
    xcrun notarytool store-credentials AC_PASSWORD \
      --apple-id <your-apple-id-email> \
-     --team-id "$DEVELOPMENT_TEAM" \
+     --team-id UYNK59NFK8 \
      --password <app-specific-password>
    ```
-3. The release script reads this profile by name (`AC_PASSWORD`) and requires `DEVELOPMENT_TEAM` so the archive and export use your signing team.
+3. The release script reads this profile by name (`AC_PASSWORD`). The signing team is `UYNK59NFK8`, set in the Xcode project and `scripts/exportOptions.plist`.
 
 ### Sparkle EdDSA keys
 
@@ -129,7 +128,7 @@ Run `task changelog` (see `Taskfile.yml`) to regenerate `docs/CHANGELOG.md`, the
 ### 3. Build, sign, notarize, package
 
 ```sh
-DEVELOPMENT_TEAM=ABCDE12345 scripts/release.sh X.Y.Z
+scripts/release.sh X.Y.Z
 ```
 
 The script:
