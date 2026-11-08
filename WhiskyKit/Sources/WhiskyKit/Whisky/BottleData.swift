@@ -33,10 +33,11 @@ public struct BottleData: Codable {
         case paths
     }
 
-    public static let containerDir = FileManager.default.homeDirectoryForCurrentUser
-        .appending(path: "Library")
-        .appending(path: "Containers")
-        .appending(path: Bundle.whiskyBundleIdentifier)
+    /// Root folder for Whisky's app-owned data.
+    ///
+    /// Kept under `~/Library/Application Support/Whisky` so the registry and
+    /// default bottles do not use a bundle-identifier folder.
+    public static let containerDir = WhiskyWineInstaller.applicationFolder
 
     public static let bottleEntriesDir = containerDir
         .appending(path: "BottleVM")

@@ -370,7 +370,7 @@ Launcher crashes may leave clues in Wine logs:
 
 1. **Open Logs Folder:**
    ```
-   ~/Library/Logs/com.che3mz.whisky/
+   ~/Library/Logs/Whisky/
    ```
 
 2. **Find Latest Log:**
@@ -393,7 +393,7 @@ Ensure Wine is properly installed:
    - Should show version 9.0 or later
 
 2. **Verify WhiskyWine:**
-   - Check `/Users/[username]/Library/Application Support/com.che3mz.whisky/Libraries/Wine/`
+   - Check `/Users/[username]/Library/Application Support/Whisky/Libraries/Wine/`
    - Should contain `bin/`, `lib/`, `share/` directories
 
 ### Test in Clean Bottle

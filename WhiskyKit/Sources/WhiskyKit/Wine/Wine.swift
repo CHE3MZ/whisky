@@ -1385,11 +1385,11 @@ public extension Wine {
 
     /// The URL to the directory where Wine process logs are stored.
     ///
-    /// Logs are stored in `~/Library/Logs/{bundle-identifier}/` with ISO 8601
+    /// Logs are stored in `~/Library/Logs/Whisky/` with ISO 8601
     /// timestamps as filenames.
     static let logsFolder = FileManager.default.urls(
         for: .libraryDirectory, in: .userDomainMask
-    )[0].appending(path: "Logs").appending(path: Bundle.whiskyBundleIdentifier)
+    )[0].appending(path: "Logs").appending(path: Bundle.whiskyFolderName)
 
     /// Enforces log retention policy by deleting the oldest `.log` files until total size is under the limit.
     ///

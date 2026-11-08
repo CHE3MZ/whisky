@@ -90,14 +90,14 @@ public enum WhiskyWineInstallError: LocalizedError, Equatable {
 public class WhiskyWineInstaller {
     /// The root application support folder for Whisky.
     ///
-    /// Located at `~/Library/Application Support/{bundle-identifier}/`.
+    /// Located at `~/Library/Application Support/Whisky/`.
     public static let applicationFolder = FileManager.default.urls(
         for: .applicationSupportDirectory, in: .userDomainMask
-    )[0].appending(path: Bundle.whiskyBundleIdentifier)
+    )[0].appending(path: Bundle.whiskyFolderName)
 
     /// The folder containing all library files including Wine and DXVK.
     ///
-    /// Located at `~/Library/Application Support/{bundle-identifier}/Libraries/`.
+    /// Located at `~/Library/Application Support/Whisky/Libraries/`.
     public static let libraryFolder = applicationFolder.appending(path: "Libraries")
 
     /// The URL to the Wine binary directory.
@@ -318,9 +318,9 @@ public class WhiskyWineInstaller {
         // a full uninstall is the one case where it should not.
         try? FileManager.default.removeItem(at: GPTKImporter.storeFolder)
 
-        // BottleData.plist registers bottle paths; remove it so a reinstall
+        // BottleVM.plist registers bottle paths; remove it so a reinstall
         // starts with no orphaned entries pointing at deleted directories.
-        let bottleData = applicationFolder.appending(path: "BottleData.plist")
+        let bottleData = BottleData.bottleEntriesDir
         if FileManager.default.fileExists(atPath: bottleData.path(percentEncoded: false)) {
             try? FileManager.default.removeItem(at: bottleData)
         }

@@ -37,7 +37,7 @@ final class BottleProgramDiscoveryTests: XCTestCase {
         // Use POSIX realpath to pin `driveC` to the same canonical form the
         // enumerator returns, so constructed and discovered URLs (and the
         // blocklist entry, compared by URL equality inside the helper) match.
-        // Real bottles live under ~/Library/Containers, which isn't symlinked.
+        // Real bottles live under ~/Library/Application Support/Whisky, which isn't symlinked.
         driveC = Self.canonicalize(driveC)
     }
 

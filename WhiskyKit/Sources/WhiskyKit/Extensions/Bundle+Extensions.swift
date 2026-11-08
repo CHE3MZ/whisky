@@ -22,4 +22,10 @@ public extension Bundle {
     static var whiskyBundleIdentifier: String {
         Bundle.main.bundleIdentifier ?? "com.che3mz.whisky"
     }
+
+    /// Folder name Whisky uses for its own files under `~/Library`.
+    ///
+    /// Kept separate from the bundle identifier so the on-disk folders stay
+    /// user-friendly (`~/Library/Application Support/Whisky`, etc.).
+    static let whiskyFolderName = "Whisky"
 }

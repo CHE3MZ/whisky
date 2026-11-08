@@ -270,7 +270,7 @@ DXVK provides better GPU acceleration for Steam's UI rendering, reducing stutter
 
 **If Still Invisible:**
 - Delete Steam, reinstall fresh
-- Check ~/Library/Logs/com.che3mz.whisky/ for errors
+- Check ~/Library/Logs/Whisky/ for errors
 
 **Related Issues:**
 - whisky-app/whisky#1183 (No UI)

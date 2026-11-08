@@ -85,13 +85,19 @@ To switch:
 
 The original app uses a different bundle identifier (`com.che3mz.whisky` here vs. `com.isaacmarovitz.Whisky`), which is why bottles aren't shared automatically. The old **Bottle → Export** / **File → Import Bottle** route still works if you'd rather move bottles by hand or onto another Mac. With no critical bottles, you can skip migration entirely — the new app creates a fresh bottle on first launch.
 
-> **Upgrading from an earlier `com.franke.Whisky` build?** This fork now uses `com.che3mz.whisky`. Move your data once:
+> **Upgrading from an earlier `com.franke.Whisky` build?** This fork now keeps its files under `Whisky` folders (for example `~/Library/Application Support/Whisky`) instead of the bundle identifier. Move your data once:
 >
 > ```sh
-> mv ~/Library/Application\ Support/com.franke.Whisky ~/Library/Application\ Support/com.che3mz.whisky
-> defaults export com.franke.Whisky /tmp/whisky-old.plist
-> defaults import com.che3mz.whisky /tmp/whisky-old.plist
-> rm /tmp/whisky-old.plist
+> mkdir -p "$HOME/Library/Application Support/Whisky"
+> for old in com.franke.Whisky com.che3mz.whisky; do
+>   mv "$HOME/Library/Application Support/$old/"* "$HOME/Library/Application Support/Whisky/" 2>/dev/null || true
+>   mv "$HOME/Library/Containers/$old/BottleVM.plist" "$HOME/Library/Application Support/Whisky/" 2>/dev/null || true
+>   mv "$HOME/Library/Containers/$old/GameRouting.plist" "$HOME/Library/Application Support/Whisky/" 2>/dev/null || true
+>   mv "$HOME/Library/Containers/$old/Bottles" "$HOME/Library/Application Support/Whisky/" 2>/dev/null || true
+> done
+> defaults export com.franke.Whisky /tmp/whisky-old.plist 2>/dev/null || true
+> defaults import com.che3mz.whisky /tmp/whisky-old.plist 2>/dev/null || true
+> rm -f /tmp/whisky-old.plist
 > ```
 >
 > Caches, logs, and HTTP storage can be discarded; the app recreates them.
@@ -100,7 +106,7 @@ The original app uses a different bundle identifier (`com.che3mz.whisky` here vs
 
 Dragging **Whisky.app** to the Trash (or `brew uninstall --cask CHE3MZ/tools/whisky`) removes the app but leaves the Wine runtime, your bottles, and app data behind — by design, so reinstalling doesn't re-download ~330 MB or lose your bottles.
 
-> ⚠️ **Back up your bottles first if you want to keep them.** Removing the container below deletes every bottle stored in its default location. Bottles you created in a custom folder live wherever you put them — check **Bottle → Reveal in Finder** before deleting anything.
+> ⚠️ **Back up your bottles first if you want to keep them.** Removing the `Whisky` folder below deletes every bottle stored in its default location. Bottles you created in a custom folder live wherever you put them — check **Bottle → Reveal in Finder** before deleting anything.
 
 To remove Whisky **completely**, delete the app and then these paths (all under `~/Library`):
 
@@ -108,18 +114,18 @@ To remove Whisky **completely**, delete the app and then these paths (all under 
 # 1. The app itself
 rm -rf "/Applications/Whisky.app"          # or: brew uninstall --cask CHE3MZ/tools/whisky
 
-# 2. Bottles + bottle list (default bottle location is inside this container)
-rm -rf ~/Library/Containers/com.che3mz.whisky
-rm -rf ~/Library/Containers/com.che3mz.whisky.WhiskyThumbnail
+# 2. Bottles, bottle registry, and the ~330 MB Wine runtime (default location)
+rm -rf ~/Library/Application\ Support/Whisky
 
-# 3. The Wine runtime (~330 MB) and other app support
-rm -rf ~/Library/Application\ Support/com.che3mz.whisky
+# 3. Caches and logs
+rm -rf ~/Library/Caches/Whisky
+rm -rf ~/Library/Logs/Whisky
 
-# 4. Caches, logs, preferences, and saved state
-rm -rf ~/Library/Caches/com.che3mz.whisky
-rm -rf ~/Library/Logs/com.che3mz.whisky
+# 4. System-managed files that stay named after the bundle identifier
 rm -rf ~/Library/HTTPStorages/com.che3mz.whisky
 rm -f  ~/Library/Preferences/com.che3mz.whisky.plist
+rm -rf ~/Library/Saved\ Application\ State/com.che3mz.whisky.savedState
+rm -rf ~/Library/Containers/com.che3mz.whisky.WhiskyThumbnail
 ```
 
 If you also installed bottles in a **custom location**, delete those folders too. Migrated bottles that still belong to the original app live under `~/Library/Containers/com.isaacmarovitz.Whisky` and are left untouched by the steps above.
