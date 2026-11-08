@@ -1,9 +1,9 @@
 # Steam Compatibility Guide
 
-**Feature:** Launcher Compatibility System (CHE3MZ/whisky#41)
+**Feature:** Launcher Compatibility System
 **Last Updated:** January 12, 2026
 
-> **Note:** This documentation references issue numbers from both this fork (CHE3MZ/whisky) and the original upstream project (whisky-app/whisky). Upstream references are kept for historical context. Please report new issues to [CHE3MZ/whisky](https://github.com/CHE3MZ/whisky/issues).
+> **Note:** This documentation references issue numbers from the original upstream project (whisky-app/whisky). Upstream references are kept for historical context. Please report new issues to [this fork](https://github.com/CHE3MZ/whisky/issues).
 
 ---
 
@@ -531,12 +531,11 @@ Before reporting Steam issues, verify:
 - https://help.steampowered.com/
 
 ### Whisky Resources:
-- Issue Tracking: CHE3MZ/whisky#41
+- Issue Tracking: https://github.com/CHE3MZ/whisky/issues
 - Troubleshooting: [LauncherTroubleshooting.md](LauncherTroubleshooting.md)
 
 ### Community:
-- GitHub Discussions: CHE3MZ/whisky
-- Upstream: whisky-app/whisky
+- Upstream: https://github.com/whisky-app/whisky
 
 ---
 
@@ -765,6 +764,6 @@ The launcher compatibility system addresses the majority of Steam issues documen
 **For additional help, see:**
 - [LauncherTroubleshooting.md](LauncherTroubleshooting.md) - All launchers
 - [LauncherSecurityNotes.md](LauncherSecurityNotes.md) - Security info
-- GitHub: CHE3MZ/whisky#41 - Report issues
+- GitHub: https://github.com/CHE3MZ/whisky/issues - Report issues
 
 **Happy gaming on Steam via Whisky!** 🎮

@@ -71,16 +71,16 @@ PR** — hand-editing the string catalog tends to re-serialize the whole file
 translations.
 
 Translations are managed through Crowdin and synced automatically: the
-[`Crowdin`](.github/workflows/Crowdin.yml) workflow uploads new English strings
+[`Crowdin`](workflows/Crowdin.yml) workflow uploads new English strings
 to the project's Crowdin, and opens a `New translations from Crowdin` pull
 request when translators add or update strings. To help translate, contribute
 through the Crowdin project rather than opening a PR here.
 
 ## Changelog
 
-We maintain a [CHANGELOG](docs/CHANGELOG.md) following the [Conventional 
-Commits](https://www.conventionalcommits.org/) format. In order to update the 
-[CHANGELOG](docs/CHANGELOG.md), run `task changelog` and commit the file.
+We maintain a [CHANGELOG](../docs/CHANGELOG.md) following the [Conventional
+Commits](https://www.conventionalcommits.org/) format. To update it, run
+`task changelog` (see `Taskfile.yml`) and commit the file.
 
 ## Secret scanning
 
@@ -139,7 +139,7 @@ All tests must pass before your PR can be merged.
 
 ### Testing Launcher Compatibility Features
 
-If your changes affect launcher compatibility (Issue #41), please perform the following tests:
+If your changes affect launcher compatibility, please perform the following tests:
 
 1.  **Unit Tests**: Ensure coverage for launcher detection, environment generation, and settings persistence.
 2.  **Manual Testing**:

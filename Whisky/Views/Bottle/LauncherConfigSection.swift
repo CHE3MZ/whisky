@@ -40,7 +40,7 @@ struct LauncherConfigSection: View {
                 Toggle("Launcher Compatibility Mode", isOn: $bottle.settings.launcherCompatibilityMode)
                     .help("""
                     Enables automatic fixes for Steam, Rockstar, EA App, Epic Games, \
-                    and other game launchers (CHE3MZ/whisky#41)
+                    and other game launchers (CHE3MZ/whisky)
                     """)
 
                 if bottle.settings.launcherCompatibilityMode {

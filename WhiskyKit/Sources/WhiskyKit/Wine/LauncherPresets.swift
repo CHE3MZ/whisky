@@ -64,7 +64,7 @@ public struct LauncherFixDetail: Sendable {
 /// Represents different game launcher platforms with optimized configurations.
 ///
 /// This enum provides launcher-specific environment variable presets to address
-/// compatibility issues documented in CHE3MZ/whisky#41 and ~100 related upstream issues.
+/// compatibility issues documented in this fork and ~100 related upstream issues.
 ///
 /// ## Overview
 ///

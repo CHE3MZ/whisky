@@ -20,7 +20,7 @@ import Foundation
 
 public enum DistributionConfig {
     /// Base URL for GitHub Pages distribution
-    public static let baseURL = "https://frankea.github.io/Whisky"
+    public static let baseURL = "https://che3mz.github.io/whisky"
 
     /// URL for the WhiskyWine version plist file
     public static let versionPlistURL = "\(baseURL)/WhiskyWineVersion.plist"

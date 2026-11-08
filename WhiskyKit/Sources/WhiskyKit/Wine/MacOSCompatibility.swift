@@ -167,7 +167,7 @@ extension Wine {
     /// Apply environment variable fixes for macOS 15.x (Sequoia) compatibility.
     ///
     /// These fixes address upstream issues whisky-app/whisky#1372, #1310, #1307
-    /// and CHE3MZ/whisky#41 (launcher compatibility tracking issue).
+    /// and the launcher compatibility work in this fork.
     ///
     /// This method iterates the ``MacOSCompatibilityFixes/allFixes`` registry, filtering
     /// by the current macOS version. The WINEESYNC conditional logic is preserved as a

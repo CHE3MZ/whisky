@@ -24,7 +24,7 @@ final class DistributionConfigTests: XCTestCase {
     // MARK: - Base URL Tests
 
     func testBaseURL() {
-        XCTAssertEqual(DistributionConfig.baseURL, "https://frankea.github.io/Whisky")
+        XCTAssertEqual(DistributionConfig.baseURL, "https://che3mz.github.io/whisky")
     }
 
     func testBaseURLIsHTTPS() {
@@ -34,7 +34,7 @@ final class DistributionConfigTests: XCTestCase {
     // MARK: - Version Plist URL Tests
 
     func testVersionPlistURL() {
-        let expectedURL = "https://frankea.github.io/Whisky/WhiskyWineVersion.plist"
+        let expectedURL = "https://che3mz.github.io/whisky/WhiskyWineVersion.plist"
         XCTAssertEqual(DistributionConfig.versionPlistURL, expectedURL)
     }
 
@@ -57,7 +57,7 @@ final class DistributionConfigTests: XCTestCase {
     // MARK: - Appcast URL Tests
 
     func testAppcastURL() {
-        let expectedURL = "https://frankea.github.io/Whisky/appcast.xml"
+        let expectedURL = "https://che3mz.github.io/whisky/appcast.xml"
         XCTAssertEqual(DistributionConfig.appcastURL, expectedURL)
     }
 
@@ -167,7 +167,7 @@ final class DistributionConfigTests: XCTestCase {
         )
         XCTAssertEqual(
             expectedURL,
-            "https://frankea.github.io/Whisky/WhiskyWineVersion.plist",
+            "https://che3mz.github.io/whisky/WhiskyWineVersion.plist",
             "WhiskyWineInstaller should use GitHub Pages URL"
         )
     }
@@ -365,7 +365,7 @@ final class DistributionConfigTests: XCTestCase {
         let versionURL = URL(string: DistributionConfig.versionPlistURL)
         XCTAssertNotNil(versionURL, "Version plist URL should be valid")
         XCTAssertEqual(versionURL?.scheme, "https")
-        XCTAssertEqual(versionURL?.host, "frankea.github.io")
+        XCTAssertEqual(versionURL?.host, "che3mz.github.io")
 
         // Libraries download URL
         let librariesURL = URL(string: DistributionConfig.librariesURL(version: "2.5.0"))
@@ -377,7 +377,7 @@ final class DistributionConfigTests: XCTestCase {
         let appcastURL = URL(string: DistributionConfig.appcastURL)
         XCTAssertNotNil(appcastURL, "Appcast URL should be valid")
         XCTAssertEqual(appcastURL?.scheme, "https")
-        XCTAssertEqual(appcastURL?.host, "frankea.github.io")
+        XCTAssertEqual(appcastURL?.host, "che3mz.github.io")
     }
 }
 

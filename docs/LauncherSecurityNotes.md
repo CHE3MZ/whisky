@@ -1,6 +1,6 @@
 # Launcher Compatibility Security Considerations
 
-**Feature:** Launcher Compatibility System (CHE3MZ/whisky#41)  
+**Feature:** Launcher Compatibility System
 **Component:** CEF Sandbox Disable  
 **Date:** January 12, 2026
 
@@ -118,7 +118,7 @@ The CEF sandbox **cannot function under Wine** because:
 - ✅ Clear documentation of trade-off
 
 **Cons:**
-- ❌ Defeats purpose of CHE3MZ/whisky#41 (fix launcher issues)
+- ❌ Defeats the purpose of launcher compatibility mode (fix launcher issues)
 - ❌ Steam won't work out-of-box (~50 user-facing issues)
 - ❌ Users frustrated: "Why doesn't Steam work?"
 - ❌ Requires technical knowledge to enable

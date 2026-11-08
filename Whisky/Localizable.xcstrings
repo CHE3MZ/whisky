@@ -3833,286 +3833,286 @@
         }
       }
     },
-    "Enables automatic fixes for Steam, Rockstar, EA App, Epic Games, and other game launchers (CHE3MZ/whisky#41)" : {
+    "Enables automatic fixes for Steam, Rockstar, EA App, Epic Games, and other game launchers (CHE3MZ/whisky)" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "يفعّل الإصلاحات التلقائية لـ Steam وRockstar وEA App وEpic Games وغيرها من مشغّلات الألعاب (CHE3MZ/whisky#41)"
+            "value" : "يفعّل الإصلاحات التلقائية لـ Steam وRockstar وEA App وEpic Games وغيرها من مشغّلات الألعاب (CHE3MZ/whisky)"
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zapíná automatické opravy pro Steam, Rockstar, EA App, Epic Games a další herní launchery (CHE3MZ/whisky#41)"
+            "value" : "Zapíná automatické opravy pro Steam, Rockstar, EA App, Epic Games a další herní launchery (CHE3MZ/whisky)"
           }
         },
         "da" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aktiverer automatiske løsninger til Steam, Rockstar, EA App, Epic Games og andre spillaunchere (CHE3MZ/whisky#41)"
+            "value" : "Aktiverer automatiske løsninger til Steam, Rockstar, EA App, Epic Games og andre spillaunchere (CHE3MZ/whisky)"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aktiviert automatische Korrekturen für Steam, Rockstar, EA App, Epic Games und andere Spiele-Launcher (CHE3MZ/whisky#41)"
+            "value" : "Aktiviert automatische Korrekturen für Steam, Rockstar, EA App, Epic Games und andere Spiele-Launcher (CHE3MZ/whisky)"
           }
         },
         "en" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enables automatic fixes for Steam, Rockstar, EA App, Epic Games, and other game launchers (CHE3MZ/whisky#41)"
+            "value" : "Enables automatic fixes for Steam, Rockstar, EA App, Epic Games, and other game launchers (CHE3MZ/whisky)"
           }
         },
         "en-GB" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Enables automatic fixes for Steam, Rockstar, EA App, Epic Games, and other game launchers (CHE3MZ/whisky#41)"
+            "value" : "Enables automatic fixes for Steam, Rockstar, EA App, Epic Games, and other game launchers (CHE3MZ/whisky)"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Activa correcciones automáticas para Steam, Rockstar, EA App, Epic Games y otros lanzadores de juegos (CHE3MZ/whisky#41)"
+            "value" : "Activa correcciones automáticas para Steam, Rockstar, EA App, Epic Games y otros lanzadores de juegos (CHE3MZ/whisky)"
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ottaa käyttöön automaattiset korjaukset Steamille, Rockstarille, EA Appille, Epic Gamesille ja muille pelikäynnistimille (CHE3MZ/whisky#41)"
+            "value" : "Ottaa käyttöön automaattiset korjaukset Steamille, Rockstarille, EA Appille, Epic Gamesille ja muille pelikäynnistimille (CHE3MZ/whisky)"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Active des correctifs automatiques pour Steam, Rockstar, EA App, Epic Games et d'autres lanceurs de jeux (CHE3MZ/whisky#41)"
+            "value" : "Active des correctifs automatiques pour Steam, Rockstar, EA App, Epic Games et d'autres lanceurs de jeux (CHE3MZ/whisky)"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Attiva correzioni automatiche per Steam, Rockstar, EA App, Epic Games e altri launcher di giochi (CHE3MZ/whisky#41)"
+            "value" : "Attiva correzioni automatiche per Steam, Rockstar, EA App, Epic Games e altri launcher di giochi (CHE3MZ/whisky)"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Steam、Rockstar、EA App、Epic Games などのゲームランチャー向けの自動修正を有効にします (CHE3MZ/whisky#41)"
+            "value" : "Steam、Rockstar、EA App、Epic Games などのゲームランチャー向けの自動修正を有効にします (CHE3MZ/whisky)"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Steam, Rockstar, EA App, Epic Games 등 게임 런처에 대한 자동 수정을 활성화합니다 (CHE3MZ/whisky#41)"
+            "value" : "Steam, Rockstar, EA App, Epic Games 등 게임 런처에 대한 자동 수정을 활성화합니다 (CHE3MZ/whisky)"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Schakelt automatische oplossingen in voor Steam, Rockstar, EA App, Epic Games en andere gamelaunchers (CHE3MZ/whisky#41)"
+            "value" : "Schakelt automatische oplossingen in voor Steam, Rockstar, EA App, Epic Games en andere gamelaunchers (CHE3MZ/whisky)"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Włącza automatyczne poprawki dla Steam, Rockstar, EA App, Epic Games i innych launcherów gier (CHE3MZ/whisky#41)"
+            "value" : "Włącza automatyczne poprawki dla Steam, Rockstar, EA App, Epic Games i innych launcherów gier (CHE3MZ/whisky)"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ativa correções automáticas para Steam, Rockstar, EA App, Epic Games e outros launchers de jogos (CHE3MZ/whisky#41)"
+            "value" : "Ativa correções automáticas para Steam, Rockstar, EA App, Epic Games e outros launchers de jogos (CHE3MZ/whisky)"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ativa correções automáticas para Steam, Rockstar, EA App, Epic Games e outros launchers de jogos (CHE3MZ/whisky#41)"
+            "value" : "Ativa correções automáticas para Steam, Rockstar, EA App, Epic Games e outros launchers de jogos (CHE3MZ/whisky)"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Activează remedieri automate pentru Steam, Rockstar, EA App, Epic Games și alte launchere de jocuri (CHE3MZ/whisky#41)"
+            "value" : "Activează remedieri automate pentru Steam, Rockstar, EA App, Epic Games și alte launchere de jocuri (CHE3MZ/whisky)"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Включает автоматические исправления для Steam, Rockstar, EA App, Epic Games и других игровых лаунчеров (CHE3MZ/whisky#41)"
+            "value" : "Включает автоматические исправления для Steam, Rockstar, EA App, Epic Games и других игровых лаунчеров (CHE3MZ/whisky)"
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aktiverar automatiska åtgärder för Steam, Rockstar, EA App, Epic Games och andra spellaunchers (CHE3MZ/whisky#41)"
+            "value" : "Aktiverar automatiska åtgärder för Steam, Rockstar, EA App, Epic Games och andra spellaunchers (CHE3MZ/whisky)"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Steam, Rockstar, EA App, Epic Games ve diğer oyun başlatıcıları için otomatik düzeltmeleri etkinleştirir (CHE3MZ/whisky#41)"
+            "value" : "Steam, Rockstar, EA App, Epic Games ve diğer oyun başlatıcıları için otomatik düzeltmeleri etkinleştirir (CHE3MZ/whisky)"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Вмикає автоматичні виправлення для Steam, Rockstar, EA App, Epic Games та інших ігрових лаунчерів (CHE3MZ/whisky#41)"
+            "value" : "Вмикає автоматичні виправлення для Steam, Rockstar, EA App, Epic Games та інших ігрових лаунчерів (CHE3MZ/whisky)"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bật các bản sửa lỗi tự động cho Steam, Rockstar, EA App, Epic Games và các trình khởi chạy game khác (CHE3MZ/whisky#41)"
+            "value" : "Bật các bản sửa lỗi tự động cho Steam, Rockstar, EA App, Epic Games và các trình khởi chạy game khác (CHE3MZ/whisky)"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "为 Steam、Rockstar、EA App、Epic Games 等游戏启动器启用自动修复 (CHE3MZ/whisky#41)"
+            "value" : "为 Steam、Rockstar、EA App、Epic Games 等游戏启动器启用自动修复 (CHE3MZ/whisky)"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "為 Steam、Rockstar、EA App、Epic Games 等遊戲啟動器啟用自動修正 (CHE3MZ/whisky#41)"
+            "value" : "為 Steam、Rockstar、EA App、Epic Games 等遊戲啟動器啟用自動修正 (CHE3MZ/whisky)"
           }
         }
       }
     },
-    "Enables workarounds for common game controller detection and mapping issues on macOS (CHE3MZ/whisky#42)" : {
+    "Enables workarounds for common game controller detection and mapping issues on macOS (CHE3MZ/whisky)" : {
       "localizations" : {
         "ar" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "يفعّل الحلول البديلة لمشكلات اكتشاف وحدات التحكم في الألعاب وتعيين أزرارها الشائعة على macOS (CHE3MZ/whisky#42)"
+            "value" : "يفعّل الحلول البديلة لمشكلات اكتشاف وحدات التحكم في الألعاب وتعيين أزرارها الشائعة على macOS (CHE3MZ/whisky)"
           }
         },
         "cs" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Zapíná náhradní řešení běžných potíží s rozpoznáním a mapováním herních ovladačů v macOS (CHE3MZ/whisky#42)"
+            "value" : "Zapíná náhradní řešení běžných potíží s rozpoznáním a mapováním herních ovladačů v macOS (CHE3MZ/whisky)"
           }
         },
         "da" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aktiverer løsninger på almindelige problemer med registrering og tildeling af controllere på macOS (CHE3MZ/whisky#42)"
+            "value" : "Aktiverer løsninger på almindelige problemer med registrering og tildeling af controllere på macOS (CHE3MZ/whisky)"
           }
         },
         "de" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aktiviert Problemumgehungen für häufige Probleme bei Controller-Erkennung und -Zuordnung unter macOS (CHE3MZ/whisky#42)"
+            "value" : "Aktiviert Problemumgehungen für häufige Probleme bei Controller-Erkennung und -Zuordnung unter macOS (CHE3MZ/whisky)"
           }
         },
         "es" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Activa soluciones para los problemas habituales de detección y asignación de mandos en macOS (CHE3MZ/whisky#42)"
+            "value" : "Activa soluciones para los problemas habituales de detección y asignación de mandos en macOS (CHE3MZ/whisky)"
           }
         },
         "fi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ottaa käyttöön kiertotavat yleisiin peliohjainten tunnistus- ja määritysongelmiin macOS:ssä (CHE3MZ/whisky#42)"
+            "value" : "Ottaa käyttöön kiertotavat yleisiin peliohjainten tunnistus- ja määritysongelmiin macOS:ssä (CHE3MZ/whisky)"
           }
         },
         "fr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Active des contournements pour les problèmes courants de détection et de mappage des manettes sur macOS (CHE3MZ/whisky#42)"
+            "value" : "Active des contournements pour les problèmes courants de détection et de mappage des manettes sur macOS (CHE3MZ/whisky)"
           }
         },
         "it" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Attiva soluzioni per i problemi comuni di rilevamento e mappatura dei controller su macOS (CHE3MZ/whisky#42)"
+            "value" : "Attiva soluzioni per i problemi comuni di rilevamento e mappatura dei controller su macOS (CHE3MZ/whisky)"
           }
         },
         "ja" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "macOS でよくあるゲームコントローラの検出やマッピングの問題に対する回避策を有効にします (CHE3MZ/whisky#42)"
+            "value" : "macOS でよくあるゲームコントローラの検出やマッピングの問題に対する回避策を有効にします (CHE3MZ/whisky)"
           }
         },
         "ko" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "macOS에서 흔히 발생하는 게임 컨트롤러 감지 및 매핑 문제의 우회 조치를 활성화합니다 (CHE3MZ/whisky#42)"
+            "value" : "macOS에서 흔히 발생하는 게임 컨트롤러 감지 및 매핑 문제의 우회 조치를 활성화합니다 (CHE3MZ/whisky)"
           }
         },
         "nl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Schakelt oplossingen in voor veelvoorkomende problemen met controllerdetectie en -toewijzing op macOS (CHE3MZ/whisky#42)"
+            "value" : "Schakelt oplossingen in voor veelvoorkomende problemen met controllerdetectie en -toewijzing op macOS (CHE3MZ/whisky)"
           }
         },
         "pl" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Włącza obejścia typowych problemów z wykrywaniem i mapowaniem kontrolerów w macOS (CHE3MZ/whisky#42)"
+            "value" : "Włącza obejścia typowych problemów z wykrywaniem i mapowaniem kontrolerów w macOS (CHE3MZ/whisky)"
           }
         },
         "pt-BR" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ativa soluções para problemas comuns de detecção e mapeamento de controles no macOS (CHE3MZ/whisky#42)"
+            "value" : "Ativa soluções para problemas comuns de detecção e mapeamento de controles no macOS (CHE3MZ/whisky)"
           }
         },
         "pt-PT" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Ativa soluções para os problemas habituais de deteção e mapeamento de comandos no macOS (CHE3MZ/whisky#42)"
+            "value" : "Ativa soluções para os problemas habituais de deteção e mapeamento de comandos no macOS (CHE3MZ/whisky)"
           }
         },
         "ro" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Activează soluții pentru problemele frecvente de detectare și mapare a controllerelor pe macOS (CHE3MZ/whisky#42)"
+            "value" : "Activează soluții pentru problemele frecvente de detectare și mapare a controllerelor pe macOS (CHE3MZ/whisky)"
           }
         },
         "ru" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Включает обходные решения для частых проблем с определением и назначением кнопок контроллеров в macOS (CHE3MZ/whisky#42)"
+            "value" : "Включает обходные решения для частых проблем с определением и назначением кнопок контроллеров в macOS (CHE3MZ/whisky)"
           }
         },
         "sv" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Aktiverar lösningar på vanliga problem med identifiering och knappmappning av handkontroller på macOS (CHE3MZ/whisky#42)"
+            "value" : "Aktiverar lösningar på vanliga problem med identifiering och knappmappning av handkontroller på macOS (CHE3MZ/whisky)"
           }
         },
         "tr" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "macOS'te sık görülen oyun kumandası algılama ve tuş eşleme sorunları için geçici çözümleri etkinleştirir (CHE3MZ/whisky#42)"
+            "value" : "macOS'te sık görülen oyun kumandası algılama ve tuş eşleme sorunları için geçici çözümleri etkinleştirir (CHE3MZ/whisky)"
           }
         },
         "uk" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Вмикає обхідні рішення для типових проблем із розпізнаванням і призначенням кнопок контролерів у macOS (CHE3MZ/whisky#42)"
+            "value" : "Вмикає обхідні рішення для типових проблем із розпізнаванням і призначенням кнопок контролерів у macOS (CHE3MZ/whisky)"
           }
         },
         "vi" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "Bật các giải pháp thay thế cho những sự cố thường gặp về nhận diện và ánh xạ nút tay cầm trên macOS (CHE3MZ/whisky#42)"
+            "value" : "Bật các giải pháp thay thế cho những sự cố thường gặp về nhận diện và ánh xạ nút tay cầm trên macOS (CHE3MZ/whisky)"
           }
         },
         "zh-Hans" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "启用针对 macOS 上常见游戏控制器识别和映射问题的变通方案 (CHE3MZ/whisky#42)"
+            "value" : "启用针对 macOS 上常见游戏控制器识别和映射问题的变通方案 (CHE3MZ/whisky)"
           }
         },
         "zh-Hant" : {
           "stringUnit" : {
             "state" : "translated",
-            "value" : "啟用針對 macOS 上常見遊戲控制器偵測與對應問題的因應措施 (CHE3MZ/whisky#42)"
+            "value" : "啟用針對 macOS 上常見遊戲控制器偵測與對應問題的因應措施 (CHE3MZ/whisky)"
           }
         }
       }

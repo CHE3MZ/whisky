@@ -24,7 +24,7 @@ import WhiskyKit
 /// ## Overview
 ///
 /// This system provides comprehensive diagnostics for debugging launcher problems
-/// related to CHE3MZ/whisky#41. It generates detailed reports of bottle configuration,
+/// in this fork. It generates detailed reports of bottle configuration,
 /// environment variables, system state, and validates settings against known
 /// working configurations.
 ///

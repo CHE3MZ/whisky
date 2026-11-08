@@ -23,8 +23,8 @@ import Foundation
 /// The winetricks.log entry for a verb is written only after the verb's
 /// installer process exits. The vc_redist installer is known to hang under
 /// wine after installing successfully, so the runtime can be fully present
-/// while the log (and thus verb-based detection) says it is not
-/// (CHE3MZ/whisky#233).
+/// while the log (and thus verb-based detection) says it is not. This is a
+/// known false negative in the verb-based check.
 ///
 /// The probe keys on `system32/mfc140.dll`. Wine never ships mfc140.dll as
 /// a builtin, so it only appears after a real redist install; msvcp140.dll
@@ -34,9 +34,9 @@ import Foundation
 /// winetricks' bookkeeping path: its `installed_file1` expands
 /// `W_SYSTEM32_DLLS_WIN`, which is `C:\windows\syswow64` on win64 and
 /// system32 only on win32, where the two coincide. mfc140.dll in syswow64
-/// alone is the partial install from #233 (the x86 half landed, the x64
-/// half hung) and must not count as installed, so the panel keeps offering
-/// the rerun that repairs it.
+/// alone is the partial install (the x86 half landed, the x64 half hung)
+/// and must not count as installed, so the panel keeps offering the rerun
+/// that repairs it.
 ///
 /// This probe is a fallback, scoped to the `vcruntime` definition, and is
 /// only consulted when verb-based detection found the required verbs

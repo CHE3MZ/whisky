@@ -2,7 +2,7 @@
 
 **Date:** January 12, 2026  
 **Branch:** `feature/launcher-compatibility-system`  
-**Issue:** #41 - Steam & Game Launcher Issues
+**Issue:** [whisky-app/whisky#41](https://github.com/whisky-app/whisky/issues/41) - Steam & Game Launcher Issues
 
 ## Executive Summary
 
@@ -571,7 +571,7 @@ Total time: 0.523 seconds
 ## Lessons Learned
 
 ### What Went Well
-1. **Comprehensive Planning**: Detailed analysis of Issue #41 paid off
+1. **Comprehensive Planning**: Detailed analysis of the upstream launcher issue paid off
 2. **Modular Design**: Clean separation made testing easy
 3. **Test-Driven**: Writing tests first caught issues early
 4. **Documentation**: Inline docs made code review smooth

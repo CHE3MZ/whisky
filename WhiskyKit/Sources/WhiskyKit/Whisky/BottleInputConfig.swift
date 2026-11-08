@@ -20,7 +20,7 @@ import Foundation
 
 /// Configuration settings for game controller and input device compatibility.
 ///
-/// This configuration section addresses CHE3MZ/whisky#42 (tracking issue) and
+/// This configuration section addresses controller compatibility in this fork and
 /// ~30 related upstream issues with controller detection, mapping, and functionality.
 ///
 /// ## Overview

@@ -2,7 +2,7 @@ name: Documentation
 
 on:
   push:
-    branches: [main]
+    branches: [master]
     paths:
       - 'WhiskyKit/**'
       - 'dist/pages/**'
@@ -58,7 +58,7 @@ jobs:
             --target WhiskyKit \
             --disable-indexing \
             --transform-for-static-hosting \
-            --hosting-base-path Whisky \
+            --hosting-base-path whisky \
             --output-path ../docs
 
       - name: Stage distribution files

@@ -9,7 +9,7 @@ Most problems already have an answer:
 
 1. **Make sure you're running this fork.** The default `brew install --cask whisky` installs the
    **archived original** (last updated April 2025), *not* this fork. This fork is
-   `brew install --cask CHE3MZ/whisky/whisky`, or the DMG from
+   `brew install --cask CHE3MZ/tools/whisky`, or the DMG from
    [Releases](https://github.com/CHE3MZ/whisky/releases/latest). Check **Whisky → About** — bugs in
    the archived original can't be fixed here.
 2. **Search [existing issues](https://github.com/CHE3MZ/whisky/issues?q=is%3Aissue).**

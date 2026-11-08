@@ -19,21 +19,21 @@ a successor pointer. Realistic asks, easiest first:
 
 > The `whisky` cask is already deprecated (unmaintained, 2025-04-09). `CHE3MZ/whisky` is an actively
 > maintained fork (signed + notarized DMGs, in-app Sparkle updates). Requesting one of:
-> (a) add a `caveats` note pointing users to `brew install --cask CHE3MZ/whisky/whisky`;
+> (a) add a `caveats` note pointing users to `brew install --cask CHE3MZ/tools/whisky`;
 > (b) repoint the cask's `url`/`homepage` to the fork's releases; or
 > (c) `disable!` the cask with that pointer.
 
 The `caveats`-pointer ask (a) is the lowest-friction and most likely to be accepted; a full repoint (b)
 is more sensitive. Until then, keep the README's "Getting the right Whisky" warning prominent and the
-qualified tap (`CHE3MZ/whisky/whisky`) as the documented path.
+qualified tap (`CHE3MZ/tools/whisky`) as the documented path.
 
 ## 2. Search & domain
 
 - The GitHub Pages landing page (`dist/pages/`) already has solid on-page SEO (title, description,
-  OpenGraph/Twitter cards, JSON-LD). The ceiling is **domain authority**: `frankea.github.io` is treated
+  OpenGraph/Twitter cards, JSON-LD). The ceiling is **domain authority**: `che3mz.github.io` is treated
   as its own site by search engines (github.io is on the Public Suffix List), but a project subpath on a
   personal Pages domain still carries less weight for a niche query than a dedicated domain with backlinks.
-- **Action:** consider a custom domain (e.g. `whisky.frankea.dev` or a `.app`) with a `CNAME` in
+- **Action:** consider a custom domain (e.g. `whisky.example.com` or a `.app`) with a `CNAME` in
   `dist/pages/` and the Pages custom-domain setting. Marginal alone (~5-10%), meaningful **only** paired
   with backlinks below.
 - **Action:** ask the archived `whisky-app` org (Isaac) whether the archived repo's README / getwhisky.app

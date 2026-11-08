@@ -79,7 +79,7 @@ install.
 Events carry a random per-install anonymous ID and never include personal data,
 file names, paths, or raw error text. Every event Whisky can send is the list
 above, and all of it — plus the SDK configuration — lives in one file,
-[`Whisky/Utils/Telemetry.swift`](Whisky/Utils/Telemetry.swift): all automatic
+[`Whisky/Utils/Telemetry.swift`](../Whisky/Utils/Telemetry.swift): all automatic
 capture (lifecycle events, screen views, feature flags, swizzling) is disabled,
 `personProfiles` is `.never`, and `identify()` is never called, so no person
 profile is created.

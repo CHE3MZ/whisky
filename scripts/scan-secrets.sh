@@ -14,9 +14,9 @@ fi
 
 cd "$(git rev-parse --show-toplevel)"
 
-# By default, scan only commits since main so re-scans don't drown in
+# By default, scan only commits since master so re-scans don't drown in
 # false positives from old bundled Wine binaries that pre-date the fork.
-BASE="${1:-origin/main}"
+BASE="${1:-origin/master}"
 
 echo "Scanning commits since $BASE for verified secrets..."
 trufflehog git \

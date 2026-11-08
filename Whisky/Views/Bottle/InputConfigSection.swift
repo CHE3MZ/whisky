@@ -33,7 +33,7 @@ struct InputConfigSection: View {
                 Toggle("Controller Compatibility Mode", isOn: $bottle.settings.controllerCompatibilityMode)
                     .help("""
                     Enables workarounds for common game controller detection \
-                    and mapping issues on macOS (CHE3MZ/whisky#42)
+                    and mapping issues on macOS (CHE3MZ/whisky)
                     """)
 
                 if bottle.settings.controllerCompatibilityMode {

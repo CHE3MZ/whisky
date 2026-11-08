@@ -25,7 +25,7 @@ Roles here expand with track record:
 1. **Contributor**: pull requests, reviewed and merged by the maintainer.
 2. **Project member (triage)**: issue triage, labels, and pull request review. No commit access.
 3. **Co-maintainer (commit)**: direct commit and merge rights. Considered only after a sustained
-   record at the previous stage, and only alongside branch protection requiring review on `main`.
+   record at the previous stage, and only alongside branch protection requiring review on `master`.
 
 Regardless of stage, **release signing stays with the maintainer**: the Developer ID certificate, the
 Sparkle update key, and the notarization credentials exist only on the maintainer's machines and are

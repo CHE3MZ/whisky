@@ -1,9 +1,9 @@
 # Launcher Troubleshooting Guide
 
-**Feature:** Launcher Compatibility System (CHE3MZ/whisky#41)
+**Feature:** Launcher Compatibility System
 **Last Updated:** January 12, 2026
 
-> **Note:** This documentation references issue numbers from both this fork (CHE3MZ/whisky) and the original upstream project (whisky-app/whisky). Upstream references are kept for historical context. Please report new issues to [CHE3MZ/whisky](https://github.com/CHE3MZ/whisky/issues).
+> **Note:** This documentation references issue numbers from the original upstream project (whisky-app/whisky). Upstream references are kept for historical context. Please report new issues to [this fork](https://github.com/CHE3MZ/whisky/issues).
 
 ---
 
@@ -555,7 +555,7 @@ Include in your issue report:
 
 - **GitHub Issues:** https://github.com/CHE3MZ/whisky/issues
 - **Upstream Repository:** https://github.com/whisky-app/whisky
-- **This Fork's Tracking Issue:** CHE3MZ/whisky#41
+- **This Fork's Issue Tracker:** https://github.com/CHE3MZ/whisky/issues
 
 ---
 
@@ -659,8 +659,8 @@ Before making changes:
 
 ## Additional Resources
 
-- **Issue Tracking:** CHE3MZ/whisky#41
-- **Pull Request:** #53
+- **Issue Tracking:** https://github.com/CHE3MZ/whisky/issues
+- **Upstream Pull Request:** [frankea/Whisky#53](https://github.com/frankea/Whisky/pull/53)
 - **Security Notes:** [LauncherSecurityNotes.md](LauncherSecurityNotes.md)
 - **Implementation Details:** [LauncherCompatibilityImplementation.md](LauncherCompatibilityImplementation.md)
 
