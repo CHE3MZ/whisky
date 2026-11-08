@@ -9,6 +9,10 @@ tasks:
     silent: true
     cmds:
       - task --list
+  build:
+    desc: Build the app
+    cmds:
+      - scripts/build.sh {{.CLI_ARGS}}
   cliff:
     desc: Run git cliff
     silent: true
