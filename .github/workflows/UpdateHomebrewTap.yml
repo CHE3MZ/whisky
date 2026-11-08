@@ -37,6 +37,7 @@ jobs:
             echo "::error::BREW_TOKEN secret is not set. Add a PAT with Contents:write for CHE3MZ/homebrew-tools."
             exit 1
           fi
+          echo "::add-mask::${BREW_TOKEN}"
 
           if [[ "$TAG" != app-v* ]]; then
             echo "::error::Refusing to sync: '${TAG}' is not an app release tag (expected app-vX.Y.Z)."
@@ -74,6 +75,8 @@ jobs:
           else
             sed -i -E "s/version \"[^\"]+\"/version \"${version}\"/" Casks/whisky.rb
             sed -i -E "s/sha256 \"[0-9a-f]{64}\"/sha256 \"${sha}\"/" Casks/whisky.rb
+            # Older casks used the bare runtime-style v tag; rewrite it to app-v.
+            sed -i -E 's#releases/download/v#releases/download/app-v#' Casks/whisky.rb
           fi
 
           # `sed -i` exits 0 even when it matches nothing, so assert both edits
@@ -85,6 +88,8 @@ jobs:
             || { echo "::error::version line was not updated in Casks/whisky.rb"; exit 1; }
           grep -qF "sha256 \"${sha}\"" Casks/whisky.rb \
             || { echo "::error::sha256 line was not updated (existing line not 64-lowercase-hex?)"; exit 1; }
+          grep -qF "releases/download/app-v#{version}" Casks/whisky.rb \
+            || { echo "::error::url line does not use the app-v tag scheme in Casks/whisky.rb"; exit 1; }
 
           git add Casks/whisky.rb
           if git diff --cached --quiet; then

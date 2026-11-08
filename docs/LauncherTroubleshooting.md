@@ -660,7 +660,7 @@ Before making changes:
 ## Additional Resources
 
 - **Issue Tracking:** https://github.com/CHE3MZ/whisky/issues
-- **Upstream Pull Request:** [frankea/Whisky#53](https://github.com/frankea/Whisky/pull/53)
+- **Parent fork pull request:** [frankea/Whisky#53](https://github.com/frankea/Whisky/pull/53)
 - **Security Notes:** [LauncherSecurityNotes.md](LauncherSecurityNotes.md)
 - **Implementation Details:** [LauncherCompatibilityImplementation.md](LauncherCompatibilityImplementation.md)
 

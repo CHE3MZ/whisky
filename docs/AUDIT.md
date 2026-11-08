@@ -20,6 +20,7 @@ means different things in different buckets.
 
 | Status | What it really means |
 |---|---|
+| `addressed-direct` | The issue number is cited in CHANGELOG, code, docs, or a commit message. **High confidence.** |
 | `addressed-categorical` | The issue's symptom class maps to a shipped v1.0 requirement category. **Infrastructure exists** (e.g. the troubleshooting wizard, dependency installer, crash classifier) — but for any specific user, that infrastructure still has to surface the right remediation in their specific case. Not equivalent to "verified fixed for this issue." |
 | `wont-fix-out-of-scope` | Wine internals, anti-cheat, kernel, mobile, niche corporate apps. Not addressable from the app side. |
 | `unverified` | Body too incoherent to triage, or genuinely needs reproduction. **Honest bucket.** |

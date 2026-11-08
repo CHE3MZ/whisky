@@ -26,14 +26,15 @@ A Developer ID Application certificate is required to ship a Gatekeeper-friendly
 Apple's notary service needs an app-specific password.
 
 1. Generate one at <https://appleid.apple.com> → **Sign-In and Security → App-Specific Passwords**.
-2. Store it as a notarytool keychain profile:
+2. Store it as a notarytool keychain profile, exporting `DEVELOPMENT_TEAM` first:
    ```sh
+   export DEVELOPMENT_TEAM=ABCDE12345  # your 10-character Apple Developer team ID
    xcrun notarytool store-credentials AC_PASSWORD \
      --apple-id <your-apple-id-email> \
-     --team-id Z7JS58F8U3 \
+     --team-id "$DEVELOPMENT_TEAM" \
      --password <app-specific-password>
    ```
-3. The release script reads this profile by name (`AC_PASSWORD`).
+3. The release script reads this profile by name (`AC_PASSWORD`) and requires `DEVELOPMENT_TEAM` so the archive and export use your signing team.
 
 ### Sparkle EdDSA keys
 
@@ -121,10 +122,14 @@ Update both fields in `Whisky.xcodeproj/project.pbxproj` (every occurrence):
 - `MARKETING_VERSION = X.Y.Z;` — user-visible version.
 - `CURRENT_PROJECT_VERSION = N;` — Sparkle build number, must increment monotonically.
 
-### 2. Build, sign, notarize, package
+### 2. Update the changelog
+
+Run `task changelog` (see `Taskfile.yml`) to regenerate `docs/CHANGELOG.md`, then commit it with the release.
+
+### 3. Build, sign, notarize, package
 
 ```sh
-scripts/release.sh X.Y.Z
+DEVELOPMENT_TEAM=ABCDE12345 scripts/release.sh X.Y.Z
 ```
 
 The script:
@@ -171,7 +176,7 @@ Edit `dist/pages/appcast.xml` and add a new `<item>` near the top of `<channel>`
 ### 6. Commit, tag, and release
 
 ```sh
-git add Whisky.xcodeproj/project.pbxproj dist/pages/appcast.xml
+git add Whisky.xcodeproj/project.pbxproj docs/CHANGELOG.md dist/pages/appcast.xml
 git commit -m "release: X.Y.Z"
 git push
 git tag -a app-vX.Y.Z -m "Whisky X.Y.Z"
