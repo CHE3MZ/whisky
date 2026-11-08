@@ -171,13 +171,12 @@
             <sparkle:shortVersionString>3.3.0</sparkle:shortVersionString>
             <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
             <description><![CDATA[
-                <p>Crash-safe, forward-compatible bottle settings, hardened icon parsing, and optional opt-in anonymous telemetry.</p>
+                <p>Crash-safe, forward-compatible bottle settings and hardened icon parsing.</p>
                 <ul>
                     <li>Bottle and per-program settings are now written atomically, so a crash mid-save can no longer wipe your configuration.</li>
                     <li>Settings written by a newer Whisky load gracefully — an unrecognized choice falls back to its default instead of failing to load the whole bottle.</li>
                     <li>An unreadable settings file is now preserved (moved aside for recovery) instead of being silently overwritten.</li>
                     <li>Hardened icon and thumbnail extraction against crafted or corrupt Windows executables that could previously crash or hang the parser.</li>
-                    <li>Optional, <strong>opt-in</strong> anonymous usage telemetry (off by default) to surface first-run install failures — no personal data, paths, or error text is ever sent.</li>
                 </ul>
                 <p>See the <a href="https://github.com/CHE3MZ/whisky/releases/tag/app-v3.3.0">release notes</a> for the full changelog.</p>
             ]]></description>

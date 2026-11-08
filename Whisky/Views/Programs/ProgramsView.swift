@@ -239,7 +239,6 @@ struct ProgramItemView: View {
 
     private func launchProgram() {
         isLaunching = true
-        Telemetry.capture(.firstProgramLaunchAttempted)
         // Capture modifier flags synchronously before entering async context
         let useTerminal = NSEvent.modifierFlags.contains(.shift)
 

@@ -236,7 +236,6 @@ extension LibraryModel {
         }
 
         programLaunching.insert(url)
-        Telemetry.capture(.firstProgramLaunchAttempted)
         let useTerminal = NSEvent.modifierFlags.contains(.shift)
         Task {
             let result = await program.launchWithUserMode(useTerminal: useTerminal)

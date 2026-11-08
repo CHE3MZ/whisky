@@ -176,15 +176,13 @@ struct WhiskyWineInstallView: View {
         }
     }
 
-    /// Reports the funnel event and sets the user-facing error state.
+    /// Sets the user-facing error state.
     @MainActor
     private func applyInstallOutcome(_ outcome: InstallOutcome) {
         switch outcome {
         case .success:
-            Telemetry.capture(.runtimeInstallSucceeded)
             installError = nil
-        case let .failure(reason, message):
-            Telemetry.capture(.runtimeInstallFailed(reason: reason))
+        case let .failure(message):
             if let message {
                 installError = String(
                     format: String(localized: "setup.whiskywine.error.installFailed.detail"),
@@ -196,12 +194,11 @@ struct WhiskyWineInstallView: View {
         }
     }
 
-    /// Outcome of an install attempt. The failure case carries the coarse
-    /// telemetry reason (decided where the error is known) and an optional
-    /// user-facing message; illegal combinations are unrepresentable.
+    /// Outcome of an install attempt. The failure case carries an optional
+    /// user-facing message.
     private enum InstallOutcome {
         case success
-        case failure(reason: Telemetry.InstallFailureReason, message: String?)
+        case failure(message: String?)
 
         var installed: Bool {
             if case .success = self {
@@ -219,16 +216,14 @@ struct WhiskyWineInstallView: View {
                 try WhiskyWineInstaller.install(from: tarball)
                 guard WhiskyWineInstaller.isWhiskyWineInstalled() else {
                     // Extraction reported success but the runtime isn't usable.
-                    return .failure(reason: .runtimeIncomplete, message: nil)
+                    return .failure(message: nil)
                 }
                 // The install replaced Libraries, so any deployed GPTK payload
                 // went with it; the store outlives it and redeploys here.
                 GPTKImporter.deployStoredPayloadIfCapable()
                 return .success
             } catch {
-                let reason: Telemetry.InstallFailureReason =
-                    (error as? WhiskyWineInstallError) == .tarballNotFound ? .tarballMissing : .extractFailed
-                return .failure(reason: reason, message: error.localizedDescription)
+                return .failure(message: error.localizedDescription)
             }
         }.value
     }

@@ -511,7 +511,6 @@ Total time: 0.523 seconds
 - [ ] Cloud save synchronization helpers
 
 ### Phase 3 (Long Term)
-- [ ] Telemetry for auto-tuning defaults (opt-in)
 - [ ] Machine learning for detection improvement
 - [ ] Launcher-specific logging verbosity
 - [ ] Integration with Proton compatibility database

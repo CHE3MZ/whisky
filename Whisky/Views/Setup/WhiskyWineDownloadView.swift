@@ -32,15 +32,14 @@ struct WhiskyWineDownloadView: View {
     /// Bytes already on disk when this UI session's download began (non-zero
     /// when resuming a partial), so speed and ETA only count fresh bytes.
     @State private var sessionBaselineBytes: Int64?
-    /// The current failure, if any. Carries the user-facing message and the
-    /// telemetry reason together so the two can never drift apart.
-    /// Internal so the failure helper in WhiskyWineDownloadFormatting.swift can set it.
+    /// The current failure, if any. Internal so the failure helper in
+    /// WhiskyWineDownloadFormatting.swift can set it.
     @State var downloadFailure: DownloadFailure?
     /// Expected SHA-256 of the runtime archive, from the version plist. `nil`
     /// when no hash is advertised, in which case verification is skipped.
     @State private var expectedSHA256: String?
-    /// Guards the once-per-setup-attempt `runtime_install_started` capture against
-    /// repeated `onAppear` calls from NavigationStack (mirrors the install view).
+    /// Guards the once-per-setup-attempt download start against repeated
+    /// `onAppear` calls from NavigationStack.
     @State private var hasStartedDownload: Bool = false
     @Binding var tarLocation: URL
     @Binding var path: [SetupStage]
@@ -92,15 +91,12 @@ struct WhiskyWineDownloadView: View {
         }
         .frame(width: 400, height: 200)
         .onAppear {
-            // Guard against multiple onAppear calls from NavigationStack so the
-            // once-per-setup-attempt runtime_install_started capture holds.
+            // Guard against multiple onAppear calls from NavigationStack.
             guard !hasStartedDownload else { return }
             hasStartedDownload = true
             Task {
                 diagnostics.reset()
                 diagnostics.record("Entered download stage")
-                diagnostics.record("Telemetry consent: \(Telemetry.consent.rawValue)")
-                Telemetry.capture(.runtimeInstallStarted)
                 await fetchVersionAndDownload()
             }
         }
@@ -361,8 +357,7 @@ extension WhiskyWineDownloadView {
                         The downloaded Wine runtime failed its integrity check and was not installed. \
                         This usually means the download was corrupted. Please try again.
                         """
-                    ),
-                    reason: .verifyFailed
+                    )
                 )
                 return
             }

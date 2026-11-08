@@ -64,7 +64,6 @@ struct WhiskyApp: App {
             updaterDelegate: nil,
             userDriverDelegate: SparkleUpdaterDelegate.shared
         )
-        Telemetry.startIfConsented()
     }
 
     /// Brings a deployed GPTK payload up to date at launch, in one background
