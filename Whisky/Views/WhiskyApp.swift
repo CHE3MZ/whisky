@@ -22,7 +22,7 @@ import Sparkle
 import SwiftUI
 import WhiskyKit
 
-private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.franke.Whisky", category: "WhiskyApp")
+private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "com.che3mz.whisky", category: "WhiskyApp")
 
 @main
 // swiftlint:disable:next type_body_length

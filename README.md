@@ -83,7 +83,18 @@ To switch:
 2. Open it and choose **File → Migrate from the Original Whisky**. It finds the bottles the original app left in `~/Library/Containers/com.isaacmarovitz.Whisky/` and imports the ones you pick. Bottles are referenced **in place** — nothing is moved or copied — so the original app keeps working if you'd like to keep it around.
 3. *(Optional)* Once you're happy, remove the original app: drag **/Applications/Whisky.app** to the Trash, or `brew uninstall --cask whisky` if you installed it via Homebrew. Your bottles stay put.
 
-The original app uses a different bundle identifier (`com.franke.Whisky` here vs. `com.isaacmarovitz.Whisky`), which is why bottles aren't shared automatically. The old **Bottle → Export** / **File → Import Bottle** route still works if you'd rather move bottles by hand or onto another Mac. With no critical bottles, you can skip migration entirely — the new app creates a fresh bottle on first launch.
+The original app uses a different bundle identifier (`com.che3mz.whisky` here vs. `com.isaacmarovitz.Whisky`), which is why bottles aren't shared automatically. The old **Bottle → Export** / **File → Import Bottle** route still works if you'd rather move bottles by hand or onto another Mac. With no critical bottles, you can skip migration entirely — the new app creates a fresh bottle on first launch.
+
+> **Upgrading from an earlier `com.franke.Whisky` build?** This fork now uses `com.che3mz.whisky`. Move your data once:
+>
+> ```sh
+> mv ~/Library/Application\ Support/com.franke.Whisky ~/Library/Application\ Support/com.che3mz.whisky
+> defaults export com.franke.Whisky /tmp/whisky-old.plist
+> defaults import com.che3mz.whisky /tmp/whisky-old.plist
+> rm /tmp/whisky-old.plist
+> ```
+>
+> Caches, logs, and HTTP storage can be discarded; the app recreates them.
 
 ## Uninstalling
 
@@ -98,17 +109,17 @@ To remove Whisky **completely**, delete the app and then these paths (all under 
 rm -rf "/Applications/Whisky.app"          # or: brew uninstall --cask CHE3MZ/tools/whisky
 
 # 2. Bottles + bottle list (default bottle location is inside this container)
-rm -rf ~/Library/Containers/com.franke.Whisky
-rm -rf ~/Library/Containers/com.franke.Whisky.WhiskyThumbnail
+rm -rf ~/Library/Containers/com.che3mz.whisky
+rm -rf ~/Library/Containers/com.che3mz.whisky.WhiskyThumbnail
 
 # 3. The Wine runtime (~330 MB) and other app support
-rm -rf ~/Library/Application\ Support/com.franke.Whisky
+rm -rf ~/Library/Application\ Support/com.che3mz.whisky
 
 # 4. Caches, logs, preferences, and saved state
-rm -rf ~/Library/Caches/com.franke.Whisky
-rm -rf ~/Library/Logs/com.franke.Whisky
-rm -rf ~/Library/HTTPStorages/com.franke.Whisky
-rm -f  ~/Library/Preferences/com.franke.Whisky.plist
+rm -rf ~/Library/Caches/com.che3mz.whisky
+rm -rf ~/Library/Logs/com.che3mz.whisky
+rm -rf ~/Library/HTTPStorages/com.che3mz.whisky
+rm -f  ~/Library/Preferences/com.che3mz.whisky.plist
 ```
 
 If you also installed bottles in a **custom location**, delete those folders too. Migrated bottles that still belong to the original app live under `~/Library/Containers/com.isaacmarovitz.Whisky` and are left untouched by the steps above.

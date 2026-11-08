@@ -74,7 +74,7 @@ func bottleLocationRefusal(_ result: BottleLocationValidation.ValidationResult) 
 }
 
 private let bottleVMLogger = Logger(
-    subsystem: Bundle.main.bundleIdentifier ?? "com.franke.Whisky",
+    subsystem: Bundle.main.bundleIdentifier ?? "com.che3mz.whisky",
     category: "BottleVM"
 )
 
