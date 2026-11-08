@@ -1,7 +1,7 @@
 name: Update Homebrew Tap
 
-# When an app release (vX.Y.Z) is published, bump the CHE3MZ/homebrew-tools
-# cask to the new version + DMG sha256 so `brew install --cask CHE3MZ/whisky/whisky`
+# When an app release (app-vX.Y.Z) is published, bump the CHE3MZ/homebrew-tools
+# cask to the new version + DMG sha256 so `brew install --cask CHE3MZ/tools/whisky`
 # always tracks the latest release without a manual edit.
 #
 # Requires a repository secret BREW_TOKEN: a personal access token (classic `repo`,
@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: App release tag to sync (e.g. v3.1.0)
+        description: App release tag to sync (e.g. app-v3.1.0)
         required: true
 
 permissions:
@@ -23,7 +23,7 @@ permissions:
 jobs:
   update-tap:
     # Only app releases; the Wine Libraries stream uses bare vX.Y.Z tags and has no cask.
-    if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'v') }}
+    if: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.event.release.tag_name, 'app-v') }}
     runs-on: ubuntu-latest
     steps:
       - name: Bump cask to the released version
@@ -38,7 +38,11 @@ jobs:
             exit 1
           fi
 
-          version="${TAG#v}"
+          if [[ "$TAG" != app-v* ]]; then
+            echo "::error::Refusing to sync: '${TAG}' is not an app release tag (expected app-vX.Y.Z)."
+            exit 1
+          fi
+          version="${TAG#app-v}"
           # Strictly validate the version before it flows into URLs and the sed
           # expressions below — refuse anything that isn't a dotted numeric version.
           if ! printf '%s' "$version" | grep -qE '^[0-9]+(\.[0-9]+)*$'; then
@@ -54,8 +58,23 @@ jobs:
 
           git clone --depth 1 "https://x-access-token:${BREW_TOKEN}@github.com/CHE3MZ/homebrew-tools.git" tap
           cd tap
-          sed -i -E "s/version \"[^\"]+\"/version \"${version}\"/" Casks/whisky.rb
-          sed -i -E "s/sha256 \"[0-9a-f]{64}\"/sha256 \"${sha}\"/" Casks/whisky.rb
+          mkdir -p Casks
+          if [ ! -f Casks/whisky.rb ]; then
+            cat > Casks/whisky.rb <<EOF
+          cask "whisky" do
+            version "${version}"
+            sha256 "${sha}"
+            url "https://github.com/CHE3MZ/whisky/releases/download/app-v#{version}/Whisky-#{version}.dmg"
+            name "Whisky"
+            desc "Run Windows games and applications on macOS"
+            homepage "https://github.com/CHE3MZ/whisky"
+            app "Whisky.app"
+          end
+          EOF
+          else
+            sed -i -E "s/version \"[^\"]+\"/version \"${version}\"/" Casks/whisky.rb
+            sed -i -E "s/sha256 \"[0-9a-f]{64}\"/sha256 \"${sha}\"/" Casks/whisky.rb
+          fi
 
           # `sed -i` exits 0 even when it matches nothing, so assert both edits
           # actually landed. Otherwise a partial match (e.g. the existing sha256
@@ -67,13 +86,14 @@ jobs:
           grep -qF "sha256 \"${sha}\"" Casks/whisky.rb \
             || { echo "::error::sha256 line was not updated (existing line not 64-lowercase-hex?)"; exit 1; }
 
-          if git diff --quiet; then
+          git add Casks/whisky.rb
+          if git diff --cached --quiet; then
             echo "Cask already at ${version}; nothing to do."
             exit 0
           fi
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -am "whisky ${version}"
+          git commit -m "whisky ${version}"
           git push
           echo "Tap updated to whisky ${version}."

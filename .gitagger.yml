@@ -1,7 +1,7 @@
 scale: patch
 pre: stable
-format: auto
-custom: ""
+format: custom
+custom: "app-v<MAJOR>.<MINOR>.<PATCH>"
 remote: origin
 push: true
 force: false
