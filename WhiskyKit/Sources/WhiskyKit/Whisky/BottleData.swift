@@ -153,8 +153,7 @@ public struct BottleData: Codable {
             at: directory,
             includingPropertiesForKeys: [.isDirectoryKey],
             options: [.skipsHiddenFiles]
-        )
-        else { return [] }
+        ) else { return [] }
 
         return entries
             .filter { (try? $0.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true }

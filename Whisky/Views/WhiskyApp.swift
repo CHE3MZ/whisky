@@ -406,8 +406,7 @@ extension WhiskyApp {
         guard let urls = try? FileManager.default.contentsOfDirectory(
             at: Wine.logsFolder,
             includingPropertiesForKeys: [.creationDateKey]
-        )
-        else {
+        ) else {
             return
         }
 

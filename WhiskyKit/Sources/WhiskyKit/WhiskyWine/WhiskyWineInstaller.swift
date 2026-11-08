@@ -364,10 +364,8 @@ public class WhiskyWineInstaller {
             }
         }
 
-        if let localVersion, let remoteVersion {
-            if localVersion < remoteVersion {
-                return (true, remoteVersion)
-            }
+        if let localVersion, let remoteVersion, localVersion < remoteVersion {
+            return (true, remoteVersion)
         }
 
         return (false, SemanticVersion(0, 0, 0))

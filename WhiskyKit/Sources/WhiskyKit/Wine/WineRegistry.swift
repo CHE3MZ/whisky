@@ -46,17 +46,16 @@ enum WineRegistryFile {
                 continue
             }
 
-            if inSection, trimmed.hasPrefix("\"\(valueName)\"") {
-                // Parse value: "valueName"="value" or "valueName"=dword:00000001
-                if let equalsIndex = trimmed.firstIndex(of: "=") {
-                    let rawValue = String(trimmed[trimmed.index(after: equalsIndex)...])
-                        .trimmingCharacters(in: .whitespaces)
-                    // Strip surrounding quotes if present
-                    if rawValue.hasPrefix("\""), rawValue.hasSuffix("\"") {
-                        return String(rawValue.dropFirst().dropLast())
-                    }
-                    return rawValue
+            if inSection, trimmed.hasPrefix("\"\(valueName)\""),
+               // Parse value: "valueName"="value" or "valueName"=dword:00000001
+               let equalsIndex = trimmed.firstIndex(of: "=") {
+                let rawValue = String(trimmed[trimmed.index(after: equalsIndex)...])
+                    .trimmingCharacters(in: .whitespaces)
+                // Strip surrounding quotes if present
+                if rawValue.hasPrefix("\""), rawValue.hasSuffix("\"") {
+                    return String(rawValue.dropFirst().dropLast())
                 }
+                return rawValue
             }
         }
 
@@ -221,8 +220,7 @@ public extension Wine {
     static func retinaMode(bottle: Bottle) async throws -> Bool? {
         guard let output = try await Wine.queryRegistryKey(
             bottle: bottle, key: RegistryKey.macDriver.rawValue, name: "RetinaMode", type: .string
-        )
-        else {
+        ) else {
             return nil
         }
         switch output {
@@ -250,8 +248,7 @@ public extension Wine {
             key: RegistryKey.desktop.rawValue,
             name: "LogPixels",
             type: .dword
-        )
-        else { return nil }
+        ) else { return nil }
 
         let noPrefix = output.replacingOccurrences(of: "0x", with: "")
         let int = Int(noPrefix, radix: 16)
@@ -346,8 +343,7 @@ public extension Wine {
             key: RegistryKey.explorer.rawValue,
             name: "Desktop",
             type: .string
-        ), !desktop.isEmpty
-        else {
+        ), !desktop.isEmpty else {
             return nil
         }
         // Desktop value is present -- query the resolution

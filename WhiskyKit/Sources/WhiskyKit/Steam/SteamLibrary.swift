@@ -20,7 +20,10 @@ import Foundation
 
 /// A fully installed Steam game discovered inside a Wine bottle.
 public struct SteamGame: Identifiable, Equatable, Sendable {
-    public var id: Int { appId }
+    public var id: Int {
+        appId
+    }
+
     /// The Steam App ID.
     public let appId: Int
     /// The display name from the manifest.
@@ -219,8 +222,7 @@ public enum SteamLibrary {
         let steamApps = library.appending(path: "steamapps")
         guard let contents = try? FileManager.default.contentsOfDirectory(
             atPath: steamApps.path(percentEncoded: false)
-        )
-        else { return [] }
+        ) else { return [] }
 
         var found: [SteamGame] = []
         for filename in contents where filename.hasPrefix("appmanifest_") && filename.hasSuffix(".acf") {
@@ -234,8 +236,7 @@ public enum SteamLibrary {
             var isDirectory: ObjCBool = false
             guard FileManager.default.fileExists(
                 atPath: installURL.path(percentEncoded: false), isDirectory: &isDirectory
-            ), isDirectory.boolValue
-            else { continue }
+            ), isDirectory.boolValue else { continue }
 
             found.append(SteamGame(
                 appId: manifest.appId,

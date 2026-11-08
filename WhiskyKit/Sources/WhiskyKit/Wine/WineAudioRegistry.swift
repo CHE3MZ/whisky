@@ -129,8 +129,7 @@ public extension Wine {
             key: AudioRegistryKey.directSound.rawValue,
             name: "HelBuflen",
             type: .string
-        )
-        else {
+        ) else {
             return nil
         }
         return Int(value)

@@ -332,8 +332,7 @@ public enum BottleOperations {
             at: url,
             includingPropertiesForKeys: [.totalFileAllocatedSizeKey],
             options: [.skipsHiddenFiles]
-        )
-        else {
+        ) else {
             return 0
         }
         var total: Int64 = 0

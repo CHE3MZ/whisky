@@ -1341,8 +1341,7 @@ extension Wine {
     /// - Parameter key: The environment variable name to validate.
     /// - Returns: `true` if the key is safe to use in shell commands.
     static func isValidEnvKey(_ key: String) -> Bool {
-        guard let first = key.first else { return false }
-        guard isAsciiLetter(first) || first == "_" else { return false }
+        guard let first = key.first, isAsciiLetter(first) || first == "_" else { return false }
         return key.allSatisfy { isAsciiLetter($0) || isAsciiDigit($0) || $0 == "_" }
     }
 

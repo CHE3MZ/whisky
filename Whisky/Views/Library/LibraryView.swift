@@ -42,7 +42,9 @@ struct LibraryView: View {
     @StateObject private var model = LibraryModel()
     @State private var search: String = ""
 
-    private var bottles: [Bottle] { bottleVM.bottles.filter(\.isAvailable) }
+    private var bottles: [Bottle] {
+        bottleVM.bottles.filter(\.isAvailable)
+    }
 
     private var visible: [LibraryRow] {
         guard !search.isEmpty else { return model.rows }
@@ -82,7 +84,11 @@ struct LibraryView: View {
             "library.launch.failed",
             isPresented: Binding(
                 get: { model.launchError != nil },
-                set: { if !$0 { model.launchError = nil } }
+                set: {
+                    if !$0 {
+                        model.launchError = nil
+                    }
+                }
             )
         ) {
             Button("button.ok") { model.launchError = nil }

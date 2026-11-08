@@ -27,7 +27,9 @@ enum LibrarySort: String, CaseIterable, Identifiable {
     case name
     case bottle
 
-    var id: String { rawValue }
+    var id: String {
+        rawValue
+    }
 
     var label: LocalizedStringResource {
         switch self {
@@ -46,7 +48,9 @@ struct LibraryRow: Identifiable {
     let bottleName: String?
     let lastPlayed: Date?
 
-    var id: String { item.id }
+    var id: String {
+        item.id
+    }
 }
 
 /// Builds the library and owns what is currently starting or running.

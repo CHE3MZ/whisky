@@ -358,11 +358,9 @@ extension Whisky {
         /// Tails a log file, printing new lines as they appear until the Wine process exits.
         @MainActor
         private func tailLogFile(at logFileURL: URL) async throws {
-            guard FileManager.default.fileExists(atPath: logFileURL.path(percentEncoded: false)) else {
-                return
-            }
-
-            guard let handle = try? FileHandle(forReadingFrom: logFileURL) else { return }
+            guard FileManager.default.fileExists(atPath: logFileURL.path(percentEncoded: false)),
+                  let handle = try? FileHandle(forReadingFrom: logFileURL)
+            else { return }
             defer { try? handle.close() }
 
             // Seek to end to only show new content

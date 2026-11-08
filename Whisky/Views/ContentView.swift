@@ -62,7 +62,11 @@ struct ContentView: View {
             "bottle.creation.failed.title",
             isPresented: Binding(
                 get: { bottleVM.bottleCreationAlert != nil },
-                set: { if !$0 { bottleVM.bottleCreationAlert = nil } }
+                set: {
+                    if !$0 {
+                        bottleVM.bottleCreationAlert = nil
+                    }
+                }
             ),
             presenting: bottleVM.bottleCreationAlert
         ) { alert in
@@ -86,7 +90,11 @@ struct ContentView: View {
             "bottle.registry.corrupt.title",
             isPresented: Binding(
                 get: { corruptRegistryBackupURL != nil },
-                set: { if !$0 { corruptRegistryBackupURL = nil } }
+                set: {
+                    if !$0 {
+                        corruptRegistryBackupURL = nil
+                    }
+                }
             ),
             presenting: corruptRegistryBackupURL
         ) { _ in
@@ -101,7 +109,11 @@ struct ContentView: View {
             "bottle.orphaned.title",
             isPresented: Binding(
                 get: { !bottleVM.orphanedBottles.isEmpty },
-                set: { if !$0 { bottleVM.orphanedBottles = [] } }
+                set: {
+                    if !$0 {
+                        bottleVM.orphanedBottles = []
+                    }
+                }
             )
         ) {
             Button("bottle.orphaned.reimport") {
@@ -178,7 +190,9 @@ struct ContentView: View {
         }
         .handlesExternalEvents(preferring: [], allowing: ["*"])
         .onOpenURL { url in
-            if QuickLaunch.handle(url) { return }
+            if QuickLaunch.handle(url) {
+                return
+            }
             openedFileURL = url
         }
         .dropDestination(for: URL.self) { urls, _ in

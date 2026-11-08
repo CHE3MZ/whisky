@@ -145,7 +145,7 @@ struct WhiskyWineInstallView: View {
             diagnostics.record("Invoking WhiskyWineInstaller.install(from:) in detached task")
             let outcome = await Self.performInstall(tarball: capturedTarURL)
             let isInstalled = outcome.installed
-            if case let .failure(_, message?) = outcome {
+            if case let .failure(message?) = outcome {
                 diagnostics.record("Install failed: \(message)")
             }
             let installStatus = isInstalled ? "installed" : "not installed"

@@ -119,8 +119,7 @@ struct ProgramOverrideSettingsView: View {
             guard let diagnosis = await Wine.classifyLastRun(
                 logFileURL: logURL,
                 exitCode: 1
-            )
-            else { return }
+            ) else { return }
             diagnosisPresentation = DiagnosisPresentation(
                 diagnosis: diagnosis,
                 logText: (try? String(contentsOf: logURL, encoding: .utf8)) ?? ""
@@ -134,8 +133,7 @@ struct ProgramOverrideSettingsView: View {
             guard let diagnosis = await Wine.classifyLastRun(
                 logFileURL: logURL,
                 exitCode: 1
-            )
-            else { return }
+            ) else { return }
             diagnosisPresentation = DiagnosisPresentation(
                 diagnosis: diagnosis,
                 logText: (try? String(contentsOf: logURL, encoding: .utf8)) ?? ""

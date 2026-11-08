@@ -180,8 +180,7 @@ public enum WineUserProfile {
             at: profile,
             includingPropertiesForKeys: [.isRegularFileKey],
             options: [.skipsHiddenFiles]
-        )
-        else { return false }
+        ) else { return false }
 
         for case let item as URL in enumerator {
             let components = item.pathComponents.dropFirst(profile.pathComponents.count)

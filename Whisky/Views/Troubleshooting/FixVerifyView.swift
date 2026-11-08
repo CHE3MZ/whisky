@@ -138,8 +138,7 @@ extension FixVerifyView {
     private var canUndo: Bool {
         guard let lastApplied = engine.session.fixAttempts.last(where: {
             $0.result == .applied
-        })
-        else {
+        }) else {
             return false
         }
         // Check if the fix is reversible by previewing (read-only, no side effects)
@@ -155,8 +154,7 @@ extension FixVerifyView {
     private func performUndo() {
         guard let lastApplied = engine.session.fixAttempts.last(where: {
             $0.result == .applied
-        })
-        else {
+        }) else {
             return
         }
         let success = FixApplicator.undo(

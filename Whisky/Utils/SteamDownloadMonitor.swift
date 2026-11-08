@@ -53,8 +53,7 @@ class SteamDownloadMonitor: ObservableObject {
 
     /// Starts monitoring if the detected launcher is Steam.
     func startMonitoring(bottleURL: URL, detectedLauncher: LauncherType?) {
-        guard detectedLauncher == .steam else { return }
-        guard !isMonitoring else { return }
+        guard detectedLauncher == .steam, !isMonitoring else { return }
 
         isMonitoring = true
         lastSnapshot = [:]
@@ -117,7 +116,9 @@ class SteamDownloadMonitor: ObservableObject {
             status = .downloading
             stallStartTime = nil
         } else {
-            if stallStartTime == nil { stallStartTime = Date() }
+            if stallStartTime == nil {
+                stallStartTime = Date()
+            }
             let stallDuration = Date().timeIntervalSince(stallStartTime ?? Date())
 
             if stallDuration >= stallThreshold {
@@ -144,8 +145,7 @@ class SteamDownloadMonitor: ObservableObject {
             at: directory,
             includingPropertiesForKeys: [.isDirectoryKey],
             options: [.skipsHiddenFiles]
-        )
-        else { return snapshot }
+        ) else { return snapshot }
 
         for subdir in subdirs {
             guard let isDir = try? subdir.resourceValues(forKeys: [.isDirectoryKey]).isDirectory,
@@ -166,15 +166,15 @@ class SteamDownloadMonitor: ObservableObject {
             at: directory,
             includingPropertiesForKeys: [.fileSizeKey, .contentModificationDateKey],
             options: [.skipsHiddenFiles]
-        )
-        else { return (totalSize, newestMtime) }
+        ) else { return (totalSize, newestMtime) }
 
         for case let fileURL as URL in enumerator {
             guard let values = try? fileURL.resourceValues(
                 forKeys: [.fileSizeKey, .contentModificationDateKey]
-            )
-            else { continue }
-            if let size = values.fileSize { totalSize += UInt64(size) }
+            ) else { continue }
+            if let size = values.fileSize {
+                totalSize += UInt64(size)
+            }
             if let mtime = values.contentModificationDate, mtime > newestMtime {
                 newestMtime = mtime
             }
@@ -195,7 +195,9 @@ class SteamDownloadMonitor: ObservableObject {
         }
         for (key, cur) in current {
             guard let prev = previous[key] else { continue }
-            if cur.size > prev.size || cur.mtime > prev.mtime { return true }
+            if cur.size > prev.size || cur.mtime > prev.mtime {
+                return true
+            }
         }
         return false
     }
@@ -211,8 +213,7 @@ class SteamDownloadMonitor: ObservableObject {
             at: logsFolder,
             includingPropertiesForKeys: [.contentModificationDateKey],
             options: [.skipsHiddenFiles]
-        )
-        else { return evidence }
+        ) else { return evidence }
 
         let recentLogs = logFiles
             .filter { $0.pathExtension == "log" }

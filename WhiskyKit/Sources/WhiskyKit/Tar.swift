@@ -222,8 +222,7 @@ public class Tar {
         guard let enumerator = fileManager.enumerator(
             at: root,
             includingPropertiesForKeys: [.isSymbolicLinkKey]
-        )
-        else { return }
+        ) else { return }
 
         for case let item as URL in enumerator {
             let isSymlink = (try? item.resourceValues(forKeys: [.isSymbolicLinkKey]).isSymbolicLink) ?? false

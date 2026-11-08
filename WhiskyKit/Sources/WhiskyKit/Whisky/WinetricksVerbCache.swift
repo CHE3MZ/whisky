@@ -144,8 +144,7 @@ public struct WinetricksVerbCache: Codable, Sendable {
 
         guard let attrs = try? FileManager.default.attributesOfItem(
             atPath: logURL.path(percentEncoded: false)
-        )
-        else {
+        ) else {
             return (nil, nil)
         }
 

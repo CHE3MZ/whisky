@@ -191,8 +191,7 @@ public extension Program {
             guard let diagnosis = await Wine.classifyLastRun(
                 logFileURL: logFileURL,
                 exitCode: exitCode
-            ), !diagnosis.isEmpty
-            else {
+            ), !diagnosis.isEmpty else {
                 return
             }
 

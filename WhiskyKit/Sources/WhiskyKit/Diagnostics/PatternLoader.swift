@@ -72,16 +72,14 @@ public enum PatternLoader {
         guard let patternsURL = Bundle.module.url(
             forResource: "patterns",
             withExtension: "json"
-        )
-        else {
+        ) else {
             return handleMissingResource("patterns.json")
         }
 
         guard let remediationsURL = Bundle.module.url(
             forResource: "remediations",
             withExtension: "json"
-        )
-        else {
+        ) else {
             return handleMissingResource("remediations.json")
         }
 
@@ -104,7 +102,7 @@ public enum PatternLoader {
         #if DEBUG
         fatalError("Missing resource: \(name) in Bundle.module")
         #else
-        return ([], [:])
+        ([], [:])
         #endif
     }
 }
