@@ -14,7 +14,7 @@ jobs:
     steps:
       # The official Homebrew cask `whisky` tracks the original (archived) Whisky
       # project and is not controlled by this fork, so it is not bumped here. This
-      # fork's Homebrew distribution is the frankea/homebrew-whisky tap, updated by
+      # fork's Homebrew distribution is the CHE3MZ/homebrew-tools tap, updated by
       # the UpdateHomebrewTap workflow (see docs/ReleaseWorkflow.md for BREW_TOKEN).
 
       - name: Release Info
@@ -22,5 +22,5 @@ jobs:
           TAG_NAME: ${{ github.event.release.tag_name }}
         run: |
           echo "Release $TAG_NAME published"
-          echo "Distribution: GitHub Releases and the frankea/homebrew-whisky tap"
+          echo "Distribution: GitHub Releases and the CHE3MZ/homebrew-tools tap"
           echo "Download: https://github.com/CHE3MZ/whisky/releases"

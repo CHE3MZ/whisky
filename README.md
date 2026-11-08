@@ -61,7 +61,7 @@ Whisky provides a clean and easy-to-use graphical wrapper for Wine built in nati
 brew install --cask CHE3MZ/whisky/whisky
 ```
 
-This taps [frankea/homebrew-whisky](https://github.com/frankea/homebrew-whisky) and installs the latest signed/notarized DMG. `brew upgrade --cask` picks up new releases.
+This taps [CHE3MZ/homebrew-tools](https://github.com/CHE3MZ/homebrew-tools) and installs the latest signed/notarized DMG. `brew upgrade --cask` picks up new releases.
 
 > The default `brew install --cask whisky` still installs the **archived original** (last release April 2025) and always will until that cask is updated. Use the qualified `CHE3MZ/whisky/whisky` form to get this fork.
 

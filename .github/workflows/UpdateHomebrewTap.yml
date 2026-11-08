@@ -1,11 +1,11 @@
 name: Update Homebrew Tap
 
-# When an app release (vX.Y.Z) is published, bump the frankea/homebrew-whisky
+# When an app release (vX.Y.Z) is published, bump the CHE3MZ/homebrew-tools
 # cask to the new version + DMG sha256 so `brew install --cask CHE3MZ/whisky/whisky`
 # always tracks the latest release without a manual edit.
 #
 # Requires a repository secret BREW_TOKEN: a personal access token (classic `repo`,
-# or fine-grained with Contents: write) for frankea/homebrew-whisky. The default
+# or fine-grained with Contents: write) for CHE3MZ/homebrew-tools. The default
 # GITHUB_TOKEN cannot push to a different repository.
 
 on:
@@ -34,7 +34,7 @@ jobs:
           set -euo pipefail
 
           if [ -z "${BREW_TOKEN:-}" ]; then
-            echo "::error::BREW_TOKEN secret is not set. Add a PAT with Contents:write for frankea/homebrew-whisky."
+            echo "::error::BREW_TOKEN secret is not set. Add a PAT with Contents:write for CHE3MZ/homebrew-tools."
             exit 1
           fi
 
@@ -52,7 +52,7 @@ jobs:
           sha="$(sha256sum whisky.dmg | awk '{print $1}')"
           echo "sha256=${sha}"
 
-          git clone --depth 1 "https://x-access-token:${BREW_TOKEN}@github.com/frankea/homebrew-whisky.git" tap
+          git clone --depth 1 "https://x-access-token:${BREW_TOKEN}@github.com/CHE3MZ/homebrew-tools.git" tap
           cd tap
           sed -i -E "s/version \"[^\"]+\"/version \"${version}\"/" Casks/whisky.rb
           sed -i -E "s/sha256 \"[0-9a-f]{64}\"/sha256 \"${sha}\"/" Casks/whisky.rb

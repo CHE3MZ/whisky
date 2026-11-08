@@ -47,7 +47,7 @@ Run it once. The private key is stored automatically in your login keychain. The
 
 ## Credential continuity (backup & recovery)
 
-Three secrets gate the release pipeline. Losing the Sparkle key is **unrecoverable** for existing installs: `SUPublicEDKey` is baked into every shipped `Info.plist`, so a regenerated key permanently strands all installed copies off auto-update. Keep current, restore-tested backups of all three. (A fourth credential, the `BREW_TOKEN` repository secret used by the release step that publishes to [frankea/homebrew-whisky](https://github.com/frankea/homebrew-whisky), is regenerable and so needs no backup — the three-secrets focus here is on the non-regenerable ones.)
+Three secrets gate the release pipeline. Losing the Sparkle key is **unrecoverable** for existing installs: `SUPublicEDKey` is baked into every shipped `Info.plist`, so a regenerated key permanently strands all installed copies off auto-update. Keep current, restore-tested backups of all three. (A fourth credential, the `BREW_TOKEN` repository secret used by the release step that publishes to [CHE3MZ/homebrew-tools](https://github.com/CHE3MZ/homebrew-tools), is regenerable and so needs no backup — the three-secrets focus here is on the non-regenerable ones.)
 
 | Secret | Where it lives | If lost |
 | --- | --- | --- |
@@ -190,11 +190,11 @@ The push to `main` triggers `.github/workflows/Documentation.yml`, which redeplo
 
 Publishing the `vX.Y.Z` release fires `.github/workflows/UpdateHomebrewTap.yml`,
 which downloads the DMG, computes its sha256, and bumps the
-[frankea/homebrew-whisky](https://github.com/frankea/homebrew-whisky) cask so
+[CHE3MZ/homebrew-tools](https://github.com/CHE3MZ/homebrew-tools) cask so
 `brew install --cask CHE3MZ/whisky/whisky` tracks the new version. No manual edit needed.
 
 This requires a one-time repository secret **`BREW_TOKEN`** — a personal access token
-(classic `repo`, or fine-grained with **Contents: write**) for `frankea/homebrew-whisky`;
+(classic `repo`, or fine-grained with **Contents: write**) for `CHE3MZ/homebrew-tools`;
 the default `GITHUB_TOKEN` cannot push to another repository. If the secret is missing the
 workflow fails loudly so the drift is visible. You can also re-sync any tag manually via the
 workflow's `workflow_dispatch` input.
