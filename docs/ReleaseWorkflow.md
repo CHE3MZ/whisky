@@ -7,7 +7,7 @@ The fork uses two parallel artifact streams:
 - **App releases** (`app-vX.Y.Z`) — `Whisky-X.Y.Z.dmg`, signed and notarized for direct distribution.
 - **Wine Libraries releases** (`vX.Y.Z`) — `Libraries.tar.gz` containing the Wine/DXVK runtime that the app downloads on first launch.
 
-Both live on GitHub Releases. Static metadata (version plist, Sparkle appcast) is served from GitHub Pages, which is **workflow-deployed** through `.github/workflows/Documentation.yml`. The `gh-pages` branch is unused; static files go in `dist/pages/`.
+Both live on GitHub Releases. The Wine version plist is served from GitHub Pages, which is **workflow-deployed** through `.github/workflows/Documentation.yml` (the `gh-pages` branch is unused; static files go in `dist/pages/`). The Sparkle feed is generated per release, attached to that release as `appcast.xml`, and mirrored to the historical Pages URL at deploy time, so no appcast file is committed or edited by hand.
 
 ## One-time setup
 
@@ -55,6 +55,7 @@ Pushing an `app-vX.Y.Z` tag runs `.github/workflows/Release.yml` on a `macos-26`
 | `APPLE_ID` | Apple ID for notarytool |
 | `APPLE_APP_SPECIFIC_PASSWORD` | app-specific password for notarytool |
 | `APPLE_TEAM_ID` | optional; defaults to `UYNK59NFK8` |
+| `SPARKLE_ED_PRIVATE_KEY` | base64 of the exported Sparkle Ed25519 private key (signs the appcast in CI) |
 | `BREW_TOKEN` | personal access token for the Homebrew tap workflow |
 
 CI archives with manual Developer ID signing (`ARCHIVE_CODE_SIGN_STYLE=Manual`, `ARCHIVE_CODE_SIGN_IDENTITY=Developer ID Application`), so only the Developer ID certificate is needed there. The local fallback below still archives with Apple Development signing and re-signs on export.
@@ -73,7 +74,20 @@ A keypair is needed to sign appcast entries. Sparkle's `generate_keys` tool ship
 ~/Library/Developer/Xcode/DerivedData/Whisky-*/SourcePackages/artifacts/sparkle/Sparkle/bin/generate_keys
 ```
 
-Run it once. The private key is stored automatically in your login keychain. The public key is printed to stdout — it is already committed in `Whisky/Info.plist` under `SUPublicEDKey`. If you regenerate keys you will invalidate the existing public key in the bundled app and need to re-release.
+Run it once. The private key is stored automatically in your login keychain. The public key is printed to stdout — it is committed in `Whisky/Info.plist` under `SUPublicEDKey`. If you regenerate keys you will invalidate the existing public key in the bundled app and need to re-release.
+
+> **Fork note.** This fork does not have the upstream Whisky signing key and cannot continue its update chain. It uses its own keypair, so installs of the upstream app must update to a build from this fork **once, manually** (or via Homebrew); after that, Sparkle auto-updates work normally with the fork's key. Treat the first fork release as a migration release and say so in the release notes.
+
+The release workflow also needs the same key as the repository secret `SPARKLE_ED_PRIVATE_KEY`. Export it and copy the base64 to **Settings → Secrets and variables → Actions**:
+
+```sh
+SPARKLE_BIN=$(ls -dt ~/Library/Developer/Xcode/DerivedData/Whisky-*/SourcePackages/artifacts/sparkle/Sparkle/bin 2>/dev/null | head -1)
+"$SPARKLE_BIN/generate_keys" -x sparkle_ed25519_private.key
+base64 -i sparkle_ed25519_private.key | pbcopy
+rm sparkle_ed25519_private.key
+```
+
+CI decodes the secret and passes it to `sign_update --ed-key-file`, so the key never appears in the workflow logs.
 
 ## Credential continuity (backup & recovery)
 
@@ -81,7 +95,7 @@ Three secrets gate the release pipeline. Losing the Sparkle key is **unrecoverab
 
 | Secret | Where it lives | If lost |
 | --- | --- | --- |
-| Sparkle EdDSA private key | login keychain ("Private key for signing Sparkle updates") | Existing installs never see another auto-update |
+| Sparkle EdDSA private key | login keychain ("Private key for signing Sparkle updates") and the `SPARKLE_ED_PRIVATE_KEY` repository secret | Existing installs never see another auto-update |
 | Developer ID Application identity | login keychain | Re-issue from the Apple Developer portal; releases blocked until done |
 | notarytool app-specific password | appleid.apple.com; cached as keychain profile `AC_PASSWORD` | Regenerate at appleid.apple.com, re-run `store-credentials` |
 
@@ -127,7 +141,7 @@ A backup that has never been restored from is a hope, not a backup. `sign_update
 "$SPARKLE_BIN/sign_update" --ed-key-file sparkle_ed25519_private.key build/release/Whisky-X.Y.Z.dmg
 ```
 
-The printed `sparkle:edSignature` **and** the printed `length` must both exactly match that release's entry in `dist/pages/appcast.xml` — Ed25519 signatures are deterministic, so a mismatch in either means a wrong key or a non-canonical DMG: the exported key is wrong **or** the DMG you signed is not the exact published artifact (rebuilt locally, partially downloaded, wrong file). If in doubt, download the release asset from the appcast enclosure URL and sign that.
+The printed `sparkle:edSignature` **and** the printed `length` must both exactly match the `appcast.xml` asset attached to that release (download it with `gh release download app-vX.Y.Z --pattern appcast.xml`). Ed25519 signatures are deterministic, so a mismatch in either means a wrong key or a non-canonical DMG: the exported key is wrong **or** the DMG you signed is not the exact published artifact (rebuilt locally, partially downloaded, wrong file). If in doubt, download the release asset from the appcast enclosure URL and sign that.
 
 ### Recovery on a new machine
 
@@ -151,17 +165,17 @@ The printed `sparkle:edSignature` **and** the printed `length` must both exactly
    git tag -a app-vX.Y.Z -m "Whisky X.Y.Z"
    git push origin app-vX.Y.Z
    ```
-4. The `Release` workflow runs on `macos-26`, builds/signs/notarizes/staples the DMG with `create-dmg`, and creates the GitHub Release with `Whisky-X.Y.Z.dmg`.
-5. After the workflow finishes, add the appcast entry from the published DMG (see **Manual app release → 5. Add an appcast entry** below) and commit it to `master`; Pages deploys through `Documentation.yml`.
+4. The `Release` workflow runs on `macos-26`, builds/signs/notarizes/staples the DMG with `create-dmg`, signs it for Sparkle, generates `appcast.xml`, and publishes the release with both assets. The release is created as a draft and published only after both assets are attached, so the Pages mirror never reads a partial release.
+5. The workflow then dispatches `Documentation.yml`, which mirrors the newest app release's `appcast.xml` to the historical Pages URL. No appcast file is committed or edited by hand.
 6. The Homebrew tap updates automatically when the release is published.
 
-The release script injects `MARKETING_VERSION` from the requested version (the tag in CI) and a UTC-timestamp `CURRENT_PROJECT_VERSION` at archive time, so there is no version bump to commit. The checked-in project keeps the neutral development values (`MARKETING_VERSION = 0.0.0`). The injected build number is printed in the workflow run summary and written to `build/release/build-number.txt`; use it for the appcast entry.
+The release script injects `MARKETING_VERSION` from the requested version (the tag in CI) and a UTC-timestamp `CURRENT_PROJECT_VERSION` at archive time, so there is no version bump to commit. The checked-in project keeps the neutral development values (`MARKETING_VERSION = 0.0.0`). The injected build number is printed in the workflow run summary and written to `build/release/build-number.txt`; the release workflow passes it to `scripts/appcast.sh` for `sparkle:version`.
 
-> The Sparkle appcast is not updated by the release workflow yet. Existing installs will not see the update until the appcast entry is committed.
+> Releases published before this automation (for example `app-v3.7.0`) have no `appcast.xml` asset. Until the first release made by the updated workflow exists, `Documentation.yml` logs a warning and reuses the currently deployed feed, so Pages keeps serving updates without a gap.
 
 ## Manual app release (fallback)
 
-> This local flow is a fallback. Pushing an `app-v...` tag also starts the automated `Release` workflow, so use one path or the other.
+> This local flow is a fallback. Do not push the tag yourself: `gh release create` creates it, so the automated `Release` workflow does not run on top of the manual release. Use one path or the other.
 
 ### 1. No version bump needed
 
@@ -169,7 +183,7 @@ The release script injects `MARKETING_VERSION` from the requested version (the t
 
 ### 2. Update the changelog
 
-Run `task changelog` (see `Taskfile.yml`) to regenerate `docs/CHANGELOG.md`, then commit it with the release.
+Run `task changelog` (see `Taskfile.yml`) to regenerate `docs/CHANGELOG.md`, then commit and push it to `master` before publishing the release.
 
 ### 3. Build, sign, notarize, package
 
@@ -190,51 +204,38 @@ The script:
 
 The artifact lands at `build/release/Whisky-X.Y.Z.dmg`.
 
-### 4. Sign the DMG for Sparkle
+### 4. Generate the appcast
+
+`scripts/appcast.sh` signs the DMG with the Sparkle key from your login keychain and writes a single-item feed:
 
 ```sh
-~/Library/Developer/Xcode/DerivedData/Whisky-*/SourcePackages/artifacts/sparkle/Sparkle/bin/sign_update build/release/Whisky-X.Y.Z.dmg
-```
-
-Capture the printed `sparkle:edSignature` and `length`.
-
-### 5. Add an appcast entry
-
-Edit `dist/pages/appcast.xml` and add a new `<item>` near the top of `<channel>`. Use the signature and length from the previous step, and the build number printed by `release.sh` (also in `build/release/build-number.txt`) for `sparkle:version`:
-
-```xml
-<item>
-    <title>Whisky X.Y.Z</title>
-    <pubDate>RFC822 date here</pubDate>
-    <sparkle:version>BUILD_NUMBER</sparkle:version>
-    <sparkle:shortVersionString>X.Y.Z</sparkle:shortVersionString>
-    <sparkle:minimumSystemVersion>15.0</sparkle:minimumSystemVersion>
-    <description><![CDATA[<p>Release notes...</p>]]></description>
-    <enclosure
-        url="https://github.com/CHE3MZ/whisky/releases/download/app-vX.Y.Z/Whisky-X.Y.Z.dmg"
-        sparkle:edSignature="..."
-        length="..."
-        type="application/octet-stream" />
-</item>
-```
-
-### 6. Commit, tag, and release
-
-```sh
-git add docs/CHANGELOG.md dist/pages/appcast.xml
-git commit -m "release: X.Y.Z"
-git push
-git tag -a app-vX.Y.Z -m "Whisky X.Y.Z"
-git push origin app-vX.Y.Z
-
-gh release create app-vX.Y.Z \
+bash scripts/appcast.sh \
+  --version X.Y.Z \
+  --build "$(cat build/release/build-number.txt)" \
+  --dmg build/release/Whisky-X.Y.Z.dmg \
   --repo CHE3MZ/whisky \
-  --title "Whisky X.Y.Z" \
-  --notes "..." \
-  build/release/Whisky-X.Y.Z.dmg
+  --output build/release/appcast.xml
 ```
 
-The push to `master` triggers `.github/workflows/Documentation.yml`, which redeploys Pages with the updated appcast within ~1–2 minutes. Sparkle clients pick up the update on next launch.
+### 5. Publish the release with both assets
+
+Create the release as a draft, attach the DMG and the feed, then publish it:
+
+```sh
+gh release create app-vX.Y.Z --repo CHE3MZ/whisky \
+  --draft --title "Whisky X.Y.Z" --notes "..."
+gh release upload app-vX.Y.Z --repo CHE3MZ/whisky \
+  build/release/Whisky-X.Y.Z.dmg build/release/appcast.xml
+gh release edit app-vX.Y.Z --repo CHE3MZ/whisky --draft=false
+```
+
+### 6. Refresh the Pages mirror
+
+```sh
+gh workflow run Documentation.yml --repo CHE3MZ/whisky
+```
+
+The workflow mirrors the newest app release's `appcast.xml` to `https://che3mz.github.io/whisky/appcast.xml` within ~1–2 minutes. Sparkle clients pick up the update on their next check.
 
 ### 7. Homebrew tap (automatic)
 
@@ -294,7 +295,8 @@ their pinned versions, and where each comes from. When the runtime needs to chan
 ## URLs the app depends on
 
 - `https://che3mz.github.io/whisky/WhiskyWineVersion.plist` — Wine version metadata
-- `https://che3mz.github.io/whisky/appcast.xml` — Sparkle update feed
+- `https://che3mz.github.io/whisky/appcast.xml` — Sparkle update feed (mirrored at deploy time from the newest app release's `appcast.xml` asset)
+- `https://github.com/CHE3MZ/whisky/releases/download/app-vX.Y.Z/appcast.xml` — per-release signed feed/signature asset
 - `https://github.com/CHE3MZ/whisky/releases/download/vX.Y.Z/Libraries.tar.gz` — Wine binary archive
 - `https://github.com/CHE3MZ/whisky/releases/download/app-vX.Y.Z/Whisky-X.Y.Z.dmg` — app DMG
 

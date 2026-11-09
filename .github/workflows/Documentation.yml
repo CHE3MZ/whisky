@@ -68,6 +68,34 @@ jobs:
           fi
           ls -la docs/
 
+      # The Sparkle feed is generated per release and attached to that release.
+      # Keep the historical /appcast.xml URL alive by mirroring the newest app
+      # release's asset at deploy time, without committing it to the repo.
+      - name: Mirror latest app release appcast
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          rm -f docs/appcast.xml
+
+          TAG="$(gh api "repos/${GITHUB_REPOSITORY}/releases?per_page=100" \
+            --jq '[.[] | select(.draft == false and .prerelease == false) | .tag_name | select(startswith("app-v"))][0] // ""')"
+          FEED_URL="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}/appcast.xml"
+
+          if [ -n "$TAG" ] && gh release download "$TAG" \
+              --repo "$GITHUB_REPOSITORY" \
+              --pattern appcast.xml \
+              --output docs/appcast.xml; then
+            echo "Mirrored appcast.xml from release $TAG"
+          elif curl -fsSL "$FEED_URL" --output docs/appcast.xml; then
+            echo "::warning::Could not read the newest app release's appcast.xml; reusing $FEED_URL"
+          elif [ -z "$TAG" ]; then
+            echo "::warning::No app releases or deployed feed found; /appcast.xml will be absent"
+          else
+            echo "::error::Latest app release $TAG has no appcast.xml asset and no deployed feed to reuse"
+            exit 1
+          fi
+
       - name: Upload Pages Artifact
         uses: actions/upload-pages-artifact@v5
         with:
