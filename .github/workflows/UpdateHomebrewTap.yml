@@ -65,11 +65,27 @@ jobs:
           cask "whisky" do
             version "${version}"
             sha256 "${sha}"
+
             url "https://github.com/CHE3MZ/whisky/releases/download/app-v#{version}/Whisky-#{version}.dmg"
             name "Whisky"
             desc "Run Windows games and applications on macOS"
             homepage "https://github.com/CHE3MZ/whisky"
+
+            livecheck do
+              url "https://che3mz.github.io/whisky/appcast.xml"
+              strategy :sparkle, &:short_version
+            end
+
+            auto_updates true
+            conflicts_with cask: "whisky"
+
+            depends_on arch: :arm64
+            depends_on macos: :sequoia
+
             app "Whisky.app"
+            binary "#{appdir}/Whisky.app/Contents/Resources/WhiskyCmd", target: "whisky"
+
+            uninstall quit: "com.che3mz.whisky"
           end
           EOF
           else
@@ -90,6 +106,11 @@ jobs:
             || { echo "::error::sha256 line was not updated (existing line not 64-lowercase-hex?)"; exit 1; }
           grep -qF "releases/download/app-v#{version}" Casks/whisky.rb \
             || { echo "::error::url line does not use the app-v tag scheme in Casks/whisky.rb"; exit 1; }
+
+          if command -v ruby >/dev/null 2>&1; then
+            ruby -c Casks/whisky.rb >/dev/null \
+              || { echo "::error::Casks/whisky.rb is not valid Ruby"; exit 1; }
+          fi
 
           git add Casks/whisky.rb
           if git diff --cached --quiet; then
