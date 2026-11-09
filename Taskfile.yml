@@ -34,4 +34,5 @@ tasks:
       - cmd: opengrep scan
       - cmd: osv-scanner scan source --recursive .
       - cmd: gitleaks git . --no-banner --verbose
+      - cmd: actionlint --verbose
       - cmd: scorecard --local . --format json | gron

@@ -144,17 +144,18 @@ The printed `sparkle:edSignature` **and** the printed `length` must both exactly
 
 ## Automated release
 
-1. Bump `MARKETING_VERSION` and `CURRENT_PROJECT_VERSION` in `Whisky.xcodeproj/project.pbxproj`.
-2. Run `task changelog` and commit `docs/CHANGELOG.md`.
-3. Commit and push to `master`.
-4. Push an `app-vX.Y.Z` tag:
+1. Run `task changelog` and commit `docs/CHANGELOG.md`.
+2. Commit and push to `master`.
+3. Push an `app-vX.Y.Z` tag:
    ```sh
    git tag -a app-vX.Y.Z -m "Whisky X.Y.Z"
    git push origin app-vX.Y.Z
    ```
-5. The `Release` workflow runs on `macos-26`, builds/signs/notarizes/staples the DMG with `create-dmg`, and creates the GitHub Release with `Whisky-X.Y.Z.dmg`.
-6. After the workflow finishes, add the appcast entry from the published DMG (see **Manual app release → 5. Add an appcast entry** below) and commit it to `master`; Pages deploys through `Documentation.yml`.
-7. The Homebrew tap updates automatically when the release is published.
+4. The `Release` workflow runs on `macos-26`, builds/signs/notarizes/staples the DMG with `create-dmg`, and creates the GitHub Release with `Whisky-X.Y.Z.dmg`.
+5. After the workflow finishes, add the appcast entry from the published DMG (see **Manual app release → 5. Add an appcast entry** below) and commit it to `master`; Pages deploys through `Documentation.yml`.
+6. The Homebrew tap updates automatically when the release is published.
+
+The release script injects `MARKETING_VERSION` from the requested version (the tag in CI) and a UTC-timestamp `CURRENT_PROJECT_VERSION` at archive time, so there is no version bump to commit. The checked-in project keeps the neutral development values (`MARKETING_VERSION = 0.0.0`). The injected build number is printed in the workflow run summary and written to `build/release/build-number.txt`; use it for the appcast entry.
 
 > The Sparkle appcast is not updated by the release workflow yet. Existing installs will not see the update until the appcast entry is committed.
 
@@ -162,12 +163,9 @@ The printed `sparkle:edSignature` **and** the printed `length` must both exactly
 
 > This local flow is a fallback. Pushing an `app-v...` tag also starts the automated `Release` workflow, so use one path or the other.
 
-### 1. Bump versions
+### 1. No version bump needed
 
-Update both fields in `Whisky.xcodeproj/project.pbxproj` (every occurrence):
-
-- `MARKETING_VERSION = X.Y.Z;` — user-visible version.
-- `CURRENT_PROJECT_VERSION = N;` — Sparkle build number, must increment monotonically.
+`scripts/release.sh X.Y.Z` injects the version from its argument (`MARKETING_VERSION`) and a UTC-timestamp build number (`CURRENT_PROJECT_VERSION`) at archive time. The checked-in project keeps the neutral development value `MARKETING_VERSION = 0.0.0`, so there is nothing to edit or commit for a release.
 
 ### 2. Update the changelog
 
@@ -181,7 +179,7 @@ scripts/release.sh X.Y.Z
 
 The script:
 
-1. Archives the app (Apple Development by default; CI overrides to manual Developer ID signing).
+1. Archives the app with `MARKETING_VERSION` from the argument and a UTC-timestamp `CURRENT_PROJECT_VERSION` (Apple Development by default; CI overrides to manual Developer ID signing), then verifies the exported app's `Info.plist` reports the requested version and build.
 2. Re-signs on export with **Developer ID Application** per `scripts/exportOptions.plist`.
 3. Verifies the signature with `codesign --verify --deep --strict`.
 4. Builds a styled DMG with `create-dmg` (background, Applications shortcut, and icon layout).
@@ -202,7 +200,7 @@ Capture the printed `sparkle:edSignature` and `length`.
 
 ### 5. Add an appcast entry
 
-Edit `dist/pages/appcast.xml` and add a new `<item>` near the top of `<channel>`. Use the signature and length from the previous step:
+Edit `dist/pages/appcast.xml` and add a new `<item>` near the top of `<channel>`. Use the signature and length from the previous step, and the build number printed by `release.sh` (also in `build/release/build-number.txt`) for `sparkle:version`:
 
 ```xml
 <item>
@@ -223,7 +221,7 @@ Edit `dist/pages/appcast.xml` and add a new `<item>` near the top of `<channel>`
 ### 6. Commit, tag, and release
 
 ```sh
-git add Whisky.xcodeproj/project.pbxproj docs/CHANGELOG.md dist/pages/appcast.xml
+git add docs/CHANGELOG.md dist/pages/appcast.xml
 git commit -m "release: X.Y.Z"
 git push
 git tag -a app-vX.Y.Z -m "Whisky X.Y.Z"

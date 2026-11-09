@@ -31,6 +31,7 @@ VERSION="${1:?usage: scripts/release.sh <version>}"
 NOTARY_PROFILE="${NOTARY_PROFILE:-AC_PASSWORD}"
 ARCHIVE_CODE_SIGN_STYLE="${ARCHIVE_CODE_SIGN_STYLE:-Automatic}"
 ARCHIVE_CODE_SIGN_IDENTITY="${ARCHIVE_CODE_SIGN_IDENTITY:-Apple Development}"
+BUILD_NUMBER="${BUILD_NUMBER:-$(date -u +%Y%m%d%H%M%S)}"
 
 if ! command -v create-dmg >/dev/null 2>&1; then
     echo "error: create-dmg not found. Install it with: npm install --global create-dmg (Node.js 20+)" >&2
@@ -46,10 +47,12 @@ DMG_PATH="$BUILD_DIR/Whisky-$VERSION.dmg"
 cd "$PROJECT_DIR"
 mkdir -p "$BUILD_DIR"
 
-echo "==> Archiving Whisky $VERSION"
+echo "==> Archiving Whisky $VERSION (build $BUILD_NUMBER)"
 ARCHIVE_SIGNING_ARGS=(
     CODE_SIGN_STYLE="$ARCHIVE_CODE_SIGN_STYLE"
     CODE_SIGN_IDENTITY="$ARCHIVE_CODE_SIGN_IDENTITY"
+    MARKETING_VERSION="$VERSION"
+    CURRENT_PROJECT_VERSION="$BUILD_NUMBER"
 )
 if [ "$ARCHIVE_CODE_SIGN_STYLE" = "Manual" ]; then
     ARCHIVE_SIGNING_ARGS+=(PROVISIONING_PROFILE_SPECIFIER="")
@@ -75,6 +78,19 @@ xcodebuild \
 
 APP_PATH="$EXPORT_PATH/Whisky.app"
 [ -d "$APP_PATH" ] || { echo "Whisky.app not found at $APP_PATH"; exit 1; }
+
+BUILT_VERSION="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$APP_PATH/Contents/Info.plist")"
+BUILT_BUILD="$(/usr/libexec/PlistBuddy -c 'Print :CFBundleVersion' "$APP_PATH/Contents/Info.plist")"
+if [ "$BUILT_VERSION" != "$VERSION" ]; then
+    echo "error: built app reports version '$BUILT_VERSION' but release requested '$VERSION'" >&2
+    echo "       MARKETING_VERSION was not applied by the archive step." >&2
+    exit 1
+fi
+if [ "$BUILT_BUILD" != "$BUILD_NUMBER" ]; then
+    echo "error: built app reports build '$BUILT_BUILD' but release requested '$BUILD_NUMBER'" >&2
+    echo "       CURRENT_PROJECT_VERSION was not applied by the archive step." >&2
+    exit 1
+fi
 
 echo "==> Verifying signature"
 codesign --verify --deep --strict --verbose=2 "$APP_PATH"
@@ -111,4 +127,9 @@ spctl --assess --type open --context context:primary-signature --verbose=2 "$DMG
 
 echo
 echo "Build artifact: $DMG_PATH"
+echo "Version: $VERSION (build $BUILD_NUMBER)"
+echo "$BUILD_NUMBER" > "$BUILD_DIR/build-number.txt"
+if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
+    printf '**Version:** `%s` (build `%s`)\n' "$VERSION" "$BUILD_NUMBER" >> "$GITHUB_STEP_SUMMARY"
+fi
 shasum -a 256 "$DMG_PATH"

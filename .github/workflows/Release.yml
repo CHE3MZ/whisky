@@ -12,9 +12,12 @@ on:
 
 permissions:
   contents: write
+  # Needed to dispatch the Homebrew tap job after publishing (GITHUB_TOKEN-created
+  # release events do not trigger other workflows).
+  actions: write
 
 concurrency:
-  group: release-${{ github.ref }}
+  group: release-${{ inputs.tag || github.ref_name }}
   cancel-in-progress: false
 
 jobs:
@@ -53,6 +56,57 @@ jobs:
         uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
+
+      - name: Install git-cliff
+        env:
+          HOMEBREW_NO_AUTO_UPDATE: 1
+        run: brew install git-cliff
+
+      # Same generator as `task cliff` (cliff.toml at the repo root), run before the
+      # long build so a broken tag/config fails fast. `--unreleased` would be empty
+      # here because the workflow runs on the tag itself, so scope the range to the
+      # previous app release explicitly. Env lets git-cliff resolve PR titles and
+      # authors through the API.
+      - name: Generate release notes
+        env:
+          RUST_LOG: off
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPO: ${{ github.repository }}
+          TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          set -euo pipefail
+          PREV_TAG="$(git describe --tags --abbrev=0 --match 'app-v*' "${TAG}^" 2>/dev/null || true)"
+          if [ -n "$PREV_TAG" ]; then
+            RANGE="${PREV_TAG}..${TAG}"
+            FIRST_RELEASE=0
+          else
+            # First app release: everything since the root commit.
+            ROOT="$(git rev-list --max-parents=0 "$TAG" | sed -n '1p')"
+            RANGE="${ROOT}..${TAG}"
+            FIRST_RELEASE=1
+          fi
+
+          # The GitHub API lookup (PR titles/authors) is nice-to-have; a transient
+          # failure must not block an already-built release. Fall back to the
+          # offline renderer, which uses the raw commit messages.
+          if ! git-cliff "$RANGE" --tag "$TAG" --tag-pattern '^app-v' \
+              --strip all > release-notes.md; then
+            echo "::warning::git-cliff could not fetch GitHub metadata; retrying offline"
+            git-cliff "$RANGE" --tag "$TAG" --tag-pattern '^app-v' \
+              --strip all --offline > release-notes.md
+          fi
+
+          # git-cliff resolves "previous" from the tag list even when the range has
+          # no previous release, which would produce a bogus compare link.
+          if [ "$FIRST_RELEASE" = "1" ]; then
+            sed -i '' '/^\*\*Full Changelog\*\*:/d' release-notes.md
+          fi
+
+          if [ ! -s release-notes.md ]; then
+            echo "::error::git-cliff produced empty release notes"
+            exit 1
+          fi
+          cat release-notes.md
 
       - name: Install create-dmg
         run: |
@@ -135,6 +189,10 @@ jobs:
           fi
 
           if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit "$TAG" \
+              --notes-file release-notes.md \
+              --draft=false \
+              --repo "$GITHUB_REPOSITORY"
             gh release upload "$TAG" "$DMG" \
               --clobber \
               --repo "$GITHUB_REPOSITORY"
@@ -142,5 +200,15 @@ jobs:
             gh release create "$TAG" "$DMG" \
               --repo "$GITHUB_REPOSITORY" \
               --title "Whisky ${VERSION}" \
-              --generate-notes
+              --notes-file release-notes.md
           fi
+
+      # Events created with GITHUB_TOKEN do not trigger other workflows
+      # (workflow_dispatch is the documented exception), so the release above
+      # would otherwise never reach UpdateHomebrewTap's `release: published`
+      # trigger. Dispatch it explicitly; that workflow is idempotent.
+      - name: Trigger Homebrew tap update
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.release.outputs.tag }}
+        run: gh workflow run UpdateHomebrewTap.yml --repo "$GITHUB_REPOSITORY" -f tag="$TAG"

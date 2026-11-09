@@ -63,7 +63,7 @@ jobs:
       - name: Upload translations
         if: steps.check.outputs.configured == 'true' && github.event_name == 'push'
         run: |
-          for lang in ar cs da de es-ES fi fr it ja ko nl pl pt-BR pt-PT ro ru sv-SE tr uk vi zh-CN zh-TW; do
+          for lang in ar cs da de es-ES "fi" fr it ja ko nl pl pt-BR pt-PT ro ru sv-SE tr uk vi zh-CN zh-TW; do
             npx -y @crowdin/cli@4 upload translations -l "$lang" --no-progress
           done
         env:

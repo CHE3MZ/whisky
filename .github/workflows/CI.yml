@@ -385,7 +385,7 @@ jobs:
                 head -30 coverage.lcov
                 echo "=== Unique source file paths ==="
                 grep "^SF:" coverage.lcov | head -10
-                echo "has_coverage=true" >> $GITHUB_OUTPUT
+                echo "has_coverage=true" >> "$GITHUB_OUTPUT"
               else
                 echo "❌ Coverage file is empty"
               fi
