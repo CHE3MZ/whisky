@@ -9,10 +9,43 @@ tasks:
     silent: true
     cmds:
       - task --list
+  ops:
+    desc: Run all ops tasks
+    ignore_error: true
+    cmds:
+      - task lint
+      - task format
+      - task secrets
+      - task scan
   build:
     desc: Build the app
     cmds:
       - scripts/build.sh {{.CLI_ARGS}}
+  build-full:
+    desc: Build all schemes
+    cmds:
+      - scripts/build.sh --full {{.CLI_ARGS}}
+  lint:
+    desc: Lint Swift sources
+    cmds:
+      - cmd: swiftlint --strict
+  format:
+    desc: Format Swift sources
+    cmds:
+      - cmd: swiftformat .
+  test:
+    desc: Build and run tests
+    cmds:
+      - scripts/tests/test.sh
+  audit:
+    desc: Run the audit scripts
+    cmds:
+      - scripts/audit/audit.sh
+  upstream:
+    desc: Run upstream checks
+    cmds:
+      - cmd: scripts/upstream/track.sh
+      - cmd: scripts/upstream/report.sh
   cliff:
     desc: Run git cliff
     silent: true
@@ -42,4 +75,5 @@ tasks:
       - cmd: osv-scanner scan source --recursive .
       - cmd: gitleaks git . --no-banner --verbose
       - cmd: actionlint --verbose
+      - cmd: find scripts -type f -name '*.sh' -exec shellcheck {} +
       - cmd: scorecard --local . --format json | gron
