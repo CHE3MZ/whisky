@@ -17,7 +17,7 @@ on:
     paths-ignore: &docs-paths
       - '**.md'
       - 'docs/**'
-      - 'images/**'
+      - 'docs/assets/**'
       - 'LICENSE'
   pull_request:
     branches: [master]

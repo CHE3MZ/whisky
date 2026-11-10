@@ -21,19 +21,19 @@
 
 Whisky provides a clean and easy-to-use graphical wrapper for Wine built in native SwiftUI. You can make and manage bottles, install and run Windows apps and games, and unlock the full potential of your Mac with no technical knowledge required.
 
-<img width="650" alt="Whisky in action" src="./images/demo.gif">
+<img width="650" alt="Whisky in action" src="./docs/assets/demo.gif">
 
-<img width="650" alt="Config" src="./images/config-screenshot.png">
+<img width="650" alt="Config" src="./docs/assets/config-screenshot.png">
 
 *Familiar UI that integrates seamlessly with macOS*
 
 <div align="right">
-  <img width="650" alt="New Bottle" src="./images/new-bottle-screenshot.png">
+  <img width="650" alt="New Bottle" src="./docs/assets/new-bottle-screenshot.png">
 
   *One-click bottle creation and management*
 </div>
 
-<img width="650" alt="debug" src="./images/debug-screenshot.png">
+<img width="650" alt="debug" src="./docs/assets/debug-screenshot.png">
 
 *Debug and profile with ease*
 
@@ -194,19 +194,3 @@ Whisky is possible thanks to the magic of several projects:
 - D3DMetal by Apple
 
 Special thanks to Gcenx, ohaiibuzzle, Nat Brown, and [Isaac Marovitz](https://github.com/IsaacMarovitz) (original author) for their support and contributions!
-
----
-
-<table>
-  <tr>
-    <td>
-        <picture>
-          <source media="(prefers-color-scheme: dark)" srcset="./images/cw-dark.png">
-          <img src="./images/cw-light.png" width="500">
-        </picture>
-    </td>
-    <td>
-        Whisky doesn't exist without CrossOver. If you want a fully-supported commercial Wine experience on macOS, check out <a href="https://www.codeweavers.com/crossover">CrossOver</a> from CodeWeavers. (This fork has no affiliate arrangement and receives nothing from CrossOver sales.)
-    </td>
-  </tr>
-</table>
