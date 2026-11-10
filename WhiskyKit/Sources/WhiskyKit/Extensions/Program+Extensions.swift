@@ -129,12 +129,11 @@ public extension Program {
 
     /// Watches for the session actually ending, then classifies its log.
     ///
-    /// The bottle's wineserver going idle is the end-of-session signal, the
-    /// same one Discord presence uses, and this run's log keeps growing until
-    /// then because Wine's children inherit its file descriptor. Each launch
-    /// has its own log file, so concurrent watchers never double-report one
-    /// run. The probe is deliberately one interval late; the wineserver may
-    /// not be up yet at the moment of launch.
+    /// The bottle's wineserver going idle is the end-of-session signal, and
+    /// this run's log keeps growing until then because Wine's children inherit
+    /// its file descriptor. Each launch has its own log file, so concurrent
+    /// watchers never double-report one run. The probe is deliberately one
+    /// interval late; the wineserver may not be up yet at the moment of launch.
     private func watchForLateCrash(logFileURL: URL) {
         let bottle = self.bottle
         Task {

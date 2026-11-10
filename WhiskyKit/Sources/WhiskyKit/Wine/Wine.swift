@@ -354,11 +354,6 @@ public class Wine {
             try? FileManager.default.removeItem(at: prunedLogURL)
         }
 
-        // As late as possible: the bridge holds the prefix open only for a short
-        // grace window before standing down, so it wants the smallest gap it can
-        // get between itself and the program it is bridging for.
-        DiscordIntegration.shared.programLaunching(url, bottle: bottle)
-
         var exitCode: Int32 = 0
         for await output in try runProcess(
             name: programName,
@@ -394,8 +389,7 @@ public class Wine {
     /// the returned arguments with the returned environment later, from a
     /// terminal, starts the program with the DLLs, fonts and settings a launch
     /// from Whisky gives it. What only happens while `runProgram` runs is not
-    /// part of it: the log file and run log entry, the App Nap assertion, and
-    /// the Discord bridge and presence.
+    /// part of it: the log file and run log entry, and the App Nap assertion.
     ///
     /// - Parameters:
     ///   - url: The URL to the Windows executable (.exe) file.
