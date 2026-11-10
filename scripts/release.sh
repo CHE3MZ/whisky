@@ -73,7 +73,7 @@ xcodebuild \
     -exportArchive \
     -archivePath "$ARCHIVE_PATH" \
     -exportPath "$EXPORT_PATH" \
-    -exportOptionsPlist scripts/exportOptions.plist \
+    -exportOptionsPlist scripts/config/exportOptions.plist \
     -allowProvisioningUpdates
 
 APP_PATH="$EXPORT_PATH/Whisky.app"

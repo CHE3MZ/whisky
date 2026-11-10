@@ -147,5 +147,5 @@ Follow-ups (see docs/ReleaseWorkflow.md "Wine Libraries release"):
      # releases/download/vX.Y.Z/Libraries.tar.gz by name. gh's "path#label"
      # syntax only sets a display label and keeps the wrong filename.
   3. Update dist/pages/WhiskyWineVersion.plist: version $NEW_VERSION, sha256 $DIGEST, dxmtVersion $DXMT_VERSION.
-  4. Update docs/DEPENDENCIES.md (bundled table + integrity row) and the DXMT pin in scripts/upstream/sources.yml.
+  4. Update docs/DEPENDENCIES.md (bundled table + integrity row) and the DXMT pin in scripts/config/sources.yml.
 SUMMARY

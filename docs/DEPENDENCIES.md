@@ -7,7 +7,7 @@ any future maintainer can reproduce a build. Update it whenever a runtime releas
 
 See [`ReleaseWorkflow.md`](ReleaseWorkflow.md) for the assembly + publish procedure, and
 [`scripts/upstream/track.sh`](../scripts/upstream/track.sh) with
-[`sources.yml`](../scripts/upstream/sources.yml) for the automation that flags when a tracked
+[`sources.yml`](../scripts/config/sources.yml) for the automation that flags when a tracked
 component falls behind upstream.
 
 ## Bundled in runtime `v3.1.1`
@@ -57,7 +57,7 @@ every install through a normal app update, with no runtime re-download.
 
 - **Wine:** check each January for the new stable (next: **Wine 12, ~Jan 2027**). Test before bundling.
 - **Wine / DXVK-macOS / DXMT:** `TrackUpstream.yml` runs `scripts/upstream/track.sh` weekly against
-  `scripts/upstream/sources.yml` and opens an issue when a tracked source is behind. Triage; bumping is
+  `scripts/config/sources.yml` and opens an issue when a tracked source is behind. Triage; bumping is
   a deliberate, tested decision, not automatic.
 - **D3DMetal (GPTK):** Apple ships it as a Game Porting Toolkit download with no GitHub release feed, so
   it is **tracked manually** — check Apple's GPTK page when a new GPTK lands.

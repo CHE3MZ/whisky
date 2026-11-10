@@ -33,7 +33,7 @@ Apple's notary service needs an app-specific password.
      --team-id UYNK59NFK8 \
      --password <app-specific-password>
    ```
-3. The release script reads this profile by name (`AC_PASSWORD`). The signing team is `UYNK59NFK8`, set in the Xcode project and `scripts/exportOptions.plist`.
+3. The release script reads this profile by name (`AC_PASSWORD`). The signing team is `UYNK59NFK8`, set in the Xcode project and `scripts/config/exportOptions.plist`.
 
 ### create-dmg
 
@@ -194,7 +194,7 @@ scripts/release.sh X.Y.Z
 The script:
 
 1. Archives the app with `MARKETING_VERSION` from the argument and a UTC-timestamp `CURRENT_PROJECT_VERSION` (Apple Development by default; CI overrides to manual Developer ID signing), then verifies the exported app's `Info.plist` reports the requested version and build.
-2. Re-signs on export with **Developer ID Application** per `scripts/exportOptions.plist`.
+2. Re-signs on export with **Developer ID Application** per `scripts/config/exportOptions.plist`.
 3. Verifies the signature with `codesign --verify --deep --strict`.
 4. Builds a styled DMG with `create-dmg` (background, Applications shortcut, and icon layout).
 5. Signs the DMG with the Developer ID Application certificate.
@@ -265,7 +265,7 @@ their pinned versions, and where each comes from. When the runtime needs to chan
    - Place **D3DMetal** as extracted from Apple's Game Porting Toolkit. ⚠️ Redistribution is governed by
      Apple's GPTK license — confirm terms before publishing.
    - Record the exact versions you used back into `docs/DEPENDENCIES.md`, and bump the matching
-     `commit`/`release` values in `scripts/upstream/sources.yml` so drift detection stays accurate.
+     `commit`/`release` values in `scripts/config/sources.yml` so drift detection stays accurate.
    - `tar -czf Libraries.tar.gz Libraries/` (mind the `Tar` pipe-drain pitfall noted below).
 2. Tag with the bare version `vX.Y.Z` (no `app-` prefix).
 3. `gh release create vX.Y.Z --title "Wine Libraries vX.Y.Z" Libraries.tar.gz`.

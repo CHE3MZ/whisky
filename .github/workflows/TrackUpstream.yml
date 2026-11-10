@@ -1,8 +1,8 @@
 name: Track Upstream
 
 # Runs scripts/upstream/track.sh once a week. The script checks the pins in
-# scripts/upstream/sources.yml and opens an issue in the master repository
-# when an upstream source has a newer commit or release.
+# scripts/config/sources.yml and opens an issue in the home repo when an
+# upstream source has a newer commit or release.
 
 on:
   schedule:

@@ -6,8 +6,7 @@
 #   - commit:  compared with the latest commit on the repository's default branch
 #   - release: compared with the tag from the repository's latest GitHub release
 #
-# With --github, a changed source opens an issue with the gh CLI in every
-# master repository that has action: issue.
+# With --github, a changed source opens an issue with the gh CLI in ISSUE_REPO.
 #
 # Usage: scripts/upstream/track.sh [--github] [SOURCES_YML]
 #
@@ -21,6 +20,7 @@ set -eu
 SCRIPT_DIR=$(CDPATH='' cd "$(dirname "$0")" && pwd)
 GITHUB_ISSUES=0
 SOURCES_FILE=''
+ISSUE_REPO='CHE3MZ/whisky'
 TOKEN=${GITHUB_TOKEN:-${GH_TOKEN:-}}
 SEP=$(printf '\034')
 
@@ -49,8 +49,8 @@ Usage: scripts/upstream/track.sh [--github] [SOURCES_YML]
 Checks sources in sources.yml against GitHub.
 
 Options:
-  --github    Create an issue in each master repository with action: issue
-              when a source has a new commit or release (requires gh)
+  --github    Create an issue in the ISSUE_REPO when a source has a new
+              commit or release (requires gh)
   -h, --help  Show this help
 EOF
 }
@@ -88,7 +88,7 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-SOURCES_FILE=${SOURCES_FILE:-"$SCRIPT_DIR/sources.yml"}
+SOURCES_FILE=${SOURCES_FILE:-"$SCRIPT_DIR/../config/sources.yml"}
 
 print_field() {
     printf '  %s%s:%s %s%s%s\n' "$GRAY" "$1" "$RESET" "$WHITE" "$2" "$RESET"
@@ -123,6 +123,11 @@ if [ "$GITHUB_ISSUES" -eq 1 ]; then
     if ! gh auth status >/dev/null 2>&1; then
         printf '%s%serror:%s gh is not authenticated; run "gh auth login"\n' \
             "$RED" "$BOLD" "$RESET" >&2
+        exit 1
+    fi
+    if ! gh repo view "$ISSUE_REPO" --json nameWithOwner >/dev/null 2>&1; then
+        printf '%s%serror:%s issue repository %s does not exist or is not accessible\n' \
+            "$RED" "$BOLD" "$RESET" "$ISSUE_REPO" >&2
         exit 1
     fi
     if [ -z "$TOKEN" ]; then
@@ -334,16 +339,11 @@ report_update() {
     [ "$GITHUB_ISSUES" -eq 1 ] || return 0
 
     update_title="Update ${update_name} to ${update_subject}"
-    update_body=$(printf "A new %s is available for %s.\n\n- Source: %s\n- Pinned %s: \`%s\`\n- Latest %s: \`%s\`\n\nUpdate the pinned value in \`scripts/upstream/sources.yml\`.\n" \
+    update_body=$(printf "A new %s is available for %s.\n\n- Source: %s\n- Pinned %s: \`%s\`\n- Latest %s: \`%s\`\n\nUpdate the pinned value in \`scripts/config/sources.yml\`.\n" \
         "$update_kind" "$update_name" "$update_link" \
         "$update_kind" "$update_old" "$update_kind" "$update_new")
 
-    while IFS= read -r issue_repo; do
-        [ -n "$issue_repo" ] || continue
-        create_issue "$issue_repo" "$update_title" "$update_body" || source_error=1
-    done <<EOF
-$master_targets
-EOF
+    create_issue "$ISSUE_REPO" "$update_title" "$update_body" || source_error=1
 }
 
 tmp=$(mktemp "${TMPDIR:-/tmp}/whisky-sources.XXXXXX")
@@ -365,38 +365,9 @@ up_to_date=0
 with_changes=0
 errors=0
 
-master_targets=''
-source_count=0
-while IFS="$SEP" read -r section name link commit release action; do
-    case "$section" in
-        master)
-            if [ "$GITHUB_ISSUES" -eq 1 ] && [ "$action" = "issue" ]; then
-                if ! target=$(github_slug "$link"); then
-                    print_error "master entry '$name' has an invalid GitHub link"
-                    errors=$((errors + 1))
-                elif ! gh repo view "$target" --json nameWithOwner >/dev/null 2>&1; then
-                    print_error "master repository '$target' does not exist or is not accessible"
-                    errors=$((errors + 1))
-                else
-                    master_targets="${master_targets}${target}
-"
-                fi
-            fi
-            ;;
-        sources)
-            source_count=$((source_count + 1))
-            ;;
-    esac
-done < "$tmp"
-
+source_count=$(awk -F"$SEP" '$1 == "sources" { n++ } END { print n + 0 }' "$tmp")
 if [ "$source_count" -eq 0 ]; then
     printf '%s%serror:%s no sources found in %s\n' \
-        "$RED" "$BOLD" "$RESET" "$SOURCES_FILE" >&2
-    exit 1
-fi
-
-if [ "$GITHUB_ISSUES" -eq 1 ] && [ -z "$master_targets" ]; then
-    printf '%s%serror:%s no master entries with action: issue found in %s\n' \
         "$RED" "$BOLD" "$RESET" "$SOURCES_FILE" >&2
     exit 1
 fi
