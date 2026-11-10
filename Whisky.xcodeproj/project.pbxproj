@@ -938,7 +938,7 @@
 			inputFileListPaths = (
 			);
 			inputPaths = (
-				"$(SRCROOT)/scripts/fill-missing-translations.py",
+				"$(SRCROOT)/scripts/audit/fill-missing-translations.py",
 			);
 			name = "Fill Missing Translations";
 			outputFileListPaths = (
@@ -947,7 +947,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Untranslated keys would otherwise render as raw identifiers in every\n# non-English UI; see the header of the script.\n/usr/bin/python3 \"${SRCROOT}/scripts/fill-missing-translations.py\" \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\"\n";
+			shellScript = "# Untranslated keys would otherwise render as raw identifiers in every\n# non-English UI; see the header of the script.\n/usr/bin/python3 \"${SRCROOT}/scripts/audit/fill-missing-translations.py\" \"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}\"\n";
 		};
 		6E50D98129CD0EAF008C39F6 /* SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;

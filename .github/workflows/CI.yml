@@ -81,9 +81,9 @@ jobs:
       - uses: actions/checkout@v6
       - name: Check en-GB covers every string
         run: |
-          ./scripts/british-english.py --check || {
+          ./scripts/audit/british-english.py --check || {
             echo ""
-            echo "Run ./scripts/british-english.py locally and commit the result."
+            echo "Run ./scripts/audit/british-english.py locally and commit the result."
             exit 1
           }
 
@@ -185,7 +185,7 @@ jobs:
           # Every compiled localization must carry every en key, or untranslated
           # strings render as raw identifiers (#291). The "Fill Missing
           # Translations" build phase does the filling; this asserts it ran.
-          python3 scripts/fill-missing-translations.py --check "$app/Contents/Resources"
+          python3 scripts/audit/fill-missing-translations.py --check "$app/Contents/Resources"
 
   # XCUITest job - runs WhiskyUITests against the Whisky app target.
   # Tests that need bottle fixtures call `try requireBottleFixture()` which

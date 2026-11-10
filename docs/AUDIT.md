@@ -69,13 +69,13 @@ list, runs heuristics, applies overrides, and produces a per-issue index.
 mise install
 
 # Heuristics-only, fetch on demand
-python scripts/audit_upstream.py
+python scripts/audit/audit_upstream.py
 
 # Force a fresh fetch from the upstream API
-python scripts/audit_upstream.py --refresh
+python scripts/audit/audit_upstream.py --refresh
 
 # Show "newly addressed" against an older ref
-python scripts/audit_upstream.py --diff-against app-v3.0.1
+python scripts/audit/audit_upstream.py --diff-against app-v3.0.1
 ```
 
 Outputs land under `.planning/audit/` (gitignored — local working notes):

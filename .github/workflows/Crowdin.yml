@@ -117,7 +117,7 @@ jobs:
               for key in missing[:20]:
                   print(" -", key)
               sys.exit(1)
-          # en-GB is generated locally by scripts/british-english.py and is
+          # en-GB is generated locally by scripts/audit/british-english.py and is
           # restored by the next step, so its absence from the export is fine.
           # A row whose translation is identical to the English source is also
           # fine to lose: Crowdin drops those on import by design, and a
@@ -143,8 +143,8 @@ jobs:
       - name: Restore en-GB rows
         if: steps.check.outputs.configured == 'true' && github.event_name != 'push'
         run: |
-          ./scripts/british-english.py
-          ./scripts/british-english.py --check
+          ./scripts/audit/british-english.py
+          ./scripts/audit/british-english.py --check
 
       - name: Open or update the sync PR
         if: steps.check.outputs.configured == 'true' && github.event_name != 'push'

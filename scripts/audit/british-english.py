@@ -24,15 +24,15 @@
 # `config.audio.driver.auto` to every British user, which is exactly the bug this
 # script exists to prevent.
 #
-#   ./scripts/british-english.py            rewrite en-GB
-#   ./scripts/british-english.py --check    exit 1 if it is out of date
+#   ./scripts/audit/british-english.py            rewrite en-GB
+#   ./scripts/audit/british-english.py --check    exit 1 if it is out of date
 
 import json
 import pathlib
 import re
 import sys
 
-CATALOG = pathlib.Path(__file__).resolve().parent.parent / "Whisky" / "Localizable.xcstrings"
+CATALOG = pathlib.Path(__file__).resolve().parent.parent.parent / "Whisky" / "Localizable.xcstrings"
 
 # Only differences that are unambiguous in software UI copy. -ise vs -ize is a
 # real split even within British usage (Oxford keeps -ize), but -ise is what the
@@ -138,7 +138,7 @@ def main() -> int:
             if strings[key]["localizations"].get("en-GB", {}).get("stringUnit", {}).get("value") != value
         ]
         if stale:
-            print("en-GB is out of date, %d string(s), run scripts/british-english.py:" % len(stale))
+            print("en-GB is out of date, %d string(s), run scripts/audit/british-english.py:" % len(stale))
             for key in stale[:10]:
                 print("  " + key)
             return 1

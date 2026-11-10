@@ -26,9 +26,9 @@
 #
 # Runs as a build phase of the Whisky target, after Copy Bundle Resources:
 #
-#   ./scripts/fill-missing-translations.py <Resources dir>          fill in place
-#   ./scripts/fill-missing-translations.py --check <Resources dir>  exit 1 if a
-#                                                                   key is missing
+#   ./scripts/audit/fill-missing-translations.py <Resources dir>          fill in place
+#   ./scripts/audit/fill-missing-translations.py --check <Resources dir>  exit 1 if a
+#                                                                         key is missing
 #
 # Python 3.9 compatible: Xcode's bundled python3 runs it during builds.
 
@@ -90,7 +90,7 @@ def main(argv: list) -> int:
     check = "--check" in argv
     args = [a for a in argv if a != "--check"]
     if len(args) != 1:
-        print("usage: fill-missing-translations.py [--check] <Resources dir>")
+        print("usage: scripts/audit/fill-missing-translations.py [--check] <Resources dir>")
         return 2
     resources = pathlib.Path(args[0])
     source_dir = resources / (SOURCE_LANGUAGE + ".lproj")
