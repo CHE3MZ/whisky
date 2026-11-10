@@ -108,6 +108,6 @@ developer_id.p12*
 *.age
 *.gpg
 *.enc
-# Built by scripts/build_audio_test.sh, which also drops a copy beside itself.
+# Built by scripts/tests/build_audio_test.sh, which also drops a copy beside itself.
 # The one under Whisky/Resources is committed; this one is not.
-scripts/WhiskyAudioTest.exe
+scripts/tests/WhiskyAudioTest.exe
