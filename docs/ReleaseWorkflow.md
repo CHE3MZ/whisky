@@ -265,7 +265,7 @@ their pinned versions, and where each comes from. When the runtime needs to chan
    - Place **D3DMetal** as extracted from Apple's Game Porting Toolkit. ⚠️ Redistribution is governed by
      Apple's GPTK license — confirm terms before publishing.
    - Record the exact versions you used back into `docs/DEPENDENCIES.md`, and bump the matching
-     `*_PINNED` tags in `.github/workflows/RuntimeTrack.yml` so drift detection stays accurate.
+     `commit`/`release` values in `scripts/upstream/sources.yml` so drift detection stays accurate.
    - `tar -czf Libraries.tar.gz Libraries/` (mind the `Tar` pipe-drain pitfall noted below).
 2. Tag with the bare version `vX.Y.Z` (no `app-` prefix).
 3. `gh release create vX.Y.Z --title "Wine Libraries vX.Y.Z" Libraries.tar.gz`.

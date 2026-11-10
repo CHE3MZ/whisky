@@ -1,0 +1,25 @@
+name: Track Upstream
+
+# Runs scripts/upstream/track.sh once a week. The script checks the pins in
+# scripts/upstream/sources.yml and opens an issue in the master repository
+# when an upstream source has a newer commit or release.
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  track:
+    name: Check upstream sources
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Run source tracker
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: sh scripts/upstream/track.sh --github

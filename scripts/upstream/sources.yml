@@ -1,0 +1,22 @@
+master:
+  - name: "Whisky Master"
+    link: "https://github.com/CHE3MZ/whisky"
+    action: issue
+
+sources:
+  - name: "Whisky Upstream"
+    link: "https://github.com/frankea/Whisky"
+    commit: "3abfbae945e3400caaa13cf2e78fe5a187a1405b"
+    release: null
+  - name: "Wine MacOS Builds"
+    link: "https://github.com/Gcenx/macOS_Wine_builds"
+    commit: null
+    release: "11.0_1"
+  - name: "DXVK MacOS"
+    link: "https://github.com/Gcenx/DXVK-macOS"
+    commit: null
+    release: "v1.10.3-20230507-repack"
+  - name: "DXMT MacOS"
+    link: "https://github.com/3Shain/dxmt"
+    commit: null
+    release: "v0.80"
