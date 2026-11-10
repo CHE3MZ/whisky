@@ -253,7 +253,7 @@ workflow's `workflow_dispatch` input.
 ## Wine Libraries release
 
 The runtime (`Libraries.tar.gz`) is **assembled from upstream binaries, not built from source** — see
-[`DEPENDENCIES.md`](DEPENDENCIES.md) for the authoritative list of components,
+[`dependencies.md`](misc/dependencies.md) for the authoritative list of components,
 their pinned versions, and where each comes from. When the runtime needs to change:
 
 1. **Assemble `Libraries.tar.gz`** from the pinned upstream binaries. The archive unpacks to a
@@ -264,8 +264,9 @@ their pinned versions, and where each comes from. When the runtime needs to chan
      layout.
    - Place **D3DMetal** as extracted from Apple's Game Porting Toolkit. ⚠️ Redistribution is governed by
      Apple's GPTK license — confirm terms before publishing.
-   - Record the exact versions you used back into `docs/DEPENDENCIES.md`, and bump the matching
-     `commit`/`release` values in `scripts/config/sources.yml` so drift detection stays accurate.
+   - Bump the matching `commit`/`release` values in `scripts/config/sources.yml` and run
+     `scripts/upstream/report.sh` to refresh `docs/misc/dependencies.md`, so drift detection stays
+     accurate.
    - `tar -czf Libraries.tar.gz Libraries/` (mind the `Tar` pipe-drain pitfall noted below).
 2. Tag with the bare version `vX.Y.Z` (no `app-` prefix).
 3. `gh release create vX.Y.Z --title "Wine Libraries vX.Y.Z" Libraries.tar.gz`.
@@ -275,7 +276,8 @@ their pinned versions, and where each comes from. When the runtime needs to chan
    shasum -a 256 Libraries.tar.gz
    ```
 5. Update `dist/pages/WhiskyWineVersion.plist` with the version, bundled DXVK version, and the digest
-   from the previous step. Record the same digest in [`DEPENDENCIES.md`](DEPENDENCIES.md):
+   from the previous step. Record the same digest in the runtime-integrity table in
+   [`dependencies.md`](misc/dependencies.md):
    ```xml
    <dict>
        <key>version</key>

@@ -130,6 +130,7 @@ echo "Build artifact: $DMG_PATH"
 echo "Version: $VERSION (build $BUILD_NUMBER)"
 echo "$BUILD_NUMBER" > "$BUILD_DIR/build-number.txt"
 if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
+    # shellcheck disable=SC2016  # the backticks are Markdown, not a substitution
     printf '**Version:** `%s` (build `%s`)\n' "$VERSION" "$BUILD_NUMBER" >> "$GITHUB_STEP_SUMMARY"
 fi
 shasum -a 256 "$DMG_PATH"

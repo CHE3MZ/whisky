@@ -87,6 +87,22 @@ jobs:
             exit 1
           }
 
+  # docs/misc/dependencies.md is generated from scripts/config/sources.yml by
+  # report.sh; a stale file means a pin moved without refreshing the doc (or a
+  # hand edit that the generator would overwrite).
+  dependencies:
+    name: Dependencies doc
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Check dependencies.md is up to date
+        run: |
+          ./scripts/upstream/report.sh --check || {
+            echo ""
+            echo "Run ./scripts/upstream/report.sh locally and commit the result."
+            exit 1
+          }
+
   # Detects which areas a PR touches so macOS jobs can be skipped when they
   # can't be affected. Runs on every event; the outputs are only consulted for
   # pull requests (pushes to master always run everything).

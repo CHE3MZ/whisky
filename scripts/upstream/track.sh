@@ -224,14 +224,12 @@ parse_sources() {
                 commit = scalar(value)
             else if (key == "release")
                 release = scalar(value)
-            else if (key == "action")
-                action = scalar(value)
         }
         function emit() {
             if (active)
-                printf "%s\034%s\034%s\034%s\034%s\034%s\n", section, name, link, commit, release, action
+                printf "%s\034%s\034%s\034%s\034%s\n", section, name, link, commit, release
             active = 0
-            name = link = commit = release = action = ""
+            name = link = commit = release = ""
         }
         /^[A-Za-z_][A-Za-z0-9_]*[ \t]*:/ {
             emit()
@@ -372,7 +370,7 @@ if [ "$source_count" -eq 0 ]; then
     exit 1
 fi
 
-while IFS="$SEP" read -r section name link commit release action; do
+while IFS="$SEP" read -r section name link commit release; do
     [ "$section" = "sources" ] || continue
     total=$((total + 1))
 

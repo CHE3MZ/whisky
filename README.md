@@ -134,7 +134,7 @@ If you also installed bottles in a **custom location**, delete those folders too
 
 - **[Support](docs/SUPPORT.md)** - Where to file bugs and what to expect from a single-maintainer fork
 - **[Governance & continuity](docs/GOVERNANCE.md)** - Who maintains this and the honest bus-factor situation
-- **[Runtime dependencies](docs/DEPENDENCIES.md)** - The bundled Wine/DXVK/D3DMetal/DXMT versions and their upstream sources
+- **[Runtime dependencies](docs/misc/dependencies.md)** - The bundled Wine/DXVK/D3DMetal/DXMT versions and their upstream sources
 
 WhiskyKit, the core framework powering Whisky, has comprehensive API documentation:
 
