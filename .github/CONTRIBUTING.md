@@ -97,9 +97,8 @@ and ignored.
 To scan locally before pushing:
 
 ```bash
-brew install trufflehog
-./scripts/scan-secrets.sh        # scans HEAD vs origin/master
-./scripts/scan-secrets.sh master   # scans HEAD vs local master
+brew bundle
+task secrets
 ```
 
 If the scan fails on a real secret, **rotate the credential first** (treat

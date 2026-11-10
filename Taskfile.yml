@@ -27,6 +27,13 @@ tasks:
     desc: Lint links.
     cmds:
       - cmd: lychee .
+  secrets:
+    desc: Run secret scans
+    ignore_error: true
+    cmds:
+      - cmd: trufflehog git file://. --results=verified,unknown --fail
+      - cmd: gitleaks git . --no-banner --verbose
+      - cmd: betterleaks git . --no-banner --verbose
   scan:
     desc: Run other ops tools on the repo.
     ignore_error: true
