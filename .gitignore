@@ -114,3 +114,7 @@ developer_id.p12*
 # Built by scripts/tests/build_audio_test.sh, which also drops a copy beside itself.
 # The one under Whisky/Resources is committed; this one is not.
 scripts/tests/WhiskyAudioTest.exe
+
+# Runtime assembly scratch/cache and output (scripts/runtime.sh).
+scripts/runtime/build/
+scripts/runtime/release/

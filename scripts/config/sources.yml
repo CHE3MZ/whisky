@@ -4,18 +4,27 @@ sources:
     link: "https://github.com/frankea/Whisky"
     commit: "3abfbae945e3400caaa13cf2e78fe5a187a1405b"
     release: null
+
   - name: "Wine MacOS Builds"
     id: "WINE"
     link: "https://github.com/Gcenx/macOS_Wine_builds"
     commit: null
     release: "11.0_1"
+    asset: "wine-stable-11.0_1-osx64.tar.xz"
+    sha256: "b50dc50ec7f41d58b115a6b685d4d1315ba3c797bd3aa0f49213f2703cb82388"
+
   - name: "DXVK MacOS"
     id: "DXVK"
     link: "https://github.com/Gcenx/DXVK-macOS"
     commit: null
     release: "v1.10.3-20230507-repack"
+    asset: "dxvk-macOS-async-v1.10.3-20230507-repack.tar.gz"
+    sha256: "acd1520ad105d8ef124a09c8e11a259a5dc8bdc565ad18e0e52693f9807b2477"
+
   - name: "DXMT MacOS"
     id: "DXMT"
     link: "https://github.com/3Shain/dxmt"
     commit: null
     release: "v0.80"
+    asset: "dxmt-v0.80-builtin.tar.gz"
+    sha256: "8f260e36b5739e68f3bad613381441385c4dc7b85b78ba8de653d5a6a264529d"
