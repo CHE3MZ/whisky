@@ -55,7 +55,7 @@ tasks:
     desc: Generate changelog
     silent: true
     cmds:
-      - git-cliff --strip all -o docs/CHANGELOG.md
+      - git-cliff --strip all -o docs/misc/changelog.md
   check-links:
     desc: Lint links.
     cmds:

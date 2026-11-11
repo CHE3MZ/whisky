@@ -132,7 +132,7 @@ If you also installed bottles in a **custom location**, delete those folders too
 
 ## Documentation
 
-- **[Support](docs/SUPPORT.md)** - Where to file bugs and what to expect from a single-maintainer fork
+- **[Support](docs/support.md)** - Where to file bugs and what to expect from a single-maintainer fork
 - **[Governance & continuity](docs/GOVERNANCE.md)** - Who maintains this and the honest bus-factor situation
 - **[Runtime dependencies](docs/misc/dependencies.md)** - The bundled Wine/DXVK/D3DMetal/DXMT versions and their upstream sources
 
@@ -144,9 +144,9 @@ WhiskyKit, the core framework powering Whisky, has comprehensive API documentati
 
 ### Troubleshooting
 
-- **[Launcher Troubleshooting](docs/LauncherTroubleshooting.md)** - Fix issues with Steam, Epic, Battle.net, etc.
-- **[Steam Compatibility Guide](docs/SteamCompatibility.md)** - Detailed guide for Steam on Whisky
-- **[Stability Troubleshooting](docs/StabilityTroubleshooting.md)** - Diagnose crashes, freezes, reboots, and kernel panics
+- **[Launcher Troubleshooting](docs/support/LauncherTroubleshooting.md)** - Fix issues with Steam, Epic, Battle.net, etc.
+- **[Steam Compatibility Guide](docs/support/SteamCompatibility.md)** - Detailed guide for Steam on Whisky
+- **[Stability Troubleshooting](docs/support/StabilityTroubleshooting.md)** - Diagnose crashes, freezes, reboots, and kernel panics
 - **Controller Issues** - Enable "Controller Compatibility Mode" in Bottle Config → Controller & Input
 - **[Game Configurations](https://github.com/CHE3MZ/whisky/blob/master/WhiskyKit/Sources/WhiskyKit/GameDatabase/Resources/GameDB.json)** - 80+ curated per-game compatibility configs, also browsable in-app under Game Configurations
 

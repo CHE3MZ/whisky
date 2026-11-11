@@ -81,7 +81,7 @@ through the Crowdin project rather than opening a PR here.
 
 ## Changelog
 
-We maintain a [CHANGELOG](../docs/CHANGELOG.md) following the [Conventional
+We maintain a [CHANGELOG](../docs/misc/changelog.md) following the [Conventional
 Commits](https://www.conventionalcommits.org/) format. To update it, run
 `task changelog` (see `Taskfile.yml`) and commit the file.
 

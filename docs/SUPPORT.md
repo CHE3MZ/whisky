@@ -14,7 +14,7 @@ Most problems already have an answer:
    the archived original can't be fixed here.
 2. **Search [existing issues](https://github.com/CHE3MZ/whisky/issues?q=is%3Aissue).**
 3. **Check the troubleshooting docs:**
-   [Launcher](LauncherTroubleshooting.md) · [Steam](SteamCompatibility.md) · [Stability](StabilityTroubleshooting.md).
+   [Launcher](support/LauncherTroubleshooting.md) · [Steam](support/SteamCompatibility.md) · [Stability](support/StabilityTroubleshooting.md).
 4. **For a specific game**, check the [Game Support wiki](https://github.com/CHE3MZ/whisky/wiki/Game-Support)
    and use the **Game Compatibility Report** template.
 

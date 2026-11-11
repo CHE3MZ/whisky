@@ -1,10 +1,10 @@
 blank_issues_enabled: false
 contact_links:
   - name: 🔧 Launcher / Steam / Epic / EA App troubleshooting
-    url: https://github.com/CHE3MZ/whisky/blob/master/docs/LauncherTroubleshooting.md
+    url: https://github.com/CHE3MZ/whisky/blob/master/docs/support/LauncherTroubleshooting.md
     about: Most launcher issues are addressed here before opening a new issue.
   - name: 💥 Crash / freeze / kernel panic troubleshooting
-    url: https://github.com/CHE3MZ/whisky/blob/master/docs/StabilityTroubleshooting.md
+    url: https://github.com/CHE3MZ/whisky/blob/master/docs/support/StabilityTroubleshooting.md
     about: Run the in-app diagnostics (Bottle Configuration → View Diagnostics) before reporting.
   - name: 🎮 Game configurations (bundled)
     url: https://github.com/CHE3MZ/whisky/blob/master/WhiskyKit/Sources/WhiskyKit/GameDatabase/Resources/GameDB.json

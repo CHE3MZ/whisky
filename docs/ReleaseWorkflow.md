@@ -158,7 +158,7 @@ The printed `sparkle:edSignature` **and** the printed `length` must both exactly
 
 ## Automated release
 
-1. Run `task changelog` and commit `docs/CHANGELOG.md`.
+1. Run `task changelog` and commit `docs/misc/changelog.md`.
 2. Commit and push to `master`.
 3. Push an `app-vX.Y.Z` tag:
    ```sh
@@ -183,7 +183,7 @@ The release script injects `MARKETING_VERSION` from the requested version (the t
 
 ### 2. Update the changelog
 
-Run `task changelog` (see `Taskfile.yml`) to regenerate `docs/CHANGELOG.md`, then commit and push it to `master` before publishing the release.
+Run `task changelog` (see `Taskfile.yml`) to regenerate `docs/misc/changelog.md`, then commit and push it to `master` before publishing the release.
 
 ### 3. Build, sign, notarize, package
 
