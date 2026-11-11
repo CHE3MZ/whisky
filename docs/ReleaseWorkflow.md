@@ -189,20 +189,22 @@ Run `task changelog` (see `Taskfile.yml`) to regenerate `docs/misc/changelog.md`
 
 ```sh
 scripts/release.sh X.Y.Z
+# or, through Task:
+task release -- X.Y.Z
 ```
 
-The script:
+The script refuses to run with uncommitted changes (set `ALLOW_DIRTY=1` to override) and checks the Developer ID certificate, notary profile, and `create-dmg` before the long build. It then:
 
 1. Archives the app with `MARKETING_VERSION` from the argument and a UTC-timestamp `CURRENT_PROJECT_VERSION` (Apple Development by default; CI overrides to manual Developer ID signing), then verifies the exported app's `Info.plist` reports the requested version and build.
 2. Re-signs on export with **Developer ID Application** per `scripts/config/exportOptions.plist`.
 3. Verifies the signature with `codesign --verify --deep --strict`.
 4. Builds a styled DMG with `create-dmg` (background, Applications shortcut, and icon layout).
 5. Signs the DMG with the Developer ID Application certificate.
-6. Submits the DMG to Apple's notary service and waits for the verdict (typically 5–15 minutes).
+6. Submits the DMG to Apple's notary service and waits for the verdict (typically 5–15 minutes). A non-`Accepted` verdict prints Apple's notarization log and stops.
 7. Staples the notarization ticket.
-8. Verifies the stapled DMG passes `spctl --assess`.
+8. Runs a best-effort `spctl --assess` check; a failure is printed as a warning (`stapler validate` is the authoritative check).
 
-The artifact lands at `build/release/Whisky-X.Y.Z.dmg`.
+The artifact lands at `build/release/Whisky-X.Y.Z.dmg`. Build intermediates and Swift package artifacts stay in `build/release/DerivedData`; set `CLEAN=1` to remove `build/release` before starting.
 
 ### 4. Generate the appcast
 

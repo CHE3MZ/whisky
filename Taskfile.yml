@@ -25,6 +25,10 @@ tasks:
     desc: Build all schemes
     cmds:
       - scripts/build.sh --full {{.CLI_ARGS}}
+  release:
+    desc: Perform a release build
+    cmds:
+      - scripts/release.sh {{.CLI_ARGS}}
   lint:
     desc: Lint Swift sources
     cmds:
@@ -68,7 +72,7 @@ tasks:
       - cmd: gitleaks git . --no-banner --verbose
       - cmd: betterleaks git . --no-banner --verbose
   scan:
-    desc: Run other ops tools on the repo.
+    desc: Run other ops tools on the repo
     ignore_error: true
     cmds:
       - cmd: opengrep scan

@@ -82,9 +82,18 @@ if [ ! -f "$DMG" ]; then
 fi
 
 if [ -z "${SPARKLE_BIN:-}" ]; then
-    SPARKLE_BIN="$(find "$HOME/Library/Developer/Xcode/DerivedData" \
-        -path '*/SourcePackages/artifacts/sparkle/Sparkle/bin' -type d \
-        2>/dev/null | head -1 || true)"
+    for derived_data in \
+        "$PROJECT_DIR/build/release/DerivedData" \
+        "$PROJECT_DIR/build" \
+        "$HOME/Library/Developer/Xcode/DerivedData"; do
+        [ -d "$derived_data" ] || continue
+        SPARKLE_BIN="$(find "$derived_data" \
+            -path '*/SourcePackages/artifacts/sparkle/Sparkle/bin' -type d \
+            2>/dev/null | head -1 || true)"
+        if [ -n "$SPARKLE_BIN" ]; then
+            break
+        fi
+    done
 fi
 SIGN_UPDATE="${SPARKLE_BIN:-}/sign_update"
 if [ ! -x "$SIGN_UPDATE" ]; then
