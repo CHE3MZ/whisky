@@ -6,6 +6,7 @@ one as addressed-direct, addressed-categorical, wont-fix-out-of-scope,
 superseded, or unverified, and writes a diffable index plus a human-readable
 report under .planning/audit/. See .planning/audit/README.md.
 """
+
 from __future__ import annotations
 
 import argparse
@@ -140,23 +141,35 @@ class Classification:
 
 
 def run(cmd: list[str], capture: bool = True) -> str:
-    result = subprocess.run(cmd, cwd=REPO_ROOT, capture_output=capture, text=True, check=False)
+    result = subprocess.run(
+        cmd, cwd=REPO_ROOT, capture_output=capture, text=True, check=False
+    )
     if result.returncode != 0 and capture:
-        sys.stderr.write(f"[warn] command failed ({result.returncode}): {' '.join(cmd)}\n")
+        sys.stderr.write(
+            f"[warn] command failed ({result.returncode}): {' '.join(cmd)}\n"
+        )
         sys.stderr.write(result.stderr)
     return result.stdout if capture else ""
 
 
 def gh_api_paginate(path: str) -> list[dict]:
-    raw = run([
-        "gh", "api", "-H", "Accept: application/vnd.github+json",
-        "--paginate", path,
-    ])
+    raw = run(
+        [
+            "gh",
+            "api",
+            "-H",
+            "Accept: application/vnd.github+json",
+            "--paginate",
+            path,
+        ]
+    )
     if not raw.strip():
         return []
     # gh --paginate concatenates JSON arrays as a stream of separate arrays.
     # Wrap in brackets and split on ']['.
-    chunks = ("[" + raw.replace("][", "],[") + "]") if raw.lstrip().startswith("[") else raw
+    chunks = (
+        ("[" + raw.replace("][", "],[") + "]") if raw.lstrip().startswith("[") else raw
+    )
     try:
         parsed = json.loads(chunks)
     except json.JSONDecodeError:
@@ -181,21 +194,23 @@ def fetch_snapshot() -> list[Issue]:
             continue  # skip PRs
         body = item.get("body") or ""
         reactions = item.get("reactions") or {}
-        issues.append(Issue(
-            number=item["number"],
-            title=item.get("title") or "",
-            state=item.get("state") or "open",
-            state_reason=item.get("state_reason"),
-            labels=[lbl["name"] for lbl in item.get("labels", [])],
-            comments=item.get("comments", 0),
-            reactions_total=reactions.get("total_count", 0),
-            locked=bool(item.get("locked")),
-            created_at=item.get("created_at", ""),
-            updated_at=item.get("updated_at", ""),
-            closed_at=item.get("closed_at"),
-            body_excerpt=body[:BODY_EXCERPT_BYTES],
-            html_url=item.get("html_url", ""),
-        ))
+        issues.append(
+            Issue(
+                number=item["number"],
+                title=item.get("title") or "",
+                state=item.get("state") or "open",
+                state_reason=item.get("state_reason"),
+                labels=[lbl["name"] for lbl in item.get("labels", [])],
+                comments=item.get("comments", 0),
+                reactions_total=reactions.get("total_count", 0),
+                locked=bool(item.get("locked")),
+                created_at=item.get("created_at", ""),
+                updated_at=item.get("updated_at", ""),
+                closed_at=item.get("closed_at"),
+                body_excerpt=body[:BODY_EXCERPT_BYTES],
+                html_url=item.get("html_url", ""),
+            )
+        )
     issues.sort(key=lambda i: i.number)
     return issues
 
@@ -207,8 +222,9 @@ def load_snapshot() -> list[Issue]:
 
 def save_snapshot(issues: list[Issue]) -> None:
     AUDIT_DIR.mkdir(parents=True, exist_ok=True)
-    SNAPSHOT_PATH.write_text(json.dumps([i.__dict__ for i in issues], indent=2),
-                             encoding="utf-8")
+    SNAPSHOT_PATH.write_text(
+        json.dumps([i.__dict__ for i in issues], indent=2), encoding="utf-8"
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -228,22 +244,34 @@ def collect_citations() -> dict[int, list[dict]]:
     """Return {issue_number: [{type, path, line, excerpt}, ...]}."""
     citations: dict[int, list[dict]] = defaultdict(list)
     grep_paths = [
-        "README.md", "docs", ".planning",
-        "Whisky", "WhiskyKit", "WhiskyCmd", "scripts",
+        "README.md",
+        "docs",
+        ".planning",
+        "Whisky",
+        "WhiskyKit",
+        "WhiskyCmd",
+        "scripts",
     ]
     existing = [p for p in grep_paths if (REPO_ROOT / p).exists()]
     if existing:
-        out = run([
-            "grep", "-rEn",
-            r"whisky-app/whisky#[0-9]+|upstream\s*#[0-9]+|github\.com/whisky-app/whisky/(issues|pull)/[0-9]+",
-            *existing,
-            "--include=*.md", "--include=*.swift", "--include=*.py",
-            "--include=*.json",
-            # The audit's own output quotes citations back verbatim; scanning it
-            # would let a classification keep itself alive on the next run.
-            "--exclude=snapshot.json", "--exclude=classified.json",
-            "--exclude=AUDIT_REPORT.md", "--exclude=overrides.json",
-        ])
+        out = run(
+            [
+                "grep",
+                "-rEn",
+                r"whisky-app/whisky#[0-9]+|upstream\s*#[0-9]+|github\.com/whisky-app/whisky/(issues|pull)/[0-9]+",
+                *existing,
+                "--include=*.md",
+                "--include=*.swift",
+                "--include=*.py",
+                "--include=*.json",
+                # The audit's own output quotes citations back verbatim; scanning it
+                # would let a classification keep itself alive on the next run.
+                "--exclude=snapshot.json",
+                "--exclude=classified.json",
+                "--exclude=AUDIT_REPORT.md",
+                "--exclude=overrides.json",
+            ]
+        )
         for line in out.splitlines():
             # Format: path:line:content
             try:
@@ -251,20 +279,32 @@ def collect_citations() -> dict[int, list[dict]]:
             except ValueError:
                 continue
             for match in CITATION_RE.finditer(content):
-                citations[int(match.group(1))].append({
-                    "type": "citation", "path": path, "line": int(lineno),
-                    "excerpt": content.strip()[:200],
-                })
+                citations[int(match.group(1))].append(
+                    {
+                        "type": "citation",
+                        "path": path,
+                        "line": int(lineno),
+                        "excerpt": content.strip()[:200],
+                    }
+                )
             for match in UPSTREAM_HASH_RE.finditer(content):
-                citations[int(match.group(1))].append({
-                    "type": "upstream-citation", "path": path, "line": int(lineno),
-                    "excerpt": content.strip()[:200],
-                })
+                citations[int(match.group(1))].append(
+                    {
+                        "type": "upstream-citation",
+                        "path": path,
+                        "line": int(lineno),
+                        "excerpt": content.strip()[:200],
+                    }
+                )
             for match in ISSUE_URL_RE.finditer(content):
-                citations[int(match.group(1))].append({
-                    "type": "url-citation", "path": path, "line": int(lineno),
-                    "excerpt": content.strip()[:200],
-                })
+                citations[int(match.group(1))].append(
+                    {
+                        "type": "url-citation",
+                        "path": path,
+                        "line": int(lineno),
+                        "excerpt": content.strip()[:200],
+                    }
+                )
     # Also scan git log so commit messages with `Closes whisky-app/whisky#NNN` count.
     log_out = run(["git", "log", "--all", "--format=%H%x09%s%x09%b"])
     for line in log_out.splitlines():
@@ -275,10 +315,13 @@ def collect_citations() -> dict[int, list[dict]]:
         body = parts[2] if len(parts) > 2 else ""
         haystack = f"{subject}\n{body}"
         for match in CITATION_RE.finditer(haystack):
-            citations[int(match.group(1))].append({
-                "type": "git-log", "sha": sha[:8],
-                "excerpt": subject[:200],
-            })
+            citations[int(match.group(1))].append(
+                {
+                    "type": "git-log",
+                    "sha": sha[:8],
+                    "excerpt": subject[:200],
+                }
+            )
     return citations
 
 
@@ -327,16 +370,22 @@ def classify_one(
     if issue.state == "closed":
         if issue.state_reason == "completed":
             return Classification(
-                number=issue.number, status="upstream-fixed", confidence="high",
+                number=issue.number,
+                status="upstream-fixed",
+                confidence="high",
                 rationale="Closed upstream as completed (likely inherited via Wine/runtime upgrades).",
             )
         if issue.state_reason in {"not_planned", "duplicate"}:
             return Classification(
-                number=issue.number, status="upstream-declined", confidence="high",
+                number=issue.number,
+                status="upstream-declined",
+                confidence="high",
                 rationale=f"Closed upstream as {issue.state_reason}.",
             )
         return Classification(
-            number=issue.number, status="upstream-closed", confidence="medium",
+            number=issue.number,
+            status="upstream-closed",
+            confidence="medium",
             rationale="Closed upstream without a state_reason.",
         )
 
@@ -344,7 +393,9 @@ def classify_one(
     if issue.number in citations:
         evidence = citations[issue.number]
         return Classification(
-            number=issue.number, status="addressed-direct", confidence="high",
+            number=issue.number,
+            status="addressed-direct",
+            confidence="high",
             evidence=evidence,
             rationale=f"Cited {len(evidence)} time(s) in tree/git log.",
         )
@@ -353,7 +404,9 @@ def classify_one(
     haystack = f"{issue.title}\n{issue.body_excerpt}"
     if OUT_OF_SCOPE_KEYWORDS.search(haystack):
         return Classification(
-            number=issue.number, status="wont-fix-out-of-scope", confidence="high",
+            number=issue.number,
+            status="wont-fix-out-of-scope",
+            confidence="high",
             rationale="Matches OOS keyword (anti-cheat / kernel / mobile / Wine source).",
         )
 
@@ -365,10 +418,15 @@ def classify_one(
                 label_cats.update(cats)
     shipped_label_cats = label_cats & set(fully_shipped_cats)
     if shipped_label_cats:
-        matched_reqs = sorted(rid for rid, info in reqs.items()
-                              if info["category"] in shipped_label_cats and info["shipped"])
+        matched_reqs = sorted(
+            rid
+            for rid, info in reqs.items()
+            if info["category"] in shipped_label_cats and info["shipped"]
+        )
         return Classification(
-            number=issue.number, status="addressed-categorical", confidence="medium",
+            number=issue.number,
+            status="addressed-categorical",
+            confidence="medium",
             matched_categories=sorted(shipped_label_cats),
             matched_requirements=matched_reqs,
             rationale=f"Labels map to category {sorted(shipped_label_cats)} whose v1.0 reqs all shipped.",
@@ -386,7 +444,9 @@ def classify_one(
         else "No direct citation, no label match, no keyword match."
     )
     return Classification(
-        number=issue.number, status="unverified", confidence="low",
+        number=issue.number,
+        status="unverified",
+        confidence="low",
         matched_categories=sorted(keyword_cats),
         rationale=rationale,
     )
@@ -401,6 +461,7 @@ def apply_overrides(classifications: list[Classification], overrides: dict) -> N
             c.confidence = "high"
             c.rationale = data.get("rationale", c.rationale)
             c.overridden = True
+
 
 # ---------------------------------------------------------------------------
 # Report rendering
@@ -475,8 +536,10 @@ def render_report(
     # Closed-issue summary.
     lines.append("## Closed issues — for context")
     lines.append("")
-    lines.append("Already closed in upstream before the archive on 2025-04-09. "
-                 "Listed here so the snapshot totals reconcile.")
+    lines.append(
+        "Already closed in upstream before the archive on 2025-04-09. "
+        "Listed here so the snapshot totals reconcile."
+    )
     lines.append("")
     lines.append("| Status | Count | Share |")
     lines.append("|--------|------:|------:|")
@@ -506,17 +569,25 @@ def render_report(
 
     # Top unaddressed by reactions+comments — open issues only.
     unaddressed = [
-        c for c in classifications
-        if c.status in {"unverified", "addressed-categorical"} and c.confidence != "high"
+        c
+        for c in classifications
+        if c.status in {"unverified", "addressed-categorical"}
+        and c.confidence != "high"
     ]
     unaddressed.sort(
-        key=lambda c: by_number[c.number].reactions_total + by_number[c.number].comments,
+        key=lambda c: (
+            by_number[c.number].reactions_total + by_number[c.number].comments
+        ),
         reverse=True,
     )
     lines.append("## Top 25 unaddressed open issues (by reactions + comments)")
     lines.append("")
-    lines.append("Heuristic verdicts only — these are the highest-traffic open issues that are not")
-    lines.append("`addressed-direct` and not high-confidence categorical. Likely candidates for")
+    lines.append(
+        "Heuristic verdicts only — these are the highest-traffic open issues that are not"
+    )
+    lines.append(
+        "`addressed-direct` and not high-confidence categorical. Likely candidates for"
+    )
     lines.append("manual review or override.")
     lines.append("")
     lines.append("| # | Title | Status | Reactions+Comments | URL |")
@@ -545,27 +616,31 @@ def render_report(
             lines.append(f"- **#{iss.number}**: {iss.title} — _{c.rationale}_")
             lines.append(f"  - URL: {iss.html_url}")
             if c.evidence:
-                paths = ", ".join({ev.get("path") or ev.get("sha", "") for ev in c.evidence})
+                paths = ", ".join(
+                    {ev.get("path") or ev.get("sha", "") for ev in c.evidence}
+                )
                 lines.append(f"  - Cited in: {paths}")
         lines.append("")
 
     # Methodology.
     lines.append("## Methodology")
     lines.append("")
-    lines.append("Five-step heuristic classifier in `scripts/audit/audit_upstream.py`. See")
+    lines.append(
+        "Five-step heuristic classifier in `scripts/audit/audit_upstream.py`. See"
+    )
     lines.append("`.planning/audit/README.md` for the full pipeline and limitations.")
     lines.append("")
-    lines.append(f"Categories with all v1.0 requirements shipped: {', '.join(fully_shipped) or '—'}")
+    lines.append(
+        f"Categories with all v1.0 requirements shipped: {', '.join(fully_shipped) or '—'}"
+    )
     lines.append("")
     git_log_hits = sum(
-        1 for c in classifications
+        1
+        for c in classifications
         if any(ev.get("type") == "git-log" for ev in c.evidence)
     )
     overridden = sum(1 for c in classifications if c.overridden)
-    lines.append(
-        f"**{git_log_hits}** in git log, "
-        f"**{overridden}** manual overrides, "
-    )
+    lines.append(f"**{git_log_hits}** in git log, **{overridden}** manual overrides, ")
     lines.append("")
     return "\n".join(lines)
 
@@ -580,8 +655,10 @@ def diff_against(ref: str) -> None:
     if not CLASSIFIED_PATH.exists():
         sys.stderr.write("[error] no current classified.json; run audit first\n")
         sys.exit(1)
-    current = {row["number"]: row
-               for row in json.loads(CLASSIFIED_PATH.read_text(encoding="utf-8"))}
+    current = {
+        row["number"]: row
+        for row in json.loads(CLASSIFIED_PATH.read_text(encoding="utf-8"))
+    }
     out = run(["git", "show", f"{ref}:.planning/audit/classified.json"])
     if not out.strip():
         sys.stderr.write(f"[error] no classified.json at {ref}\n")
@@ -604,8 +681,12 @@ def diff_against(ref: str) -> None:
 # ---------------------------------------------------------------------------
 
 
-def export_unverified(classifications: list[Classification], issues: list[Issue],
-                      out_dir: Path, batch_size: int) -> int:
+def export_unverified(
+    classifications: list[Classification],
+    issues: list[Issue],
+    out_dir: Path,
+    batch_size: int,
+) -> int:
     """Write the unverified-open issues to chunked JSON files for offline classification."""
     by_number = {i.number: i for i in issues}
     targets = [
@@ -627,23 +708,35 @@ def export_unverified(classifications: list[Classification], issues: list[Issue]
     n_batches = 0
     for i in range(0, len(targets), batch_size):
         n_batches += 1
-        chunk = targets[i: i + batch_size]
+        chunk = targets[i : i + batch_size]
         (out_dir / f"batch_{n_batches:02d}.json").write_text(
-            json.dumps(chunk, indent=2), encoding="utf-8")
+            json.dumps(chunk, indent=2), encoding="utf-8"
+        )
     return n_batches
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--refresh", action="store_true",
-                        help="Force re-fetch of upstream snapshot")
-    parser.add_argument("--export-unverified", metavar="DIR",
-                        help="Write unverified issues to chunked JSON batches under DIR for "
-                             "offline classification, then exit.")
-    parser.add_argument("--batch-size", type=int, default=70,
-                        help="Issues per batch when --export-unverified is used (default: 70)")
-    parser.add_argument("--diff-against", metavar="REF",
-                        help="Diff current classifications against a git ref")
+    parser.add_argument(
+        "--refresh", action="store_true", help="Force re-fetch of upstream snapshot"
+    )
+    parser.add_argument(
+        "--export-unverified",
+        metavar="DIR",
+        help="Write unverified issues to chunked JSON batches under DIR for "
+        "offline classification, then exit.",
+    )
+    parser.add_argument(
+        "--batch-size",
+        type=int,
+        default=70,
+        help="Issues per batch when --export-unverified is used (default: 70)",
+    )
+    parser.add_argument(
+        "--diff-against",
+        metavar="REF",
+        help="Diff current classifications against a git ref",
+    )
     args = parser.parse_args()
 
     if args.diff_against:
@@ -660,7 +753,9 @@ def main() -> None:
     sys.stderr.write(f"[info] {len(issues)} issues loaded\n")
 
     citations = collect_citations()
-    sys.stderr.write(f"[info] {len(citations)} unique upstream issue numbers cited in tree+gitlog\n")
+    sys.stderr.write(
+        f"[info] {len(citations)} unique upstream issue numbers cited in tree+gitlog\n"
+    )
 
     reqs, fully_shipped = load_requirements()
     sys.stderr.write(
@@ -670,13 +765,20 @@ def main() -> None:
 
     classifications = [classify_one(i, citations, fully_shipped, reqs) for i in issues]
 
-    overrides = (json.loads(OVERRIDES_PATH.read_text(encoding="utf-8"))
-                 if OVERRIDES_PATH.exists() else {})
+    overrides = (
+        json.loads(OVERRIDES_PATH.read_text(encoding="utf-8"))
+        if OVERRIDES_PATH.exists()
+        else {}
+    )
     apply_overrides(classifications, overrides)
-    sys.stderr.write(f"[info] applied {sum(1 for c in classifications if c.overridden)} overrides\n")
+    sys.stderr.write(
+        f"[info] applied {sum(1 for c in classifications if c.overridden)} overrides\n"
+    )
 
     if args.export_unverified:
-        n = export_unverified(classifications, issues, Path(args.export_unverified), args.batch_size)
+        n = export_unverified(
+            classifications, issues, Path(args.export_unverified), args.batch_size
+        )
         sys.stderr.write(
             f"[info] wrote {n} batch file(s) of unverified issues to {args.export_unverified}\n"
         )

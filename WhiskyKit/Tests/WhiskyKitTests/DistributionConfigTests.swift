@@ -298,7 +298,8 @@ final class DistributionConfigTests: XCTestCase {
 
         // Test with large version numbers
         let largeURL = DistributionConfig.librariesURL(version: "999.999.999")
-        let expectedLargeURL = "https://github.com/CHE3MZ/whisky/releases/download/runtime-v999.999.999/Libraries.tar.gz"
+        let expectedLargeURL = "https://github.com/CHE3MZ/whisky/releases/download/" +
+            "runtime-v999.999.999/Libraries.tar.gz"
         XCTAssertEqual(largeURL, expectedLargeURL)
         XCTAssertNotNil(URL(string: largeURL))
     }

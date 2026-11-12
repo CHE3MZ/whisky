@@ -32,7 +32,11 @@ import pathlib
 import re
 import sys
 
-CATALOG = pathlib.Path(__file__).resolve().parent.parent.parent / "Whisky" / "Localizable.xcstrings"
+CATALOG = (
+    pathlib.Path(__file__).resolve().parent.parent.parent
+    / "Whisky"
+    / "Localizable.xcstrings"
+)
 
 # Only differences that are unambiguous in software UI copy. -ise vs -ize is a
 # real split even within British usage (Oxford keeps -ize), but -ise is what the
@@ -68,7 +72,9 @@ def to_british(text: str) -> str:
     protected_spans = [m.span() for m in PROTECTED.finditer(text)]
 
     def overlaps_protected(start: int, end: int) -> bool:
-        return any(start < p_end and p_start < end for p_start, p_end in protected_spans)
+        return any(
+            start < p_end and p_start < end for p_start, p_end in protected_spans
+        )
 
     result = text
     for pattern, replacement in SPELLINGS:
@@ -76,7 +82,7 @@ def to_british(text: str) -> str:
         for match in re.finditer(pattern, result):
             if overlaps_protected(match.start(), match.end()):
                 continue
-            out.append(result[last:match.start()])
+            out.append(result[last : match.start()])
             out.append(match.expand(replacement))
             last = match.end()
         out.append(result[last:])
@@ -87,7 +93,7 @@ def to_british(text: str) -> str:
 def entry_bounds(text: str, key: str) -> tuple[int, int]:
     """Character range of one entry's `localizations` object, braces matched by
     hand because the values contain braces of their own."""
-    anchor = '    %s : {\n' % json.dumps(key, ensure_ascii=False)
+    anchor = f"    {json.dumps(key, ensure_ascii=False)} : {{\n"
     start = text.index(anchor)
     loc = text.index('"localizations" : {', start)
     depth, index = 0, text.index("{", loc)
@@ -106,12 +112,15 @@ def entry_bounds(text: str, key: str) -> tuple[int, int]:
 
 
 def block(value: str) -> str:
-    return ('        "en-GB" : {\n'
-            '          "stringUnit" : {\n'
-            '            "state" : "translated",\n'
-            '            "value" : %s\n'
-            '          }\n'
-            '        },\n' % json.dumps(value, ensure_ascii=False))
+    dropped = json.dumps(value, ensure_ascii=False)
+    return (
+        '        "en-GB" : {\n'
+        '          "stringUnit" : {\n'
+        '            "state" : "translated",\n'
+        f'            "value" : {dropped}\n'
+        "          }\n"
+        "        },\n"
+    )
 
 
 def main() -> int:
@@ -121,7 +130,12 @@ def main() -> int:
 
     expected: dict[str, str] = {}
     for key, entry in strings.items():
-        english = entry.get("localizations", {}).get("en", {}).get("stringUnit", {}).get("value")
+        english = (
+            entry.get("localizations", {})
+            .get("en", {})
+            .get("stringUnit", {})
+            .get("value")
+        )
         if english is None:
             # The key is its own source string. It only needs an en-GB row when
             # British spells it differently; otherwise the key renders correctly
@@ -134,20 +148,32 @@ def main() -> int:
 
     if check_only:
         stale = [
-            key for key, value in expected.items()
-            if strings[key]["localizations"].get("en-GB", {}).get("stringUnit", {}).get("value") != value
+            key
+            for key, value in expected.items()
+            if strings[key]["localizations"]
+            .get("en-GB", {})
+            .get("stringUnit", {})
+            .get("value")
+            != value
         ]
         if stale:
-            print("en-GB is out of date, %d string(s), run scripts/audit/british-english.py:" % len(stale))
+            print(
+                f"en-GB is out of date, {len(stale)} string(s), run scripts/audit/british-english.py:"
+            )
             for key in stale[:10]:
                 print("  " + key)
             return 1
-        print("en-GB covers all %d strings that need it" % len(expected))
+        print(f"en-GB covers all {len(expected)} strings that need it")
         return 0
 
     written = 0
     for key, value in expected.items():
-        current = strings[key]["localizations"].get("en-GB", {}).get("stringUnit", {}).get("value")
+        current = (
+            strings[key]["localizations"]
+            .get("en-GB", {})
+            .get("stringUnit", {})
+            .get("value")
+        )
         if current == value:
             continue
         start, end = entry_bounds(raw, key)
@@ -159,15 +185,19 @@ def main() -> int:
         elif '        "en" : {' in region:
             at = region.index('        "en" : {')
             closing = region.index("\n        }", at) + len("\n        }")
-            if region[closing:closing + 1] == ",":
+            if region[closing : closing + 1] == ",":
                 # Another language follows, so a comma-terminated block slots in.
-                region = region[:closing + 2] + block(value) + region[closing + 2:]
+                region = region[: closing + 2] + block(value) + region[closing + 2 :]
             else:
                 # en is the only language here. It needs the comma, and the row
                 # going in after it must not have one.
-                region = (region[:closing] + ",\n"
-                          + block(value).rstrip(",\n") + "\n"
-                          + region[closing + 1:])
+                region = (
+                    region[:closing]
+                    + ",\n"
+                    + block(value).rstrip(",\n")
+                    + "\n"
+                    + region[closing + 1 :]
+                )
         else:
             # No en block to anchor to, which means the key is its own source
             # string. Head of the map: always comma-safe, unlike the tail.
@@ -178,11 +208,17 @@ def main() -> int:
     CATALOG.write_text(raw, encoding="utf-8")
     check = json.loads(CATALOG.read_text(encoding="utf-8"))["strings"]
     differing = sum(
-        1 for key, value in expected.items()
-        if value != check[key]["localizations"].get("en", {}).get("stringUnit", {}).get("value", key)
+        1
+        for key, value in expected.items()
+        if value
+        != check[key]["localizations"]
+        .get("en", {})
+        .get("stringUnit", {})
+        .get("value", key)
     )
-    print("en-GB covers %d strings, %d spelled differently, %d rows written"
-          % (len(expected), differing, written))
+    print(
+        f"en-GB covers {len(expected)} strings, {differing} spelled differently, {written} rows written"
+    )
     return 0
 
 

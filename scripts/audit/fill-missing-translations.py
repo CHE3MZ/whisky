@@ -81,7 +81,8 @@ def missing_keys(source: dict, target: dict) -> dict:
 
 def localizations(resources: pathlib.Path) -> list:
     return sorted(
-        p for p in resources.glob("*.lproj")
+        p
+        for p in resources.glob("*.lproj")
         if p.is_dir() and p.stem not in (SOURCE_LANGUAGE, "Base")
     )
 
@@ -90,12 +91,14 @@ def main(argv: list) -> int:
     check = "--check" in argv
     args = [a for a in argv if a != "--check"]
     if len(args) != 1:
-        print("usage: scripts/audit/fill-missing-translations.py [--check] <Resources dir>")
+        print(
+            "usage: scripts/audit/fill-missing-translations.py [--check] <Resources dir>"
+        )
         return 2
     resources = pathlib.Path(args[0])
     source_dir = resources / (SOURCE_LANGUAGE + ".lproj")
     if not source_dir.is_dir():
-        print("error: no %s.lproj in %s" % (SOURCE_LANGUAGE, resources))
+        print(f"error: no {SOURCE_LANGUAGE}.lproj in {resources}")
         return 1
     source = tables(source_dir)
 
@@ -108,19 +111,21 @@ def main(argv: list) -> int:
         if check:
             incomplete += 1
             sample = sorted(k for entries in gaps.values() for k in entries)[:5]
-            print("error: %s is missing %d keys, e.g. %s" % (lproj.name, count, ", ".join(sample)))
+            print(
+                f"error: {lproj.name} is missing {count} keys, e.g. {', '.join(sample)}"
+            )
             continue
         for (name, suffix), entries in gaps.items():
             path = lproj / (name + suffix)
             merged = load_plist(path) if path.exists() else {}
             merged.update(entries)
             path.write_bytes(plistlib.dumps(merged, fmt=plistlib.FMT_BINARY))
-        print("%s: filled %d keys from %s" % (lproj.name, count, SOURCE_LANGUAGE))
+        print(f"{lproj.name}: filled {count} keys from {SOURCE_LANGUAGE}")
 
     if check:
         if incomplete:
             return 1
-        print("Every localization in %s carries all %s keys." % (resources, SOURCE_LANGUAGE))
+        print(f"Every localization in {resources} carries all {SOURCE_LANGUAGE} keys.")
     return 0
 
 
