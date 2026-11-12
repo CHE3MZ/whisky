@@ -24,7 +24,7 @@
 #
 # With --all it also removes gitignored local-only directories:
 #   .planning/, strix_runs/, plans/, .venv/, Pods/, Carthage/, Dependencies/,
-#   .accio/, fastlane/test_output/, iOSInjectionProject/, and package leftovers.
+#   .accio/, fastlane/test_output/, iOSInjectionProject/, .swiftpm/, and package leftovers.
 #
 # Usage: scripts/clean.sh [--dry-run] [--all]
 #   --dry-run  Print what would be removed without deleting anything
@@ -120,6 +120,7 @@ if [ "$ALL" -eq 1 ]; then
     remove_path "$PROJECT_DIR/.accio"
     remove_path "$PROJECT_DIR/fastlane/test_output"
     remove_path "$PROJECT_DIR/iOSInjectionProject"
+    remove_found '.swiftpm'
     remove_found '*.hmap'
     remove_found '*.dSYM'
     remove_found '*.dSYM.zip'
