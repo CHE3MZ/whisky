@@ -18,6 +18,10 @@ tasks:
       - task secrets
       - task scan
       - task checks
+  setup:
+    desc: Setup developer tools
+    cmds:
+      - cmd: brew bundle
   build:
     desc: Build the app
     cmds:
@@ -68,6 +72,7 @@ tasks:
     desc: Run sync operations
     cmds:
       - task: upstream
+      - task: changelog
   cliff:
     desc: Run git cliff
     silent: true
