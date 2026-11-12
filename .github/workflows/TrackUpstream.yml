@@ -18,7 +18,7 @@ jobs:
     name: Check upstream sources
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Run source tracker
         env:
           GH_TOKEN: ${{ github.token }}

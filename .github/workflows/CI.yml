@@ -42,7 +42,7 @@ jobs:
     name: SwiftLint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: SwiftLint
         uses: norio-nomura/action-swiftlint@3.2.1
         with:
@@ -53,7 +53,7 @@ jobs:
     name: SwiftFormat
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Install SwiftFormat
         run: |
           # Install SwiftFormat via pre-built binary
@@ -78,7 +78,7 @@ jobs:
     name: Localization
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Check en-GB covers every string
         run: |
           ./scripts/audit/british-english.py --check || {
@@ -94,7 +94,7 @@ jobs:
     name: Dependencies doc
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Check dependencies.md is up to date
         run: |
           sh scripts/upstream/report.sh --check || {
@@ -112,7 +112,7 @@ jobs:
     outputs:
       app: ${{ steps.filter.outputs.app }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: dorny/paths-filter@v4
         id: filter
         with:
@@ -133,7 +133,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
@@ -225,7 +225,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
@@ -307,7 +307,7 @@ jobs:
     
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
       
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
