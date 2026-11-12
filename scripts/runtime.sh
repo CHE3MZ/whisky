@@ -481,7 +481,7 @@ DIGEST=$(sha256_of "$OUTPUT_FILE")
 
 if [ "$UPDATE_DOCS" -eq 1 ]; then
     log "Updating docs/WhiskyWineVersion.plist"
-    "$SCRIPT_DIR/runtime/sync.sh" --archive "$OUTPUT_FILE"
+    bash "$SCRIPT_DIR/runtime/sync.sh" --archive "$OUTPUT_FILE"
     DOCS_STEP="  3. docs/WhiskyWineVersion.plist updated from the archive.
      Publish the archive and record the digest in docs/misc/dependencies.md
      before committing or pushing."

@@ -20,23 +20,23 @@ tasks:
   build:
     desc: Build the app
     cmds:
-      - scripts/build.sh {{.CLI_ARGS}}
+      - bash scripts/build.sh {{.CLI_ARGS}}
   build-full:
     desc: Build all schemes
     cmds:
-      - scripts/build.sh --full {{.CLI_ARGS}}
+      - bash scripts/build.sh --full {{.CLI_ARGS}}
   release:
     desc: Perform a release build
     cmds:
-      - scripts/release.sh {{.CLI_ARGS}}
+      - bash scripts/release.sh {{.CLI_ARGS}}
   runtime:
     desc: Assemble the runtime
     cmds:
-      - scripts/runtime.sh {{.CLI_ARGS}}
+      - bash scripts/runtime.sh {{.CLI_ARGS}}
   docs:
     desc: Build the documentation site
     cmds:
-      - scripts/docs.sh {{.CLI_ARGS}}
+      - bash scripts/docs.sh {{.CLI_ARGS}}
   lint:
     desc: Lint Swift sources
     cmds:
@@ -48,21 +48,21 @@ tasks:
   test:
     desc: Build and run tests
     cmds:
-      - scripts/tests/test.sh
+      - bash scripts/tests/test.sh
   audit:
     desc: Run the audit scripts
     cmds:
-      - scripts/audit/audit.sh
+      - bash scripts/audit/audit.sh
   upstream:
     desc: Run upstream checks
     cmds:
-      - cmd: scripts/upstream/track.sh
-      - cmd: scripts/upstream/report.sh
+      - cmd: sh scripts/upstream/track.sh
+      - cmd: sh scripts/upstream/report.sh
   sync:
     desc: Run sync operations
     cmds:
       - task: upstream
-      - cmd: scripts/runtime/sync.sh
+      - cmd: bash scripts/runtime/sync.sh
   cliff:
     desc: Run git cliff
     silent: true

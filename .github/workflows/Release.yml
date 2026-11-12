@@ -184,7 +184,7 @@ jobs:
         env:
           ARCHIVE_CODE_SIGN_STYLE: Manual
           ARCHIVE_CODE_SIGN_IDENTITY: Developer ID Application
-        run: scripts/release.sh "${{ steps.release.outputs.version }}"
+        run: bash scripts/release.sh "${{ steps.release.outputs.version }}"
 
       # Sign the exact DMG that will be published and generate the appcast entry.
       # The feed itself is a release asset; Documentation.yml mirrors the newest

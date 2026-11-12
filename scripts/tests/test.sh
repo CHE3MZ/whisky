@@ -26,7 +26,7 @@ set -euo pipefail
 PROJECT_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$PROJECT_DIR"
 
-"$PROJECT_DIR/scripts/build.sh" --full
+bash "$PROJECT_DIR/scripts/build.sh" --full
 
 echo "==> Running WhiskyKit unit tests"
 swift test --package-path WhiskyKit
