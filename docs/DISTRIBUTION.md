@@ -17,11 +17,12 @@ there's no pointer to this fork.
 **Action — open a PR against [homebrew/homebrew-cask](https://github.com/Homebrew/homebrew-cask)** to add
 a successor pointer. Realistic asks, easiest first:
 
-> The `whisky` cask is already deprecated (unmaintained, 2025-04-09). `CHE3MZ/whisky` is an actively
-> maintained fork (signed + notarized DMGs, in-app Sparkle updates). Requesting one of:
-> (a) add a `caveats` note pointing users to `brew install --cask CHE3MZ/tools/whisky`;
-> (b) repoint the cask's `url`/`homepage` to the fork's releases; or
-> (c) `disable!` the cask with that pointer.
+!!! quote "Requested cask change"
+    The `whisky` cask is already deprecated (unmaintained, 2025-04-09). `CHE3MZ/whisky` is an actively
+    maintained fork (signed + notarized DMGs, in-app Sparkle updates). Requesting one of:
+    (a) add a `caveats` note pointing users to `brew install --cask CHE3MZ/tools/whisky`;
+    (b) repoint the cask's `url`/`homepage` to the fork's releases; or
+    (c) `disable!` the cask with that pointer.
 
 The `caveats`-pointer ask (a) is the lowest-friction and most likely to be accepted; a full repoint (b)
 is more sensitive. Until then, keep the README's "Getting the right Whisky" warning prominent and the

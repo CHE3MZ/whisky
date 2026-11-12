@@ -62,7 +62,7 @@ CI archives with manual Developer ID signing (`ARCHIVE_CODE_SIGN_STYLE=Manual`, 
 
 Encode a `.p12` for the secret with:
 
-```sh
+```sh title="Encode the signing certificate"
 base64 -i certificate.p12 | pbcopy
 ```
 
@@ -76,11 +76,12 @@ A keypair is needed to sign appcast entries. Sparkle's `generate_keys` tool ship
 
 Run it once. The private key is stored automatically in your login keychain. The public key is printed to stdout — it is committed in `Whisky/Info.plist` under `SUPublicEDKey`. If you regenerate keys you will invalidate the existing public key in the bundled app and need to re-release.
 
-> **Fork note.** This fork does not have the upstream Whisky signing key and cannot continue its update chain. It uses its own keypair, so installs of the upstream app must update to a build from this fork **once, manually** (or via Homebrew); after that, Sparkle auto-updates work normally with the fork's key. Treat the first fork release as a migration release and say so in the release notes.
+!!! note "Fork note"
+    This fork does not have the upstream Whisky signing key and cannot continue its update chain. It uses its own keypair, so installs of the upstream app must update to a build from this fork **once, manually** (or via Homebrew); after that, Sparkle auto-updates work normally with the fork's key. Treat the first fork release as a migration release and say so in the release notes.
 
 The release workflow also needs the same key as the repository secret `SPARKLE_ED_PRIVATE_KEY`. Export it and copy the base64 to **Settings → Secrets and variables → Actions**:
 
-```sh
+```sh title="Export the Sparkle key for CI"
 SPARKLE_BIN=$(ls -dt ~/Library/Developer/Xcode/DerivedData/Whisky-*/SourcePackages/artifacts/sparkle/Sparkle/bin 2>/dev/null | head -1)
 "$SPARKLE_BIN/generate_keys" -x sparkle_ed25519_private.key
 base64 -i sparkle_ed25519_private.key | pbcopy
@@ -137,7 +138,7 @@ Three secrets gate the release pipeline. Losing the Sparkle key is **unrecoverab
 
 A backup that has never been restored from is a hope, not a backup. `sign_update` can sign directly from a key file, so the test never touches the keychain:
 
-```sh
+```sh title="Restore-test the Sparkle key"
 "$SPARKLE_BIN/sign_update" --ed-key-file sparkle_ed25519_private.key build/release/Whisky-X.Y.Z.dmg
 ```
 
@@ -147,7 +148,7 @@ The printed `sparkle:edSignature` **and** the printed `length` must both exactly
 
 0. Build Whisky once first so the Sparkle tools exist in DerivedData (see [Sparkle EdDSA keys](#sparkle-eddsa-keys) under One-time setup) — `generate_keys` ships inside the Sparkle SPM artifact, not on `PATH`. Re-declare `SPARKLE_BIN` in this fresh shell (it is only set earlier in the Backup section):
 
-   ```sh
+   ```sh title="Locate the Sparkle tools"
    SPARKLE_BIN=$(ls -dt ~/Library/Developer/Xcode/DerivedData/Whisky-*/SourcePackages/artifacts/sparkle/Sparkle/bin 2>/dev/null | head -1)
    ```
 
@@ -171,11 +172,13 @@ The printed `sparkle:edSignature` **and** the printed `length` must both exactly
 
 The release script injects `MARKETING_VERSION` from the requested version (the tag in CI) and a UTC-timestamp `CURRENT_PROJECT_VERSION` at archive time, so there is no version bump to commit. The checked-in project keeps the neutral development values (`MARKETING_VERSION = 0.0.0`). The injected build number is printed in the workflow run summary and written to `build/release/build-number.txt`; the release workflow passes it to `scripts/appcast.sh` for `sparkle:version`.
 
-> Releases published before this automation (for example `app-v3.7.0`) have no `appcast.xml` asset. Until the first release made by the updated workflow exists, `Documentation.yml` reuses the currently deployed feed **only if its newest download URL still resolves**. A stale feed that points at deleted releases is dropped instead of mirrored, so Pages does not advertise downloads that no longer exist.
+!!! note "Appcast fallback"
+    Releases published before this automation (for example `app-v3.7.0`) have no `appcast.xml` asset. Until the first release made by the updated workflow exists, `Documentation.yml` reuses the currently deployed feed **only if its newest download URL still resolves**. A stale feed that points at deleted releases is dropped instead of mirrored, so Pages does not advertise downloads that no longer exist.
 
 ## Manual app release (fallback)
 
-> This local flow is a fallback. Do not push the tag yourself: `gh release create` creates it, so the automated `Release` workflow does not run on top of the manual release. Use one path or the other.
+!!! warning "Manual release fallback"
+    This local flow is a fallback. Do not push the tag yourself: `gh release create` creates it, so the automated `Release` workflow does not run on top of the manual release. Use one path or the other.
 
 ### 1. No version bump needed
 
@@ -187,7 +190,7 @@ Run `task changelog` (see `Taskfile.yml`) to regenerate `docs/misc/changelog.md`
 
 ### 3. Build, sign, notarize, package
 
-```sh
+```sh title="Build, sign, and notarize"
 scripts/release.sh X.Y.Z
 # or, through Task:
 task release -- X.Y.Z
@@ -210,7 +213,7 @@ The artifact lands at `build/release/Whisky-X.Y.Z.dmg`. Build intermediates and 
 
 `scripts/appcast.sh` signs the DMG with the Sparkle key from your login keychain and writes a single-item feed:
 
-```sh
+```sh title="Generate the appcast"
 bash scripts/appcast.sh \
   --version X.Y.Z \
   --build "$(cat build/release/build-number.txt)" \
@@ -223,7 +226,7 @@ bash scripts/appcast.sh \
 
 Create the release as a draft, attach the DMG and the feed, then publish it:
 
-```sh
+```sh title="Publish the release with both assets"
 gh release create app-vX.Y.Z --repo CHE3MZ/whisky \
   --draft --title "Whisky X.Y.Z" --notes "..."
 gh release upload app-vX.Y.Z --repo CHE3MZ/whisky \
@@ -233,7 +236,7 @@ gh release edit app-vX.Y.Z --repo CHE3MZ/whisky --draft=false
 
 ### 6. Refresh the Pages mirror
 
-```sh
+```sh title="Refresh the Pages mirror"
 gh workflow run Documentation.yml --repo CHE3MZ/whisky
 ```
 
@@ -274,7 +277,7 @@ their pinned versions, and where each comes from. When the runtime needs to chan
 3. `gh release create vX.Y.Z --title "Wine Libraries vX.Y.Z" Libraries.tar.gz`.
 4. Compute the SHA-256 of the **exact published asset** — the app verifies the download against this
    and fails closed on a mismatch, so an incorrect value blocks every fresh install:
-   ```sh
+   ```sh title="Verify the published digest"
    shasum -a 256 Libraries.tar.gz
    ```
 5. Update `docs/WhiskyWineVersion.plist` with the version, bundled DXVK version, and the digest
@@ -282,7 +285,7 @@ their pinned versions, and where each comes from. When the runtime needs to chan
    `scripts/runtime.sh --update-docs` does this automatically after a build; publish the archive
    before committing or pushing the plist. Record the same digest in the runtime-integrity table
    in [`dependencies.md`](misc/dependencies.md):
-   ```xml
+   ```xml title="docs/WhiskyWineVersion.plist"
    <dict>
        <key>version</key>
        <dict>
@@ -308,6 +311,11 @@ their pinned versions, and where each comes from. When the runtime needs to chan
 
 ## Pitfalls
 
-- **Don't override `CODE_SIGN_IDENTITY` at archive time.** The project is configured for Apple Development with automatic signing; overriding it conflicts with provisioning. The release script lets `xcodebuild archive` use the project default and re-signs on export.
-- **Don't bundle the WhiskyKit folder as Resources.** Doing so packages the package's `.build` directory (DocC plugin executables) into the app, and Apple's notary rejects the archive because those plugin executables don't have hardened runtime. The PBXResourcesBuildPhase entry for `WhiskyKit` was removed from the project for this reason; do not add it back. The PBXFileReference and PBXGroup entries must remain or Xcode's SPM workspace integration crashes on CI.
-- **Pipe deadlocks in `Tar`.** `process.waitUntilExit()` must come *after* draining the pipe, not before. The verbose tar listing for a multi-hundred-megabyte archive will overflow the OS pipe buffer. See the fix in 3.0.1.
+!!! danger "Don't override `CODE_SIGN_IDENTITY` at archive time"
+    The project is configured for Apple Development with automatic signing; overriding it conflicts with provisioning. The release script lets `xcodebuild archive` use the project default and re-signs on export.
+
+!!! danger "Don't bundle the WhiskyKit folder as Resources"
+    Doing so packages the package's `.build` directory (DocC plugin executables) into the app, and Apple's notary rejects the archive because those plugin executables don't have hardened runtime. The PBXResourcesBuildPhase entry for `WhiskyKit` was removed from the project for this reason; do not add it back. The PBXFileReference and PBXGroup entries must remain or Xcode's SPM workspace integration crashes on CI.
+
+!!! warning "Pipe deadlocks in `Tar`"
+    `process.waitUntilExit()` must come *after* draining the pipe, not before. The verbose tar listing for a multi-hundred-megabyte archive will overflow the OS pipe buffer. See the fix in 3.0.1.

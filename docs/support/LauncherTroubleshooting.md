@@ -3,7 +3,8 @@
 **Feature:** Launcher Compatibility System
 **Last Updated:** January 12, 2026
 
-> **Note:** This documentation references issue numbers from the original upstream project (whisky-app/whisky). Upstream references are kept for historical context. Please report new issues to [this fork](https://github.com/CHE3MZ/whisky/issues).
+!!! note "Upstream issue references"
+    This documentation references issue numbers from the original upstream project (whisky-app/whisky). Upstream references are kept for historical context. Please report new issues to [this fork](https://github.com/CHE3MZ/whisky/issues).
 
 ---
 

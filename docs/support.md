@@ -22,14 +22,14 @@ Most problems already have an answer:
 
 | You have… | Go to |
 |-----------|-------|
-| A reproducible app bug | [New issue → Bug Report](https://github.com/CHE3MZ/whisky/issues/new/choose) |
-| A game that won't run right | [New issue → Game Compatibility Report](https://github.com/CHE3MZ/whisky/issues/new/choose) |
-| An idea | [New issue → Feature Request](https://github.com/CHE3MZ/whisky/issues/new/choose) |
+| A reproducible app bug | [New issue → Bug Report](https://github.com/CHE3MZ/whisky/issues/new/choose){ .md-button .md-button--primary } |
+| A game that won't run right | [New issue → Game Compatibility Report](https://github.com/CHE3MZ/whisky/issues/new/choose){ .md-button .md-button--primary } |
+| An idea | [New issue → Feature Request](https://github.com/CHE3MZ/whisky/issues/new/choose){ .md-button .md-button--primary } |
 | A security report | See [`SECURITY.md`](https://github.com/CHE3MZ/whisky/blob/master/.github/SECURITY.md) — **do not** open a public issue |
 | A "how do I…" question | The troubleshooting docs and the Game Support wiki first |
 
-**Do not open issues on the archived [whisky-app/whisky](https://github.com/whisky-app/whisky) repo** —
-it is read-only and no one will see them.
+!!! warning "Do not open issues on the archived upstream repo"
+    The archived [whisky-app/whisky](https://github.com/whisky-app/whisky) repo is read-only and no one will see issues opened there.
 
 ## What to expect
 
