@@ -71,7 +71,7 @@ final class DistributionConfigTests: XCTestCase {
     func testLibrariesURLWithStandardVersion() {
         let version = "2.5.0"
         let url = DistributionConfig.librariesURL(version: version)
-        let expectedURL = "https://github.com/CHE3MZ/whisky/releases/download/v2.5.0/Libraries.tar.gz"
+        let expectedURL = "https://github.com/CHE3MZ/whisky/releases/download/runtime-v2.5.0/Libraries.tar.gz"
 
         XCTAssertEqual(url, expectedURL)
     }
@@ -79,7 +79,7 @@ final class DistributionConfigTests: XCTestCase {
     func testLibrariesURLWithSingleDigitVersion() {
         let version = "1.0.0"
         let url = DistributionConfig.librariesURL(version: version)
-        let expectedURL = "https://github.com/CHE3MZ/whisky/releases/download/v1.0.0/Libraries.tar.gz"
+        let expectedURL = "https://github.com/CHE3MZ/whisky/releases/download/runtime-v1.0.0/Libraries.tar.gz"
 
         XCTAssertEqual(url, expectedURL)
     }
@@ -87,7 +87,7 @@ final class DistributionConfigTests: XCTestCase {
     func testLibrariesURLWithMultiDigitVersion() {
         let version = "10.20.30"
         let url = DistributionConfig.librariesURL(version: version)
-        let expectedURL = "https://github.com/CHE3MZ/whisky/releases/download/v10.20.30/Libraries.tar.gz"
+        let expectedURL = "https://github.com/CHE3MZ/whisky/releases/download/runtime-v10.20.30/Libraries.tar.gz"
 
         XCTAssertEqual(url, expectedURL)
     }
@@ -96,7 +96,7 @@ final class DistributionConfigTests: XCTestCase {
         let version = "2.5.0"
         let url = DistributionConfig.librariesURL(version: version)
 
-        XCTAssertTrue(url.contains("/v2.5.0/"), "URL should include version tag")
+        XCTAssertTrue(url.contains("/runtime-v2.5.0/"), "URL should include version tag")
         XCTAssertTrue(url.hasSuffix("Libraries.tar.gz"), "URL should end with Libraries.tar.gz")
     }
 
@@ -113,7 +113,7 @@ final class DistributionConfigTests: XCTestCase {
 
         // Verify the URL follows the expected pattern
         let pattern = "^https://github\\.com/CHE3MZ/whisky/releases/download/"
-            + "v\\d+\\.\\d+\\.\\d+/Libraries\\.tar\\.gz$"
+            + "runtime-v\\d+\\.\\d+\\.\\d+/Libraries\\.tar\\.gz$"
         guard let regex = try? NSRegularExpression(pattern: pattern) else {
             XCTFail("Invalid regex pattern: \(pattern)")
             return
@@ -174,8 +174,8 @@ final class DistributionConfigTests: XCTestCase {
 
     func testLibrariesURLMatchesReleaseTagFormat() {
         // Verify that the constructed URL matches the expected GitHub Release tag format
-        // Tag format: v{VERSION}
-        // URL format: v{VERSION}/Libraries.tar.gz
+        // Tag format: runtime-v{VERSION}
+        // URL format: runtime-v{VERSION}/Libraries.tar.gz
 
         let version = "2.5.0"
         let url = DistributionConfig.librariesURL(version: version)
@@ -186,8 +186,8 @@ final class DistributionConfigTests: XCTestCase {
 
         let tagAndFile = components[1]
         XCTAssertTrue(
-            tagAndFile.hasPrefix("v\(version)/"),
-            "URL should start with v{version}/"
+            tagAndFile.hasPrefix("runtime-v\(version)/"),
+            "URL should start with runtime-v{version}/"
         )
         XCTAssertTrue(
             tagAndFile.hasSuffix("Libraries.tar.gz"),
@@ -220,7 +220,7 @@ final class DistributionConfigTests: XCTestCase {
         let downloadURLString = DistributionConfig.librariesURL(version: versionString)
 
         // Verify the complete URL
-        let expectedURL = "https://github.com/CHE3MZ/whisky/releases/download/v2.5.0/Libraries.tar.gz"
+        let expectedURL = "https://github.com/CHE3MZ/whisky/releases/download/runtime-v2.5.0/Libraries.tar.gz"
         XCTAssertEqual(downloadURLString, expectedURL)
 
         // Verify URL is valid
@@ -230,11 +230,11 @@ final class DistributionConfigTests: XCTestCase {
     /// Tests the workflow with different versions to ensure proper URL construction
     func testWorkflowWithVariousVersions() throws {
         let testCases: [VersionTestCase] = [
-            VersionTestCase(major: 1, minor: 0, patch: 0, expectedTag: "v1.0.0"),
-            VersionTestCase(major: 2, minor: 5, patch: 0, expectedTag: "v2.5.0"),
-            VersionTestCase(major: 10, minor: 20, patch: 30, expectedTag: "v10.20.30"),
-            VersionTestCase(major: 0, minor: 1, patch: 0, expectedTag: "v0.1.0"),
-            VersionTestCase(major: 99, minor: 99, patch: 99, expectedTag: "v99.99.99")
+            VersionTestCase(major: 1, minor: 0, patch: 0, expectedTag: "runtime-v1.0.0"),
+            VersionTestCase(major: 2, minor: 5, patch: 0, expectedTag: "runtime-v2.5.0"),
+            VersionTestCase(major: 10, minor: 20, patch: 30, expectedTag: "runtime-v10.20.30"),
+            VersionTestCase(major: 0, minor: 1, patch: 0, expectedTag: "runtime-v0.1.0"),
+            VersionTestCase(major: 99, minor: 99, patch: 99, expectedTag: "runtime-v99.99.99")
         ]
 
         for testCase in testCases {
@@ -292,13 +292,13 @@ final class DistributionConfigTests: XCTestCase {
     func testURLConstructionEdgeCases() {
         // Test with zero version
         let zeroURL = DistributionConfig.librariesURL(version: "0.0.0")
-        let expectedZeroURL = "https://github.com/CHE3MZ/whisky/releases/download/v0.0.0/Libraries.tar.gz"
+        let expectedZeroURL = "https://github.com/CHE3MZ/whisky/releases/download/runtime-v0.0.0/Libraries.tar.gz"
         XCTAssertEqual(zeroURL, expectedZeroURL)
         XCTAssertNotNil(URL(string: zeroURL))
 
         // Test with large version numbers
         let largeURL = DistributionConfig.librariesURL(version: "999.999.999")
-        let expectedLargeURL = "https://github.com/CHE3MZ/whisky/releases/download/v999.999.999/Libraries.tar.gz"
+        let expectedLargeURL = "https://github.com/CHE3MZ/whisky/releases/download/runtime-v999.999.999/Libraries.tar.gz"
         XCTAssertEqual(largeURL, expectedLargeURL)
         XCTAssertNotNil(URL(string: largeURL))
     }

@@ -5,7 +5,7 @@ This document describes how to cut a Whisky app release and how to publish a new
 The fork uses two parallel artifact streams:
 
 - **App releases** (`app-vX.Y.Z`): `Whisky-X.Y.Z.dmg`, signed and notarized for direct distribution.
-- **Wine Libraries releases** (`vX.Y.Z`): `Libraries.tar.gz` containing the Wine/DXVK runtime that the app downloads on first launch.
+- **Wine Libraries releases** (`runtime-vX.Y.Z`): `Libraries.tar.gz` containing the Wine/DXVK runtime that the app downloads on first launch.
 
 Both live on GitHub Releases. The Wine version plist is served from GitHub Pages, which is **workflow-deployed** through `.github/workflows/Documentation.yml` (the `gh-pages` branch is unused; the site is built with MkDocs from `docs/`, including the static `WhiskyWineVersion.plist`). The Sparkle feed is generated per release, attached to that release as `appcast.xml`, and mirrored to the historical Pages URL at deploy time, so no appcast file is committed or edited by hand.
 
@@ -259,32 +259,29 @@ workflow's `workflow_dispatch` input.
 
 The runtime (`Libraries.tar.gz`) is **assembled from upstream binaries, not built from source**. See
 [`dependencies.md`](../misc/dependencies.md) for the authoritative list of components,
-their pinned versions, and where each comes from. When the runtime needs to change:
+their pinned versions, and where each comes from. `scripts/runtime.sh` downloads the pinned Wine,
+DXVK, and DXMT assets, verifies their SHA-256, assembles the `Libraries/` tree the app expects, and
+writes `scripts/runtime/release/Libraries-runtime-vX.Y.Z.tar.gz`. D3DMetal is not bundled; the app uses it
+only when a Game Porting Toolkit payload is present.
 
-1. **Assemble `Libraries.tar.gz`** from the pinned upstream binaries. The archive unpacks to a
-   `Libraries/` tree the app expects (`Libraries/Wine/bin/...` is the Wine binary dir per
-   `WhiskyWineInstaller.binFolder`). To reproduce a build:
-   - Download the pinned **Wine** build (Gcenx `macOS_Wine_builds`) and unpack it as `Libraries/Wine/`.
-   - Add the pinned **DXVK-macOS** DLLs and **DXMT** prebuilt release into the runtime per the Gcenx
-     layout.
-   - Place **D3DMetal** as extracted from Apple's Game Porting Toolkit. ⚠️ Redistribution is governed by
-     Apple's GPTK license. Confirm terms before publishing.
-   - Bump the matching `commit`/`release` values in `scripts/config/sources.yml` and run
-     `scripts/upstream/report.sh` to refresh `docs/misc/dependencies.md`, so drift detection stays
-     accurate.
-   - `tar -czf Libraries.tar.gz Libraries/` (mind the [Tar pipe-drain pitfall](#pitfalls)).
-2. Tag with the bare version `vX.Y.Z` (no `app-` prefix).
-3. `gh release create vX.Y.Z --title "Wine Libraries vX.Y.Z" Libraries.tar.gz`.
-4. Compute the SHA-256 of the **exact published asset**. The app verifies the download against this
+To cut a runtime release:
+
+1. **Bump the pins if needed.** Update the matching `commit`/`release` values in
+   `scripts/config/sources.yml` and run `scripts/upstream/report.sh` to refresh
+   `docs/misc/dependencies.md`.
+2. **Tag `runtime-vX.Y.Z` and push it.** `.github/workflows/Runtime.yml` builds the archive on
+   macOS and publishes the release with `Libraries.tar.gz`. `scripts/runtime/tag.sh` does a patch
+   bump and pushes the tag for you; use `--dry-run` to preview it.
+3. **Compute the SHA-256 of the exact published asset.** The app verifies the download against this
    and fails closed on a mismatch, so an incorrect value blocks every fresh install:
    ```sh title="Verify the published digest"
+   gh release download runtime-vX.Y.Z --pattern Libraries.tar.gz
    shasum -a 256 Libraries.tar.gz
    ```
-5. Update `docs/WhiskyWineVersion.plist` with the version, bundled DXVK version, and the digest
-   from the previous step, or run `scripts/runtime/sync.sh --archive Libraries.tar.gz`.
-   `scripts/runtime.sh --update-docs` does this automatically after a build; publish the archive
-   before committing or pushing the plist. Record the same digest in the runtime-integrity table
-   in [`dependencies.md`](../misc/dependencies.md):
+4. **Update `docs/WhiskyWineVersion.plist`** with the version, bundled DXVK version, and the digest,
+   or run `scripts/runtime/sync.sh --archive Libraries.tar.gz`. `scripts/runtime.sh --update-docs`
+   does this after a local build. Record the same digest in the runtime-integrity table in
+   [`dependencies.md`](../misc/dependencies.md):
    ```xml title="docs/WhiskyWineVersion.plist"
    <dict>
        <key>version</key>
@@ -299,14 +296,14 @@ their pinned versions, and where each comes from. When the runtime needs to chan
        <string>...64-hex-digest...</string>
    </dict>
    ```
-6. Commit and push. The Documentation workflow republishes Pages, and existing app installs prompt to update on their next Wine version check.
+5. Commit and push. The Documentation workflow republishes Pages, and existing app installs prompt to update on their next Wine version check.
 
 ## URLs the app depends on
 
 - `https://che3mz.github.io/whisky/WhiskyWineVersion.plist`: Wine version metadata
 - `https://che3mz.github.io/whisky/appcast.xml`: Sparkle update feed (mirrored at deploy time from the newest app release's `appcast.xml` asset)
 - `https://github.com/CHE3MZ/whisky/releases/download/app-vX.Y.Z/appcast.xml`: per-release signed feed/signature asset
-- `https://github.com/CHE3MZ/whisky/releases/download/vX.Y.Z/Libraries.tar.gz`: Wine binary archive
+- `https://github.com/CHE3MZ/whisky/releases/download/runtime-vX.Y.Z/Libraries.tar.gz`: Wine binary archive
 - `https://github.com/CHE3MZ/whisky/releases/download/app-vX.Y.Z/Whisky-X.Y.Z.dmg`: app DMG
 
 ## Pitfalls

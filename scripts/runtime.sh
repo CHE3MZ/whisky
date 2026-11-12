@@ -25,7 +25,7 @@
 #
 # Usage: scripts/runtime.sh <new-version> [options]
 #   --dry-run          Print the plan; download and write nothing.
-#   --output PATH      Archive path (default: scripts/runtime/release/Libraries-vX.Y.Z.tar.gz).
+#   --output PATH      Archive path (default: scripts/runtime/release/Libraries-runtime-vX.Y.Z.tar.gz).
 #   --workdir DIR      Build/cache dir (default: scripts/runtime/build).
 #   --keep             Keep a temp workdir after a build (only affects --dry-run).
 #   --sources PATH     Pin list (default: scripts/config/sources.yml).
@@ -63,7 +63,7 @@ Builds Libraries.tar.gz from the pinned Wine, DXVK and DXMT release assets.
 
 Options:
   --dry-run          Print the plan; download and write nothing
-  --output PATH      Archive path (default: scripts/runtime/release/Libraries-vX.Y.Z.tar.gz)
+  --output PATH      Archive path (default: scripts/runtime/release/Libraries-runtime-vX.Y.Z.tar.gz)
   --workdir DIR      Build/cache dir (default: scripts/runtime/build)
   --keep             Keep a temp workdir after a build (only affects --dry-run)
   --sources PATH     Pin list (default: scripts/config/sources.yml)
@@ -354,7 +354,7 @@ DXMT_URL=$C_URL
 DXMT_VERSION=$(semver_of "$DXMT_RELEASE")
 
 if [ -z "$OUTPUT_FILE" ]; then
-    OUTPUT_FILE="$RELEASE_DIR/Libraries-v$NEW_VERSION.tar.gz"
+    OUTPUT_FILE="$RELEASE_DIR/Libraries-runtime-v$NEW_VERSION.tar.gz"
 else
     case "$OUTPUT_FILE" in
         /*) ;;
@@ -363,7 +363,7 @@ else
 fi
 
 if [ "$DRY_RUN" -eq 1 ]; then
-    printf 'Runtime plan for v%s\n\n' "$NEW_VERSION"
+    printf 'Runtime plan for runtime-v%s\n\n' "$NEW_VERSION"
     printf 'sources: %s\noutput:  %s\n' "$SOURCES_FILE" "$OUTPUT_FILE"
     if [ "$UPDATE_DOCS" -eq 1 ]; then
         printf 'docs:    %s (would update)\n' "$SCRIPT_DIR/../docs/WhiskyWineVersion.plist"
@@ -492,7 +492,7 @@ fi
 
 printf '\nAssembled: %s\n' "$OUTPUT_FILE"
 printf 'SHA-256:   %s\n' "$DIGEST"
-printf 'Runtime:   v%s (Wine %s, DXVK %s, DXMT %s)\n' "$NEW_VERSION" "$WINE_RELEASE" "$DXVK_VERSION" "$DXMT_VERSION"
+printf 'Runtime:   runtime-v%s (Wine %s, DXVK %s, DXMT %s)\n' "$NEW_VERSION" "$WINE_RELEASE" "$DXVK_VERSION" "$DXMT_VERSION"
 
 cat <<SUMMARY
 
@@ -504,7 +504,7 @@ Next:
        grep -al 'Wine builtin DLL' "$WORK/stage/Libraries/Wine/lib/wine/x86_64-windows/winemetal.dll"
   2. Publish (asset filename must be exactly Libraries.tar.gz):
        cp "$OUTPUT_FILE" Libraries.tar.gz
-       gh release create v$NEW_VERSION --repo $RELEASE_REPO \\
+       gh release create runtime-v$NEW_VERSION --repo $RELEASE_REPO \\
          --title "Wine Libraries v$NEW_VERSION" \\
          --notes "..." Libraries.tar.gz
 $DOCS_STEP

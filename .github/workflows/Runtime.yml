@@ -1,0 +1,124 @@
+name: Runtime
+
+on:
+  push:
+    tags:
+      - 'runtime-v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing runtime release tag (runtime-vX.Y.Z)'
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: runtime-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build and publish runtime
+    runs-on: macos-26
+    timeout-minutes: 90
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.tag || github.ref }}
+          fetch-depth: 0
+
+      - name: Resolve release tag
+        id: release
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
+          REF_NAME: ${{ github.ref_name }}
+        run: |
+          set -euo pipefail
+          TAG="${INPUT_TAG:-$REF_NAME}"
+          if [[ "$TAG" != runtime-v* ]]; then
+            echo "::error::Expected a runtime-vX.Y.Z tag, got '$TAG'"
+            exit 1
+          fi
+          VERSION="${TAG#runtime-v}"
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            echo "::error::Invalid version '$VERSION' from tag '$TAG'"
+            exit 1
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Cache runtime downloads
+        uses: actions/cache@v5
+        with:
+          path: scripts/runtime/build
+          key: ${{ runner.os }}-runtime-${{ hashFiles('scripts/config/sources.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-runtime-
+
+      - name: Build runtime
+        env:
+          WHISKY_REPO: ${{ github.repository }}
+        run: bash scripts/runtime.sh "${{ steps.release.outputs.version }}"
+
+      - name: Stage release asset
+        id: asset
+        run: |
+          set -euo pipefail
+          ARCHIVE="scripts/runtime/release/Libraries-runtime-v${{ steps.release.outputs.version }}.tar.gz"
+          if [ ! -f "$ARCHIVE" ]; then
+            echo "::error::runtime.sh did not produce $ARCHIVE"
+            exit 1
+          fi
+          cp "$ARCHIVE" Libraries.tar.gz
+          echo "sha256=$(shasum -a 256 Libraries.tar.gz | awk '{print $1}')" >> "$GITHUB_OUTPUT"
+
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.release.outputs.tag }}
+          VERSION: ${{ steps.release.outputs.version }}
+          SHA256: ${{ steps.asset.outputs.sha256 }}
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "::error::Release $TAG already exists"
+            exit 1
+          fi
+          gh release create "$TAG" \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "Wine Libraries v$VERSION" \
+            --notes "Wine Libraries runtime v$VERSION. SHA-256: $SHA256." \
+            --draft \
+            --verify-tag
+
+      - name: Upload asset
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          set -euo pipefail
+          gh release upload "$TAG" Libraries.tar.gz --repo "$GITHUB_REPOSITORY"
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.release.outputs.tag }}
+        run: |
+          set -euo pipefail
+          gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --draft=false
+
+      - name: Summary
+        env:
+          TAG: ${{ steps.release.outputs.tag }}
+          SHA256: ${{ steps.asset.outputs.sha256 }}
+        run: |
+          {
+            echo "### Runtime release $TAG"
+            echo
+            echo "- Asset: \`Libraries.tar.gz\`"
+            echo "- SHA-256: \`$SHA256\`"
+            echo
+            echo "Next: update \`docs/WhiskyWineVersion.plist\` with this digest and commit."
+          } >> "$GITHUB_STEP_SUMMARY"

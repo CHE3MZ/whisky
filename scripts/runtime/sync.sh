@@ -21,7 +21,7 @@
 #   - writes version, dxvkVersion, dxmtVersion and sha256 to the docs plist
 #
 # Usage: scripts/runtime/sync.sh [--archive PATH] [--output PATH] [--check]
-#   --archive PATH  Archive to read (default: newest scripts/runtime/release/Libraries-v*.tar.gz)
+#   --archive PATH  Archive to read (default: newest scripts/runtime/release/Libraries-runtime-v*.tar.gz)
 #   --output PATH   Plist to write (default: docs/WhiskyWineVersion.plist)
 #   --check         Exit 1 if the plist is out of date; do not write
 #   -h, --help      Show this help
@@ -45,7 +45,7 @@ Usage: scripts/runtime/sync.sh [--archive PATH] [--output PATH] [--check]
 Syncs docs/WhiskyWineVersion.plist from a built Libraries.tar.gz.
 
 Options:
-  --archive PATH  Archive to read (default: newest scripts/runtime/release/Libraries-v*.tar.gz)
+  --archive PATH  Archive to read (default: newest scripts/runtime/release/Libraries-runtime-v*.tar.gz)
   --output PATH   Plist to write (default: docs/WhiskyWineVersion.plist)
   --check         Exit 1 if the plist is out of date; do not write
   -h, --help      Show this help
@@ -79,7 +79,7 @@ sha256_of() {
 
 find_default_archive() {
     local candidate
-    for candidate in "$RELEASE_DIR"/Libraries-v*.tar.gz; do
+    for candidate in "$RELEASE_DIR"/Libraries-runtime-v*.tar.gz; do
         [ -f "$candidate" ] || continue
         if [ -z "$ARCHIVE" ] || [ "$candidate" -nt "$ARCHIVE" ]; then
             ARCHIVE=$candidate
