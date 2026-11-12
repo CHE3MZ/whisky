@@ -21,10 +21,10 @@ nav:
   - Changelog: misc/changelog.md
   - Project:
       - Runtime dependencies: misc/dependencies.md
-      - Upstream audit: AUDIT.md
-      - Distribution: DISTRIBUTION.md
-      - Governance: GOVERNANCE.md
-      - Release workflow: ReleaseWorkflow.md
+      - Upstream audit: project/audit.md
+      - Distribution: project/distribution.md
+      - Governance: project/governance.md
+      - Release workflow: project/release-workflow.md
   - API Reference: https://che3mz.github.io/whisky/documentation/whiskykit/
 
 theme:

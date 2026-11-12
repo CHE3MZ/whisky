@@ -8,7 +8,7 @@ this project carries the same structural risk.
 
 Whisky (this fork) is maintained by **one person**, [@CHE3MZ](https://github.com/CHE3MZ), who holds
 final authority over the repository, releases, and the signing identity. Since August 2026,
-[@dappermint](https://github.com/dappermint) serves as **project member (triage)**: they triage issues,
+[@dappermint](https://github.com/dappermint) is **project member (triage)**: they triage issues,
 review pull requests, and help manage the tracker, but hold no commit access and no release capability.
 There is still no team and no company. "Active community fork" describes the development pace and the
 openness to contributions; it does not imply a staffed organization.
@@ -36,10 +36,10 @@ building and signing it.
 
 - **Releases depend on one person's availability.** If @CHE3MZ is unavailable for a stretch, expect
   no new releases until they're back. Existing installs keep working.
-- **Bug triage is best-effort.** See [`support.md`](support.md) for what to realistically expect.
+- **Bug triage is best-effort.** See [`support.md`](../support.md) for what to realistically expect.
 - **The runtime is consumed, not owned.** Whisky bundles Wine/DXVK/D3DMetal/DXMT binaries from upstream
-  projects (see [`dependencies.md`](misc/dependencies.md)). If those upstreams stall,
-  Whisky's runtime currency is affected — this fork does not build Wine itself.
+  projects (see [`dependencies.md`](../misc/dependencies.md)). If those upstreams stall,
+  Whisky's runtime currency is affected; this fork does not build Wine itself.
 
 ## If you want to reduce that risk
 
@@ -52,14 +52,14 @@ follows the staged model above.
 
 So that a lapse doesn't silently break things, the maintainer keeps these minimums:
 
-- **Off-machine backup** of the signing material — the Apple Developer ID Application certificate and
-  the Sparkle EdDSA private key — so a lost or dead machine doesn't mean a lost release identity. The
+- **Off-machine backup** of the signing material (the Apple Developer ID Application certificate and
+  the Sparkle EdDSA private key), so a lost or dead machine doesn't mean a lost release identity. The
   export, encryption, and restore-test procedure is documented in
-  [`ReleaseWorkflow.md`](ReleaseWorkflow.md#credential-continuity-backup-recovery); the Sparkle key
+  [Credential continuity](release-workflow.md#credential-continuity-backup-recovery); the Sparkle key
   backup is restore-tested against a published appcast signature when the backup is made.
 - A **certificate-expiry reminder**: the Developer ID cert and Apple account must not be allowed to
   lapse, or notarized releases stop building with no obvious cause.
-- The full release procedure is documented in [`ReleaseWorkflow.md`](ReleaseWorkflow.md) so it is
+- The full release procedure is documented in the [release workflow](release-workflow.md) so it is
   reproducible rather than living only in one person's head.
 
 There is intentionally **no shared key escrow** today: the project member role does not carry release

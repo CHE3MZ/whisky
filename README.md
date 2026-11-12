@@ -133,7 +133,7 @@ If you also installed bottles in a **custom location**, delete those folders too
 ## Documentation
 
 - **[Support](docs/support.md)** - Where to file bugs and what to expect from a single-maintainer fork
-- **[Governance & continuity](docs/GOVERNANCE.md)** - Who maintains this and the honest bus-factor situation
+- **[Governance & continuity](docs/project/governance.md)** - Who maintains this and the honest bus-factor situation
 - **[Runtime dependencies](docs/misc/dependencies.md)** - The bundled Wine/DXVK/D3DMetal/DXMT versions and their upstream sources
 
 WhiskyKit, the core framework powering Whisky, has comprehensive API documentation:
@@ -153,7 +153,7 @@ WhiskyKit, the core framework powering Whisky, has comprehensive API documentati
 ### Upstream issue audit
 
 Per-issue accounting of how this fork addresses the open issues from the
-archived upstream repo. Read [docs/AUDIT.md](docs/AUDIT.md) for the
+archived upstream repo. Read [docs/project/audit.md](docs/project/audit.md) for the
 methodology — including how to read the `addressed-direct` vs
 `addressed-categorical` distinction and what `unverified` GameDB entries
 actually mean.

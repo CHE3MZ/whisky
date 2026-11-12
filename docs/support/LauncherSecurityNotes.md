@@ -137,7 +137,7 @@ The CEF sandbox **cannot function under Wine** because:
 
 ## Security Measures Implemented
 
-### 1. Comprehensive Documentation ✅
+### 1. Comprehensive documentation
 
 **In Code (MacOSCompatibility.swift):**
 ```swift
@@ -154,7 +154,7 @@ The CEF sandbox **cannot function under Wine** because:
 - "Only use with trusted launchers from reputable companies"
 - Visible warning when compatibility mode enabled
 
-### 2. User Awareness ✅
+### 2. User awareness
 
 Users see security notice when enabling launcher compatibility:
 - 🛡️ Icon indicates security consideration
@@ -162,7 +162,7 @@ Users see security notice when enabling launcher compatibility:
 - Guidance to use trusted launchers only
 - Opt-in (user must explicitly enable)
 
-### 3. Logging ✅
+### 3. Logging
 
 Debug log when CEF sandbox is disabled:
 ```swift
@@ -172,7 +172,7 @@ Logger.wineKit.debug("""
     """)
 ```
 
-### 4. Opt-In Design ✅
+### 4. Opt-in design
 
 - Launcher compatibility mode **disabled by default**
 - Users must explicitly enable it
@@ -185,13 +185,13 @@ Logger.wineKit.debug("""
 
 ### Safe Usage
 
-✅ **Do:**
+**Do:**
 - Use with major launchers (Steam, Epic, EA, Rockstar, Ubisoft, Battle.net)
 - Keep launchers updated to latest versions
 - Be cautious clicking unknown links in launcher browsers
 - Use launcher compatibility only when needed
 
-❌ **Don't:**
+**Don't:**
 - Use with unknown/untrusted launcher software
 - Browse untrusted websites through launcher browsers
 - Run launchers from unverified sources
@@ -273,7 +273,7 @@ Logger.wineKit.debug("""
 
 ---
 
-## Conclusion
+## Current position
 
 **Decision:** CEF sandbox remains disabled (necessary for functionality)
 

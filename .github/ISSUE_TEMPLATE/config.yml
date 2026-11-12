@@ -10,7 +10,7 @@ contact_links:
     url: https://github.com/CHE3MZ/whisky/blob/master/WhiskyKit/Sources/WhiskyKit/GameDatabase/Resources/GameDB.json
     about: Check whether your game already has a recommended config (also browsable in-app under Game Configurations).
   - name: 📜 Upstream issue audit
-    url: https://github.com/CHE3MZ/whisky/blob/master/docs/AUDIT.md
+    url: https://github.com/CHE3MZ/whisky/blob/master/docs/project/audit.md
     about: Per-issue accounting of how this fork addresses the archived upstream's open issues.
   - name: 📦 Archived upstream (whisky-app/whisky)
     url: https://github.com/whisky-app/whisky

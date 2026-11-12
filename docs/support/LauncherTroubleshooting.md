@@ -333,21 +333,21 @@ Look for:
 
 ## Configuration Warnings Explained
 
-### ⚠️ "DXVK should be enabled for Steam"
-**Impact:** Steam UI may stutter  
-**Solution:** Enable DXVK in Config → DXVK
+### "DXVK should be enabled for Steam"
 
-### ❌ "DXVK REQUIRED for Rockstar Launcher"
-**Impact:** Logo won't display, launcher unusable  
-**Solution:** Enable DXVK immediately (critical)
+Steam UI may stutter. Enable DXVK in Config → DXVK.
 
-### ⚠️ "Steam may crash without en_US locale"
-**Impact:** steamwebhelper crashes likely  
-**Solution:** Set Locale Override to English
+### "DXVK REQUIRED for Rockstar Launcher"
 
-### ❌ "GPU spoofing REQUIRED for EA App"
-**Impact:** Black screen, "GPU not supported"  
-**Solution:** Enable GPU Spoofing (critical)
+The logo won't display and the launcher is unusable. Enable DXVK immediately.
+
+### "Steam may crash without en_US locale"
+
+steamwebhelper is likely to crash. Set Locale Override to English.
+
+### "GPU spoofing REQUIRED for EA App"
+
+The result is a black screen or "GPU not supported". Enable GPU Spoofing.
 
 ---
 

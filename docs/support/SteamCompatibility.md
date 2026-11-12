@@ -540,7 +540,7 @@ Before reporting Steam issues, verify:
 
 ---
 
-## Success Stories
+## What users report
 
 ### What Users Report Working:
 
@@ -559,7 +559,7 @@ Before reporting Steam issues, verify:
 **Game Launches:**
 - ✅ Indie/2D games: Excellent
 - ✅ AA/AAA games (DX9-11): Good-Excellent
-- ⚠️ Cutting-edge AAA (DX12): Variable
+- ⚠️ Modern AAA (DX12): Variable
 - ⚠️ Competitive multiplayer: Anti-cheat dependent
 
 ---
@@ -750,21 +750,8 @@ Based on upstream issue resolution:
 
 ---
 
-## Conclusion
+## Related pages
 
-Steam on Whisky with Launcher Compatibility Mode provides:
-- ✅ Reliable steam client operation
-- ✅ Stable downloads
-- ✅ Good game compatibility
-- ✅ Easy setup and maintenance
-
-The launcher compatibility system addresses the majority of Steam issues documented in 50+ upstream issues, making Steam on Whisky a viable gaming platform.
-
----
-
-**For additional help, see:**
-- [LauncherTroubleshooting.md](LauncherTroubleshooting.md) - All launchers
-- [LauncherSecurityNotes.md](LauncherSecurityNotes.md) - Security info
-- GitHub: https://github.com/CHE3MZ/whisky/issues - Report issues
-
-**Happy gaming on Steam via Whisky!** 🎮
+- [Launcher troubleshooting](LauncherTroubleshooting.md)
+- [Launcher security notes](LauncherSecurityNotes.md)
+- [Report an issue](https://github.com/CHE3MZ/whisky/issues)

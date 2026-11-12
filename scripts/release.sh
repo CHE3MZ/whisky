@@ -102,7 +102,7 @@ fi
 CODESIGN_IDENTITIES="$(security find-identity -v -p codesigning 2>/dev/null || true)"
 if [[ "$CODESIGN_IDENTITIES" != *"Developer ID Application"* ]]; then
     echo "error: no valid Developer ID Application certificate in the keychain." >&2
-    echo "       See docs/ReleaseWorkflow.md for setup." >&2
+    echo "       See docs/project/release-workflow.md for setup." >&2
     exit 1
 fi
 

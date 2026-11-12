@@ -7,7 +7,7 @@ body:
       value: |
         Thanks for taking the time to suggest something. Please:
         - Search [existing issues](https://github.com/CHE3MZ/whisky/issues?q=is%3Aissue) to avoid duplicates.
-        - Check [docs/AUDIT.md](https://github.com/CHE3MZ/whisky/blob/master/docs/AUDIT.md) — your feature may already be tracked.
+        - Check [docs/project/audit.md](https://github.com/CHE3MZ/whisky/blob/master/docs/project/audit.md) — your feature may already be tracked.
   - type: textarea
     id: problem
     attributes:

@@ -15,13 +15,13 @@ audit replaces that with a per-issue table.
 
 ## How to read the numbers
 
-Every classification carries a confidence level. Read carefully — "fixed"
+Every classification carries a confidence level. Read carefully: "fixed"
 means different things in different buckets.
 
 | Status | What it really means |
 |---|---|
 | `addressed-direct` | The issue number is cited in CHANGELOG, code, docs, or a commit message. **High confidence.** |
-| `addressed-categorical` | The issue's symptom class maps to a shipped v1.0 requirement category. **Infrastructure exists** (e.g. the troubleshooting wizard, dependency installer, crash classifier) — but for any specific user, that infrastructure still has to surface the right remediation in their specific case. Not equivalent to "verified fixed for this issue." |
+| `addressed-categorical` | The issue's symptom class maps to a shipped v1.0 requirement category. **Infrastructure exists** (e.g. the troubleshooting wizard, dependency installer, crash classifier), but for any specific user, that infrastructure still has to surface the right remediation in their specific case. Not equivalent to "verified fixed for this issue." |
 | `wont-fix-out-of-scope` | Wine internals, anti-cheat, kernel, mobile, niche corporate apps. Not addressable from the app side. |
 | `unverified` | Body too incoherent to triage, or genuinely needs reproduction. **Honest bucket.** |
 | `upstream-fixed` / `upstream-declined` / `upstream-closed` | Already closed in upstream before archival. Listed for context, not work-in-progress. |
@@ -30,7 +30,7 @@ means different things in different buckets.
 
 Most of the bundled `GameDB.json` entries that ship per-game configs are
 rated `unverified`. They're community-recommended recipes inferred from
-the engine, error pattern, and known-good Wine practice — **not** configs
+the engine, error pattern, and known-good Wine practice, **not** configs
 that maintainers have personally validated by running the game.
 
 The in-app Game DB UI surfaces this with:
@@ -44,20 +44,20 @@ fork (not the archived upstream) so we can refine the entry.
 
 The issue classifier does **not** look at pull requests. The 9 PRs left open
 when upstream archived were reviewed by hand (2026-06) against this fork's
-current code. Every *bug-fix* PR is resolved — several more thoroughly than the
+current code. Every *bug-fix* PR is resolved, several more thoroughly than the
 upstream patch; the rest are features or docs, tracked individually.
 
 | Upstream PR | Intent | Status in this fork |
 |---|---|---|
-| [#1374](https://github.com/whisky-app/whisky/pull/1374) | Nil the pipe readability handler to stop a high-CPU spin (#917) | **Fixed**, bettered — the handler removes itself on EOF *and* at termination (`Process+Extensions.swift`; Closes #917) |
-| [#1305](https://github.com/whisky-app/whisky/pull/1305) | Stop the 100%-CPU spin in `nextLine` (#1010) | **Fixed** — `nextLine` replaced by a 3-way `nextOutput()` enum that disarms the read source on EOF (Closes #1010) |
-| [#1264](https://github.com/whisky-app/whisky/pull/1264) | Make `WhiskyCmd run` actually launch the program (#1088, #1140) | **Fixed** — the CLI was rearchitected onto awaited `Wine.runProgram`, so the AppleScript-exits-early race and the env-var quote-escaping bug can't occur |
-| [#1339](https://github.com/whisky-app/whisky/pull/1339) | In-app Wine process monitor | **Present**, bettered — a per-bottle Processes page (name / PID / memory + graceful and force quit), not a separate window |
-| [#574](https://github.com/whisky-app/whisky/pull/574) | Async bottle / program-list loading | **Adopted** — `updateInstalledPrograms()` now walks `Program Files` and parses PE off the main actor, with a progress indicator while scanning |
-| [#765](https://github.com/whisky-app/whisky/pull/765) | Custom SwiftUI update UI | **Adopted (lighter-touch)** — gentle scheduled-update reminders via an `SPUStandardUserDriverDelegate` (Dock badge + "Install Update…" instead of a focus-stealing dialog); kept Sparkle's proven install flow |
-| [#571](https://github.com/whisky-app/whisky/pull/571) | Menu-bar extra (survive window close) | **Adopted** — opt-in menu-bar extra (Settings → General) that launches pinned programs and keeps the app alive after the window closes |
-| [#1207](https://github.com/whisky-app/whisky/pull/1207) / [#1206](https://github.com/whisky-app/whisky/issues/1206) | Document a complete uninstall | **Done** — see *Uninstalling* in the [README](https://github.com/CHE3MZ/whisky/blob/master/README.md) |
-| [#1375](https://github.com/whisky-app/whisky/pull/1375) | Crowdin translation sync | **N/A (own tooling)** — this fork syncs translations via its own Crowdin project and the [`Crowdin`](https://github.com/CHE3MZ/whisky/blob/master/.github/workflows/Crowdin.yml) workflow, not the upstream PR |
+| [#1374](https://github.com/whisky-app/whisky/pull/1374) | Nil the pipe readability handler to stop a high-CPU spin (#917) | **Fixed**, bettered: the handler removes itself on EOF *and* at termination (`Process+Extensions.swift`; Closes #917) |
+| [#1305](https://github.com/whisky-app/whisky/pull/1305) | Stop the 100%-CPU spin in `nextLine` (#1010) | **Fixed**: `nextLine` replaced by a 3-way `nextOutput()` enum that disarms the read source on EOF (Closes #1010) |
+| [#1264](https://github.com/whisky-app/whisky/pull/1264) | Make `WhiskyCmd run` actually launch the program (#1088, #1140) | **Fixed**: the CLI was rearchitected onto awaited `Wine.runProgram`, so the AppleScript-exits-early race and the env-var quote-escaping bug can't occur |
+| [#1339](https://github.com/whisky-app/whisky/pull/1339) | In-app Wine process monitor | **Present**, bettered: a per-bottle Processes page (name / PID / memory + graceful and force quit), not a separate window |
+| [#574](https://github.com/whisky-app/whisky/pull/574) | Async bottle / program-list loading | **Adopted**: `updateInstalledPrograms()` now walks `Program Files` and parses PE off the main actor, with a progress indicator while scanning |
+| [#765](https://github.com/whisky-app/whisky/pull/765) | Custom SwiftUI update UI | **Adopted (lighter-touch)**: gentle scheduled-update reminders via an `SPUStandardUserDriverDelegate` (Dock badge + "Install Update…" instead of a focus-stealing dialog); kept Sparkle's proven install flow |
+| [#571](https://github.com/whisky-app/whisky/pull/571) | Menu-bar extra (survive window close) | **Adopted**: opt-in menu-bar extra (Settings → General) that launches pinned programs and keeps the app alive after the window closes |
+| [#1207](https://github.com/whisky-app/whisky/pull/1207) / [#1206](https://github.com/whisky-app/whisky/issues/1206) | Document a complete uninstall | **Done**: see *Uninstalling* in the [README](https://github.com/CHE3MZ/whisky/blob/master/README.md) |
+| [#1375](https://github.com/whisky-app/whisky/pull/1375) | Crowdin translation sync | **N/A (own tooling)**: this fork syncs translations via its own Crowdin project and the [`Crowdin`](https://github.com/CHE3MZ/whisky/blob/master/.github/workflows/Crowdin.yml) workflow, not the upstream PR |
 
 ## Running the tool
 
@@ -78,11 +78,11 @@ python scripts/audit/audit_upstream.py --refresh
 python scripts/audit/audit_upstream.py --diff-against app-v3.0.1
 ```
 
-Outputs land under `.planning/audit/` (gitignored — local working notes):
+Outputs land under `.planning/audit/` (gitignored local working notes):
 
 | File | Purpose |
 |---|---|
-| `snapshot.json` | Raw fetched issues, ~5–10 MB |
+| `snapshot.json` | Raw fetched issues, ~5 to 10 MB |
 | `classified.json` | Per-issue enriched index, deterministically sorted |
 | `AUDIT_REPORT.md` | Human-readable rollup with per-status × category counts |
 | `overrides.json` | Hand-curated `{number: {status, rationale}}` annotations |
@@ -110,7 +110,7 @@ Going forward, the workflow is:
 - **Label drift.** Upstream labels were inconsistent; categorization is
   best effort.
 - **No automated upstream-PR correlation.** The tool doesn't trace
-  upstream PRs — neither those that closed issues before archival
+  upstream PRs, neither those that closed issues before archival
   (upstream-fixed, separate from "did this fork address it") nor the PRs
   left open at archival. The latter are reviewed by hand in
   [Open upstream PRs](#open-upstream-prs).

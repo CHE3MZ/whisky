@@ -8,7 +8,7 @@ It is generated from [`scripts/config/sources.yml`](https://github.com/CHE3MZ/wh
 [`scripts/upstream/report.sh`](https://github.com/CHE3MZ/whisky/blob/master/scripts/upstream/report.sh). Change the pins there and re-run
 the script rather than editing this file.
 
-See [`ReleaseWorkflow.md`](../ReleaseWorkflow.md) for how the runtime and app are assembled and
+See the [release workflow](../project/release-workflow.md) for how the runtime and app are assembled and
 published.
 
 ## Components
