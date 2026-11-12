@@ -118,3 +118,6 @@ scripts/tests/WhiskyAudioTest.exe
 # Runtime assembly scratch/cache and output (scripts/runtime.sh).
 scripts/runtime/build/
 scripts/runtime/release/
+
+# MkDocs
+/site/

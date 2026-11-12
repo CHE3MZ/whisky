@@ -4,8 +4,8 @@ Whisky's app code is built from this repo, but the Wine runtime it downloads on 
 (`Libraries.tar.gz`) is assembled from upstream binaries. This page explains what each component
 does and how they fit together; the pinned versions are in [Pinned versions](#pinned-versions).
 
-It is generated from [`scripts/config/sources.yml`](../../scripts/config/sources.yml) by
-[`scripts/upstream/report.sh`](../../scripts/upstream/report.sh). Change the pins there and re-run
+It is generated from [`scripts/config/sources.yml`](https://github.com/CHE3MZ/whisky/blob/master/scripts/config/sources.yml) by
+[`scripts/upstream/report.sh`](https://github.com/CHE3MZ/whisky/blob/master/scripts/upstream/report.sh). Change the pins there and re-run
 the script rather than editing this file.
 
 See [`ReleaseWorkflow.md`](../ReleaseWorkflow.md) for how the runtime and app are assembled and
@@ -111,7 +111,7 @@ app releases.
 ## Runtime archive integrity (manual)
 
 The app verifies each downloaded `Libraries.tar.gz` against the SHA-256 recorded in
-[`dist/pages/WhiskyWineVersion.plist`](../../dist/pages/WhiskyWineVersion.plist) and fails closed on a
+[`docs/WhiskyWineVersion.plist`](https://github.com/CHE3MZ/whisky/blob/master/docs/WhiskyWineVersion.plist) and fails closed on a
 mismatch. These digests are not derived from `sources.yml`, so add a row whenever a runtime release
 is published.
 
@@ -123,8 +123,8 @@ is published.
 
 ## Keeping this current
 
-[`TrackUpstream.yml`](../../.github/workflows/TrackUpstream.yml) runs
-[`track.sh`](../../scripts/upstream/track.sh) weekly against the pins in `sources.yml` and opens an
+[`TrackUpstream.yml`](https://github.com/CHE3MZ/whisky/blob/master/.github/workflows/TrackUpstream.yml) runs
+[`track.sh`](https://github.com/CHE3MZ/whisky/blob/master/scripts/upstream/track.sh) weekly against the pins in `sources.yml` and opens an
 issue in `CHE3MZ/whisky` when a tracked source moves. After changing a pin, run
 `./scripts/upstream/report.sh` to regenerate this file; CI runs `report.sh --check` and fails if it
 is stale.

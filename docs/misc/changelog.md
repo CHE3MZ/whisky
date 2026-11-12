@@ -1,4 +1,6 @@
 ## What's Changed
+* ci: improved local release script by @CHE3MZ
+* docs: moved docs around by @CHE3MZ
 * feat: fully replaced the runtime assembler with a new script that reads sources.yml by @CHE3MZ
 * ci: added local taskfile jobs for local side dev ops by @CHE3MZ
 * ci: moved secret scans to task instead of having a dedicated script for it by @CHE3MZ

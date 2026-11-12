@@ -29,6 +29,14 @@ tasks:
     desc: Perform a release build
     cmds:
       - scripts/release.sh {{.CLI_ARGS}}
+  runtime:
+    desc: Assemble the runtime
+    cmds:
+      - scripts/runtime.sh {{.CLI_ARGS}}
+  docs:
+    desc: Build the documentation site
+    cmds:
+      - scripts/docs.sh {{.CLI_ARGS}}
   lint:
     desc: Lint Swift sources
     cmds:
@@ -50,6 +58,11 @@ tasks:
     cmds:
       - cmd: scripts/upstream/track.sh
       - cmd: scripts/upstream/report.sh
+  sync:
+    desc: Run sync operations
+    cmds:
+      - task: upstream
+      - cmd: scripts/runtime/sync.sh
   cliff:
     desc: Run git cliff
     silent: true

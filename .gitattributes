@@ -1,0 +1,2 @@
+*.sh text eol=lf
+docs/WhiskyWineVersion.plist text eol=lf

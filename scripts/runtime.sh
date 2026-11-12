@@ -29,6 +29,7 @@
 #   --workdir DIR      Build/cache dir (default: scripts/runtime/build).
 #   --keep             Keep a temp workdir after a build (only affects --dry-run).
 #   --sources PATH     Pin list (default: scripts/config/sources.yml).
+#   --update-docs      Update docs/WhiskyWineVersion.plist from the built archive.
 #   -h, --help         Show this help.
 #
 # A real build needs macOS: shasum, plutil, xattr, perl, curl and bsdtar.
@@ -48,6 +49,7 @@ OUTPUT_FILE=''
 WORKDIR_ARG=''
 DRY_RUN=0
 KEEP=0
+UPDATE_DOCS=0
 SEP=$(printf '\034')
 WORK=''
 WORK_IS_TEMP=0
@@ -65,6 +67,7 @@ Options:
   --workdir DIR      Build/cache dir (default: scripts/runtime/build)
   --keep             Keep a temp workdir after a build (only affects --dry-run)
   --sources PATH     Pin list (default: scripts/config/sources.yml)
+  --update-docs      Update docs/WhiskyWineVersion.plist from the built archive
   -h, --help         Show this help
 
 Environment:
@@ -281,6 +284,9 @@ while [ $# -gt 0 ]; do
             SOURCES_FILE=$2
             shift
             ;;
+        --update-docs)
+            UPDATE_DOCS=1
+            ;;
         -h|--help)
             usage
             exit 0
@@ -358,7 +364,11 @@ fi
 
 if [ "$DRY_RUN" -eq 1 ]; then
     printf 'Runtime plan for v%s\n\n' "$NEW_VERSION"
-    printf 'sources: %s\noutput:  %s\n\n' "$SOURCES_FILE" "$OUTPUT_FILE"
+    printf 'sources: %s\noutput:  %s\n' "$SOURCES_FILE" "$OUTPUT_FILE"
+    if [ "$UPDATE_DOCS" -eq 1 ]; then
+        printf 'docs:    %s (would update)\n' "$SCRIPT_DIR/../docs/WhiskyWineVersion.plist"
+    fi
+    printf '\n'
     printf 'wine\n  release: %s\n  asset:   %s\n  sha256:  %s\n  url:     %s\n\n' \
         "$WINE_RELEASE" "$WINE_ASSET" "$WINE_SHA" "$WINE_URL"
     printf 'dxvk %s\n  release: %s\n  asset:   %s\n  sha256:  %s\n  url:     %s\n\n' \
@@ -469,6 +479,17 @@ rm -f "$OUTPUT_FILE"
 
 DIGEST=$(sha256_of "$OUTPUT_FILE")
 
+if [ "$UPDATE_DOCS" -eq 1 ]; then
+    log "Updating docs/WhiskyWineVersion.plist"
+    "$SCRIPT_DIR/runtime/sync.sh" --archive "$OUTPUT_FILE"
+    DOCS_STEP="  3. docs/WhiskyWineVersion.plist updated from the archive.
+     Publish the archive and record the digest in docs/misc/dependencies.md
+     before committing or pushing."
+else
+    DOCS_STEP="  3. Update docs/WhiskyWineVersion.plist with version $NEW_VERSION,
+     sha256 $DIGEST and dxmtVersion $DXMT_VERSION (or rerun with --update-docs)."
+fi
+
 printf '\nAssembled: %s\n' "$OUTPUT_FILE"
 printf 'SHA-256:   %s\n' "$DIGEST"
 printf 'Runtime:   v%s (Wine %s, DXVK %s, DXMT %s)\n' "$NEW_VERSION" "$WINE_RELEASE" "$DXVK_VERSION" "$DXMT_VERSION"
@@ -486,8 +507,7 @@ Next:
        gh release create v$NEW_VERSION --repo $RELEASE_REPO \\
          --title "Wine Libraries v$NEW_VERSION" \\
          --notes "..." Libraries.tar.gz
-  3. Update dist/pages/WhiskyWineVersion.plist with version $NEW_VERSION,
-     sha256 $DIGEST and dxmtVersion $DXMT_VERSION.
+$DOCS_STEP
   4. For a future runtime, bump the release and the matching asset + sha256 in
      scripts/config/sources.yml, then run scripts/upstream/report.sh.
 SUMMARY

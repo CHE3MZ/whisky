@@ -7,7 +7,7 @@ The fork uses two parallel artifact streams:
 - **App releases** (`app-vX.Y.Z`) — `Whisky-X.Y.Z.dmg`, signed and notarized for direct distribution.
 - **Wine Libraries releases** (`vX.Y.Z`) — `Libraries.tar.gz` containing the Wine/DXVK runtime that the app downloads on first launch.
 
-Both live on GitHub Releases. The Wine version plist is served from GitHub Pages, which is **workflow-deployed** through `.github/workflows/Documentation.yml` (the `gh-pages` branch is unused; static files go in `dist/pages/`). The Sparkle feed is generated per release, attached to that release as `appcast.xml`, and mirrored to the historical Pages URL at deploy time, so no appcast file is committed or edited by hand.
+Both live on GitHub Releases. The Wine version plist is served from GitHub Pages, which is **workflow-deployed** through `.github/workflows/Documentation.yml` (the `gh-pages` branch is unused; the site is built with MkDocs from `docs/`, including the static `WhiskyWineVersion.plist`). The Sparkle feed is generated per release, attached to that release as `appcast.xml`, and mirrored to the historical Pages URL at deploy time, so no appcast file is committed or edited by hand.
 
 ## One-time setup
 
@@ -277,9 +277,11 @@ their pinned versions, and where each comes from. When the runtime needs to chan
    ```sh
    shasum -a 256 Libraries.tar.gz
    ```
-5. Update `dist/pages/WhiskyWineVersion.plist` with the version, bundled DXVK version, and the digest
-   from the previous step. Record the same digest in the runtime-integrity table in
-   [`dependencies.md`](misc/dependencies.md):
+5. Update `docs/WhiskyWineVersion.plist` with the version, bundled DXVK version, and the digest
+   from the previous step — or run `scripts/runtime/sync.sh --archive Libraries.tar.gz`.
+   `scripts/runtime.sh --update-docs` does this automatically after a build; publish the archive
+   before committing or pushing the plist. Record the same digest in the runtime-integrity table
+   in [`dependencies.md`](misc/dependencies.md):
    ```xml
    <dict>
        <key>version</key>

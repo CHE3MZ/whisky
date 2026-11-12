@@ -29,12 +29,13 @@ qualified tap (`CHE3MZ/tools/whisky`) as the documented path.
 
 ## 2. Search & domain
 
-- The GitHub Pages landing page (`dist/pages/`) already has solid on-page SEO (title, description,
-  OpenGraph/Twitter cards, JSON-LD). The ceiling is **domain authority**: `che3mz.github.io` is treated
-  as its own site by search engines (github.io is on the Public Suffix List), but a project subpath on a
-  personal Pages domain still carries less weight for a niche query than a dedicated domain with backlinks.
+- The GitHub Pages landing page (`docs/index.md` and `docs/site/overrides/home.html`) already has solid
+  on-page SEO (title, description, OpenGraph/Twitter cards, JSON-LD). The ceiling is **domain
+  authority**: `che3mz.github.io` is treated as its own site by search engines (github.io is on the
+  Public Suffix List), but a project subpath on a personal Pages domain still carries less weight for a
+  niche query than a dedicated domain with backlinks.
 - **Action:** consider a custom domain (e.g. `whisky.example.com` or a `.app`) with a `CNAME` in
-  `dist/pages/` and the Pages custom-domain setting. Marginal alone (~5-10%), meaningful **only** paired
+  `docs/` and the Pages custom-domain setting. Marginal alone (~5-10%), meaningful **only** paired
   with backlinks below.
 - **Action:** ask the archived `whisky-app` org (Isaac) whether the archived repo's README / getwhisky.app
   can carry a one-line "no longer maintained — see CHE3MZ/whisky" pointer. A single backlink from the

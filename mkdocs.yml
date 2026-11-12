@@ -1,0 +1,97 @@
+site_name: Whisky
+site_description: Run Windows games and applications on macOS, using Wine.
+site_author: CHE3MZ
+site_url: https://che3mz.github.io/whisky/
+repo_url: https://github.com/CHE3MZ/whisky
+repo_name: CHE3MZ/whisky
+edit_uri: edit/master/docs/
+
+docs_dir: docs
+site_dir: site
+
+nav:
+  - Home: index.md
+  - Support:
+      - Overview: support.md
+      - Launcher troubleshooting: support/LauncherTroubleshooting.md
+      - Steam compatibility: support/SteamCompatibility.md
+      - Stability troubleshooting: support/StabilityTroubleshooting.md
+      - Launcher security notes: support/LauncherSecurityNotes.md
+      - Launcher implementation: support/LauncherCompatibilityImplementation.md
+  - Changelog: misc/changelog.md
+  - Project:
+      - Runtime dependencies: misc/dependencies.md
+      - Upstream audit: AUDIT.md
+      - Distribution: DISTRIBUTION.md
+      - Governance: GOVERNANCE.md
+      - Release workflow: ReleaseWorkflow.md
+  - API Reference: https://che3mz.github.io/whisky/documentation/whiskykit/
+
+theme:
+  name: material
+  language: en
+  logo: assets/icon.png
+  favicon: assets/icon.png
+  font: false
+  custom_dir: docs/site/overrides
+  palette:
+    - media: "(prefers-color-scheme)"
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+    - media: "(prefers-color-scheme: light)"
+      primary: custom
+      accent: custom
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      primary: custom
+      accent: custom
+      scheme: whisky
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.footer
+    - content.code.copy
+    - search.suggest
+    - search.highlight
+
+extra_css:
+  - site/stylesheets/extra.css
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+  - footnotes
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tasklist:
+      custom_checkbox: true
+
+plugins:
+  - search:
+      lang: en
+
+exclude_docs: |
+  site/overrides/
+
+copyright: Whisky is GPL v3 licensed.
+
+strict: true
