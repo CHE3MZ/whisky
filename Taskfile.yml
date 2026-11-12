@@ -17,6 +17,7 @@ tasks:
       - task format
       - task secrets
       - task scan
+      - task checks
   build:
     desc: Build the app
     cmds:
@@ -25,6 +26,11 @@ tasks:
     desc: Build all schemes
     cmds:
       - bash scripts/build.sh --full {{.CLI_ARGS}}
+  clean:
+    desc: Remove build artifacts and caches
+    cmds:
+      - cmd: bash scripts/clean.sh {{.CLI_ARGS}}
+      - cmd: uvx ruff clean
   release:
     desc: Perform a release build
     cmds:
@@ -74,9 +80,22 @@ tasks:
     cmds:
       - git-cliff --strip all -o docs/misc/changelog.md
   check-links:
-    desc: Lint links.
+    desc: Lint links
     cmds:
       - cmd: lychee .
+  check-scripts:
+    desc: Lint scripts
+    ignore_error: true
+    cmds:
+      - cmd: find scripts -type f -name '*.sh' -exec shellcheck {} +
+      - cmd: uvx ruff check . --no-cache
+      - cmd: uvx ruff format . --check --no-cache
+  checks:
+    desc: Run all checks
+    ignore_error: true
+    cmds:
+      - task: check-links
+      - task: check-scripts
   secrets:
     desc: Run secret scans
     ignore_error: true
