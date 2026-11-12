@@ -15,14 +15,17 @@
 # You should have received a copy of the GNU General Public License along with Whisky.
 # If not, see https://www.gnu.org/licenses/.
 #
-# Syncs docs/WhiskyWineVersion.plist from a built Libraries.tar.gz:
+# Writes a WhiskyWineVersion.plist from a built Libraries.tar.gz:
 #   - reads Libraries/WhiskyWineVersion.plist from the archive
 #   - computes the archive SHA-256
-#   - writes version, dxvkVersion, dxmtVersion and sha256 to the docs plist
+#   - writes version, dxvkVersion, dxmtVersion and sha256
+#
+# Runtime.yml runs this to attach the release's WhiskyWineVersion.plist asset;
+# locally it writes build/WhiskyWineVersion.plist for upload or inspection.
 #
 # Usage: scripts/runtime/sync.sh [--archive PATH] [--output PATH] [--check]
 #   --archive PATH  Archive to read (default: newest scripts/runtime/release/Libraries-runtime-v*.tar.gz)
-#   --output PATH   Plist to write (default: docs/WhiskyWineVersion.plist)
+#   --output PATH   Plist to write (default: build/WhiskyWineVersion.plist)
 #   --check         Exit 1 if the plist is out of date; do not write
 #   -h, --help      Show this help
 
@@ -31,7 +34,7 @@ set -euo pipefail
 SCRIPT_DIR=$(CDPATH='' cd "$(dirname "$0")" && pwd)
 PROJECT_DIR=$(CDPATH='' cd "$SCRIPT_DIR/../.." && pwd)
 RELEASE_DIR="$SCRIPT_DIR/release"
-DEFAULT_OUTPUT="$PROJECT_DIR/docs/WhiskyWineVersion.plist"
+DEFAULT_OUTPUT="$PROJECT_DIR/build/WhiskyWineVersion.plist"
 
 ARCHIVE=''
 OUTPUT=$DEFAULT_OUTPUT
@@ -42,11 +45,11 @@ usage() {
     cat <<'EOF'
 Usage: scripts/runtime/sync.sh [--archive PATH] [--output PATH] [--check]
 
-Syncs docs/WhiskyWineVersion.plist from a built Libraries.tar.gz.
+Writes WhiskyWineVersion.plist from a built Libraries.tar.gz.
 
 Options:
   --archive PATH  Archive to read (default: newest scripts/runtime/release/Libraries-runtime-v*.tar.gz)
-  --output PATH   Plist to write (default: docs/WhiskyWineVersion.plist)
+  --output PATH   Plist to write (default: build/WhiskyWineVersion.plist)
   --check         Exit 1 if the plist is out of date; do not write
   -h, --help      Show this help
 EOF

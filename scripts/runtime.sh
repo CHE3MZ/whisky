@@ -29,7 +29,7 @@
 #   --workdir DIR      Build/cache dir (default: scripts/runtime/build).
 #   --keep             Keep a temp workdir after a build (only affects --dry-run).
 #   --sources PATH     Pin list (default: scripts/config/sources.yml).
-#   --update-docs      Update docs/WhiskyWineVersion.plist from the built archive.
+#   --write-plist      Generate build/WhiskyWineVersion.plist from the built archive.
 #   -h, --help         Show this help.
 #
 # A real build needs macOS: shasum, plutil, xattr, perl, curl and bsdtar.
@@ -49,7 +49,7 @@ OUTPUT_FILE=''
 WORKDIR_ARG=''
 DRY_RUN=0
 KEEP=0
-UPDATE_DOCS=0
+WRITE_PLIST=0
 SEP=$(printf '\034')
 WORK=''
 WORK_IS_TEMP=0
@@ -67,7 +67,7 @@ Options:
   --workdir DIR      Build/cache dir (default: scripts/runtime/build)
   --keep             Keep a temp workdir after a build (only affects --dry-run)
   --sources PATH     Pin list (default: scripts/config/sources.yml)
-  --update-docs      Update docs/WhiskyWineVersion.plist from the built archive
+  --write-plist      Generate build/WhiskyWineVersion.plist from the built archive
   -h, --help         Show this help
 
 Environment:
@@ -284,8 +284,8 @@ while [ $# -gt 0 ]; do
             SOURCES_FILE=$2
             shift
             ;;
-        --update-docs)
-            UPDATE_DOCS=1
+        --write-plist)
+            WRITE_PLIST=1
             ;;
         -h|--help)
             usage
@@ -365,8 +365,8 @@ fi
 if [ "$DRY_RUN" -eq 1 ]; then
     printf 'Runtime plan for runtime-v%s\n\n' "$NEW_VERSION"
     printf 'sources: %s\noutput:  %s\n' "$SOURCES_FILE" "$OUTPUT_FILE"
-    if [ "$UPDATE_DOCS" -eq 1 ]; then
-        printf 'docs:    %s (would update)\n' "$SCRIPT_DIR/../docs/WhiskyWineVersion.plist"
+    if [ "$WRITE_PLIST" -eq 1 ]; then
+        printf 'plist:   %s (would generate)\n' "$SCRIPT_DIR/../build/WhiskyWineVersion.plist"
     fi
     printf '\n'
     printf 'wine\n  release: %s\n  asset:   %s\n  sha256:  %s\n  url:     %s\n\n' \
@@ -479,15 +479,16 @@ rm -f "$OUTPUT_FILE"
 
 DIGEST=$(sha256_of "$OUTPUT_FILE")
 
-if [ "$UPDATE_DOCS" -eq 1 ]; then
-    log "Updating docs/WhiskyWineVersion.plist"
+if [ "$WRITE_PLIST" -eq 1 ]; then
+    log "Generating build/WhiskyWineVersion.plist"
     bash "$SCRIPT_DIR/runtime/sync.sh" --archive "$OUTPUT_FILE"
-    DOCS_STEP="  3. docs/WhiskyWineVersion.plist updated from the archive.
-     Publish the archive and record the digest in docs/misc/dependencies.md
-     before committing or pushing."
+    DOCS_STEP="  3. build/WhiskyWineVersion.plist generated from the archive.
+     Attach it to the runtime release as WhiskyWineVersion.plist and record the
+     digest in docs/misc/dependencies.md."
 else
-    DOCS_STEP="  3. Update docs/WhiskyWineVersion.plist with version $NEW_VERSION,
-     sha256 $DIGEST and dxmtVersion $DXMT_VERSION (or rerun with --update-docs)."
+    DOCS_STEP="  3. Generate WhiskyWineVersion.plist with version $NEW_VERSION,
+     sha256 $DIGEST and dxmtVersion $DXMT_VERSION (or rerun with --write-plist),
+     then attach it to the runtime release."
 fi
 
 printf '\nAssembled: %s\n' "$OUTPUT_FILE"
@@ -502,11 +503,12 @@ Next:
      native and winemetal builtin:
        grep -aL 'Wine builtin DLL' "$WORK/stage/Libraries/DXMT/x64/d3d11.dll"
        grep -al 'Wine builtin DLL' "$WORK/stage/Libraries/Wine/lib/wine/x86_64-windows/winemetal.dll"
-  2. Publish (asset filename must be exactly Libraries.tar.gz):
+  2. Publish (assets must be named exactly Libraries.tar.gz and WhiskyWineVersion.plist):
        cp "$OUTPUT_FILE" Libraries.tar.gz
+       bash "$SCRIPT_DIR/runtime/sync.sh" --archive "$OUTPUT_FILE" --output WhiskyWineVersion.plist
        gh release create runtime-v$NEW_VERSION --repo $RELEASE_REPO \\
          --title "Wine Libraries v$NEW_VERSION" \\
-         --notes "..." Libraries.tar.gz
+         --notes "..." Libraries.tar.gz WhiskyWineVersion.plist
 $DOCS_STEP
   4. For a future runtime, bump the release and the matching asset + sha256 in
      scripts/config/sources.yml, then run scripts/upstream/report.sh.

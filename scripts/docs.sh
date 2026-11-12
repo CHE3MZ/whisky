@@ -16,38 +16,45 @@
 # If not, see https://www.gnu.org/licenses/.
 #
 # Builds the GitHub Pages site into site:
-#   - the MkDocs site from docs/ (requires mkdocs), including
-#     docs/WhiskyWineVersion.plist
+#   - the MkDocs site from docs/ (requires mkdocs)
+#   - the newest runtime-v release's WhiskyWineVersion.plist (requires gh);
+#     falls back to the deployed plist, or is absent if neither exists
 #   - DocC for WhiskyKit (requires macOS with Xcode)
 #   - the newest app release's appcast.xml (requires gh)
 #
-# Usage: scripts/docs.sh [--no-appcast]
-# Example: scripts/docs.sh --no-appcast
+# Usage: scripts/docs.sh [--no-appcast] [--no-plist]
+# Example: scripts/docs.sh --no-appcast --no-plist
 
 set -euo pipefail
 
 usage() {
     cat <<'EOF'
-Usage: scripts/docs.sh [--no-appcast]
+Usage: scripts/docs.sh [--no-appcast] [--no-plist]
 
 Builds the GitHub Pages site into site:
-  - the MkDocs site from docs/ (requires mkdocs), including
-    docs/WhiskyWineVersion.plist
+  - the MkDocs site from docs/ (requires mkdocs)
+  - the newest runtime-v release's WhiskyWineVersion.plist (requires gh);
+    falls back to the deployed plist, or is absent if neither exists
   - DocC for WhiskyKit (requires macOS with Xcode)
   - the newest app release's appcast.xml (requires gh)
 
 Options:
   --no-appcast  skip mirroring appcast.xml (offline/local builds)
+  --no-plist    skip mirroring WhiskyWineVersion.plist (offline/local builds)
   -h, --help    show this help
 EOF
 }
 
 SKIP_APPCAST=0
+SKIP_PLIST=0
 
 while [ $# -gt 0 ]; do
     case "$1" in
         --no-appcast)
             SKIP_APPCAST=1
+            ;;
+        --no-plist)
+            SKIP_PLIST=1
             ;;
         -h|--help)
             usage
@@ -123,6 +130,14 @@ appcast_download_reachable() {
         -o /dev/null "$url" >/dev/null 2>&1
 }
 
+plist_is_valid() {
+    local file="$1" sha
+    plutil -lint "$file" >/dev/null 2>&1 || return 1
+    sha="$(plutil -extract sha256 raw -o - "$file" 2>/dev/null || true)"
+    sha="$(printf '%s' "$sha" | tr '[:upper:]' '[:lower:]')"
+    printf '%s' "$sha" | grep -Eq '^[0-9a-f]{64}$'
+}
+
 mirror_appcast() {
     if ! command -v gh >/dev/null 2>&1; then
         echo "error: gh not found; install GitHub CLI or use --no-appcast." >&2
@@ -181,6 +196,62 @@ mirror_appcast() {
     warn "no app releases or reachable deployed feed found; /appcast.xml will be absent"
 }
 
+mirror_plist() {
+    if ! command -v gh >/dev/null 2>&1; then
+        echo "error: gh not found; install GitHub CLI or use --no-plist." >&2
+        exit 1
+    fi
+
+    if [ -z "${GH_TOKEN:-}" ] && ! gh auth status >/dev/null 2>&1; then
+        echo "error: gh is not authenticated; run 'gh auth login' or use --no-plist." >&2
+        exit 1
+    fi
+
+    local repo="${GITHUB_REPOSITORY:-}"
+    if [ -z "$repo" ]; then
+        repo="$(gh repo view --json nameWithOwner --jq .nameWithOwner 2>/dev/null || true)"
+    fi
+    if [ -z "$repo" ]; then
+        echo "error: could not determine repository; set GITHUB_REPOSITORY." >&2
+        exit 1
+    fi
+
+    local owner="${repo%%/*}"
+    local name="${repo#*/}"
+    local plist_url="https://${owner}.github.io/${name}/WhiskyWineVersion.plist"
+    local tag
+    local tmp
+
+    tag="$(gh api "repos/${repo}/releases?per_page=100" \
+        --jq '[.[] | select(.draft == false and .prerelease == false) | select(.tag_name | startswith("runtime-v")) | select([.assets[].name] | index("WhiskyWineVersion.plist")) | .tag_name][0] // ""')"
+
+    tmp="$(mktemp "${TMPDIR:-/tmp}/whisky-plist.XXXXXX")"
+
+    if [ -n "$tag" ] && gh release download "$tag" \
+        --repo "$repo" \
+        --pattern WhiskyWineVersion.plist \
+        --output "$tmp"; then
+        if plist_is_valid "$tmp"; then
+            cp "$tmp" "$SITE_DIR/WhiskyWineVersion.plist"
+            rm -f "$tmp"
+            echo "Mirrored WhiskyWineVersion.plist from release $tag"
+            return
+        fi
+        warn "release $tag plist is invalid; trying the deployed plist"
+    fi
+
+    rm -f "$tmp"
+    if curl -fsSL "$plist_url" --output "$tmp" && plist_is_valid "$tmp"; then
+        cp "$tmp" "$SITE_DIR/WhiskyWineVersion.plist"
+        rm -f "$tmp"
+        warn "no usable runtime-v release; reusing $plist_url"
+        return
+    fi
+
+    rm -f "$tmp"
+    warn "no usable WhiskyWineVersion.plist source; /WhiskyWineVersion.plist will be absent"
+}
+
 cd "$PROJECT_DIR"
 
 echo "==> Building MkDocs site"
@@ -188,11 +259,6 @@ mkdocs build --strict
 
 if [ ! -f "$SITE_DIR/index.html" ]; then
     echo "error: MkDocs did not produce site/index.html." >&2
-    exit 1
-fi
-
-if [ ! -f "$SITE_DIR/WhiskyWineVersion.plist" ]; then
-    echo "error: MkDocs did not produce site/WhiskyWineVersion.plist." >&2
     exit 1
 fi
 
@@ -229,6 +295,17 @@ for entry in "$DOCC_DIR"/*; do
     cp -R "$entry" "$SITE_DIR/"
 done
 shopt -u nullglob
+
+if [ "$SKIP_PLIST" -eq 1 ]; then
+    echo "==> Skipping plist mirror (--no-plist)"
+else
+    echo "==> Mirroring latest runtime release plist"
+    mirror_plist
+fi
+
+if [ ! -f "$SITE_DIR/WhiskyWineVersion.plist" ]; then
+    warn "/WhiskyWineVersion.plist will be absent (no runtime-v release asset and no deployed plist)"
+fi
 
 if [ "$SKIP_APPCAST" -eq 1 ]; then
     echo "==> Skipping appcast mirror (--no-appcast)"

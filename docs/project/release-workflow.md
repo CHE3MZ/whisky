@@ -7,7 +7,7 @@ The fork uses two parallel artifact streams:
 - **App releases** (`app-vX.Y.Z`): `Whisky-X.Y.Z.dmg`, signed and notarized for direct distribution.
 - **Wine Libraries releases** (`runtime-vX.Y.Z`): `Libraries.tar.gz` containing the Wine/DXVK runtime that the app downloads on first launch.
 
-Both live on GitHub Releases. The Wine version plist is served from GitHub Pages, which is **workflow-deployed** through `.github/workflows/Documentation.yml` (the `gh-pages` branch is unused; the site is built with MkDocs from `docs/`, including the static `WhiskyWineVersion.plist`). The Sparkle feed is generated per release, attached to that release as `appcast.xml`, and mirrored to the historical Pages URL at deploy time, so no appcast file is committed or edited by hand.
+Both live on GitHub Releases. The Wine version plist is served from GitHub Pages, which is **workflow-deployed** through `.github/workflows/Documentation.yml` (the `gh-pages` branch is unused; the site is built with MkDocs from `docs/` and the plist is mirrored from the newest runtime release). The Sparkle feed is generated per release, attached to that release as `appcast.xml`, and mirrored to the historical Pages URL at deploy time, so no appcast file is committed or edited by hand.
 
 ## One-time setup
 
@@ -270,33 +270,23 @@ To cut a runtime release:
    `scripts/config/sources.yml` and run `scripts/upstream/report.sh` to refresh
    `docs/misc/dependencies.md`.
 2. **Tag `runtime-vX.Y.Z` and push it.** `.github/workflows/Runtime.yml` builds the archive on
-   macOS and publishes the release with `Libraries.tar.gz`. `scripts/runtime/tag.sh` does a patch
-   bump and pushes the tag for you; use `--dry-run` to preview it.
-3. **Compute the SHA-256 of the exact published asset.** The app verifies the download against this
-   and fails closed on a mismatch, so an incorrect value blocks every fresh install:
-   ```sh title="Verify the published digest"
-   gh release download runtime-vX.Y.Z --pattern Libraries.tar.gz
-   shasum -a 256 Libraries.tar.gz
-   ```
-4. **Update `docs/WhiskyWineVersion.plist`** with the version, bundled DXVK version, and the digest,
-   or run `scripts/runtime/sync.sh --archive Libraries.tar.gz`. `scripts/runtime.sh --update-docs`
-   does this after a local build. Record the same digest in the runtime-integrity table in
-   [`dependencies.md`](../misc/dependencies.md):
-   ```xml title="docs/WhiskyWineVersion.plist"
-   <dict>
-       <key>version</key>
-       <dict>
-           <key>major</key><integer>X</integer>
-           <key>minor</key><integer>Y</integer>
-           <key>patch</key><integer>Z</integer>
-       </dict>
-       <key>dxvkVersion</key>
-       <string>1.10.3</string>
-       <key>sha256</key>
-       <string>...64-hex-digest...</string>
-   </dict>
-   ```
-5. Commit and push. The Documentation workflow republishes Pages, and existing app installs prompt to update on their next Wine version check.
+   macOS, publishes `Libraries.tar.gz` and a matching `WhiskyWineVersion.plist`, and dispatches
+   `Documentation.yml`. `scripts/runtime/tag.sh` does a patch bump and pushes the tag for you; use
+   `--dry-run` to preview it.
+3. **Let Pages deploy.** `Documentation.yml` mirrors the newest `WhiskyWineVersion.plist` release
+   asset to `https://che3mz.github.io/whisky/WhiskyWineVersion.plist`. No commit is needed, and
+   existing app installs pick up the update on their next Wine version check.
+
+The plist is not committed. `Documentation.yml` mirrors the newest `runtime-v` release asset,
+falling back to the deployed plist; if neither is available, `/WhiskyWineVersion.plist` is absent
+until a runtime release is published. To generate it locally:
+
+```sh title="Generate the plist locally"
+bash scripts/runtime/sync.sh --archive scripts/runtime/release/Libraries-runtime-vX.Y.Z.tar.gz
+```
+
+This writes `build/WhiskyWineVersion.plist`. Record the digest in the runtime-integrity table in
+[`dependencies.md`](../misc/dependencies.md).
 
 ## URLs the app depends on
 

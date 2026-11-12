@@ -18,9 +18,9 @@
 # Bumps the patch version of the newest runtime-vX.Y.Z tag and pushes it. The push
 # triggers .github/workflows/Runtime.yml, which builds and publishes the runtime.
 #
-# The base version is the newest local runtime-vX.Y.Z tag. On a fresh repo with no
-# runtime tags it falls back to the version in docs/WhiskyWineVersion.plist, so the
-# first tag is that version with the patch bumped.
+# The base version is the newest local runtime-vX.Y.Z tag. With no runtime tags it
+# falls back to docs/WhiskyWineVersion.plist, then to the deployed plist, so the first
+# tag is that version with the patch bumped.
 #
 # Requires a clean working tree (no staged, unstaged, or untracked changes).
 #
@@ -33,6 +33,7 @@ set -euo pipefail
 SCRIPT_DIR=$(CDPATH='' cd "$(dirname "$0")" && pwd)
 PROJECT_DIR=$(CDPATH='' cd "$SCRIPT_DIR/../.." && pwd)
 PLIST="$PROJECT_DIR/docs/WhiskyWineVersion.plist"
+PLIST_URL="https://che3mz.github.io/whisky/WhiskyWineVersion.plist"
 
 DRY_RUN=0
 
@@ -53,14 +54,15 @@ die() {
     exit 1
 }
 
-plist_version() {
+plist_version_from() {
+    local file="$1"
     if command -v plutil >/dev/null 2>&1; then
         printf '%s.%s.%s\n' \
-            "$(plutil -extract version.major raw -o - "$PLIST")" \
-            "$(plutil -extract version.minor raw -o - "$PLIST")" \
-            "$(plutil -extract version.patch raw -o - "$PLIST")"
+            "$(plutil -extract version.major raw -o - "$file")" \
+            "$(plutil -extract version.minor raw -o - "$file")" \
+            "$(plutil -extract version.patch raw -o - "$file")"
     elif command -v python3 >/dev/null 2>&1; then
-        python3 - "$PLIST" <<'PY'
+        python3 - "$file" <<'PY'
 import plistlib, sys
 with open(sys.argv[1], "rb") as handle:
     version = plistlib.load(handle).get("version") or {}
@@ -72,7 +74,7 @@ PY
             index($0, "<key>minor</key>") { getline; gsub(/[^0-9]/, "", $0); minor = $0 }
             index($0, "<key>patch</key>") { getline; gsub(/[^0-9]/, "", $0); patch = $0 }
             END { print major "." minor "." patch }
-        ' "$PLIST"
+        ' "$file"
     fi
 }
 
@@ -95,7 +97,6 @@ while [ $# -gt 0 ]; do
 done
 
 command -v git >/dev/null 2>&1 || die "git is required"
-[ -f "$PLIST" ] || die "$PLIST not found"
 
 if [ "$DRY_RUN" -eq 0 ]; then
     if [ -n "$(git -C "$PROJECT_DIR" status --porcelain)" ]; then
@@ -111,8 +112,18 @@ if [ -n "$current_tag" ]; then
     current="${current_tag#runtime-v}"
     base_source="tag $current_tag"
 else
-    current="$(plist_version)"
-    base_source="docs/WhiskyWineVersion.plist"
+    tmp_plist="$(mktemp "${TMPDIR:-/tmp}/whisky-tag.XXXXXX")"
+    if [ -f "$PLIST" ]; then
+        cp "$PLIST" "$tmp_plist"
+        base_source="docs/WhiskyWineVersion.plist"
+    elif command -v curl >/dev/null 2>&1 && curl -fsSL "$PLIST_URL" --output "$tmp_plist"; then
+        base_source="$PLIST_URL"
+    else
+        rm -f "$tmp_plist"
+        die "no runtime-v tags and no plist to read (checked $PLIST and $PLIST_URL)"
+    fi
+    current="$(plist_version_from "$tmp_plist")"
+    rm -f "$tmp_plist"
 fi
 
 case "$current" in

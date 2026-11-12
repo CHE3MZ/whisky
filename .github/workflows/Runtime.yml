@@ -12,6 +12,9 @@ on:
 
 permissions:
   contents: write
+  # Needed to dispatch Documentation.yml after publishing (GITHUB_TOKEN-created
+  # release events do not trigger other workflows).
+  actions: write
 
 concurrency:
   group: runtime-${{ inputs.tag || github.ref_name }}
@@ -72,7 +75,11 @@ jobs:
             exit 1
           fi
           cp "$ARCHIVE" Libraries.tar.gz
+          echo "archive=$ARCHIVE" >> "$GITHUB_OUTPUT"
           echo "sha256=$(shasum -a 256 Libraries.tar.gz | awk '{print $1}')" >> "$GITHUB_OUTPUT"
+
+      - name: Generate version plist
+        run: bash scripts/runtime/sync.sh --archive "${{ steps.asset.outputs.archive }}" --output WhiskyWineVersion.plist
 
       - name: Create draft release
         env:
@@ -99,7 +106,7 @@ jobs:
           TAG: ${{ steps.release.outputs.tag }}
         run: |
           set -euo pipefail
-          gh release upload "$TAG" Libraries.tar.gz --repo "$GITHUB_REPOSITORY"
+          gh release upload "$TAG" Libraries.tar.gz WhiskyWineVersion.plist --repo "$GITHUB_REPOSITORY"
 
       - name: Publish release
         env:
@@ -108,6 +115,11 @@ jobs:
         run: |
           set -euo pipefail
           gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --draft=false
+
+      - name: Refresh Pages
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run Documentation.yml --repo "$GITHUB_REPOSITORY"
 
       - name: Summary
         env:
@@ -118,7 +130,6 @@ jobs:
             echo "### Runtime release $TAG"
             echo
             echo "- Asset: \`Libraries.tar.gz\`"
+            echo "- Asset: \`WhiskyWineVersion.plist\` (mirrored to Pages by Documentation.yml)"
             echo "- SHA-256: \`$SHA256\`"
-            echo
-            echo "Next: update \`docs/WhiskyWineVersion.plist\` with this digest and commit."
           } >> "$GITHUB_STEP_SUMMARY"

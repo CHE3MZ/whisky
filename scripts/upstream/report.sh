@@ -294,7 +294,7 @@ app releases.
 ## Runtime archive integrity (manual)
 
 The app verifies each downloaded `Libraries.tar.gz` against the SHA-256 recorded in
-[`docs/WhiskyWineVersion.plist`](https://github.com/CHE3MZ/whisky/blob/master/docs/WhiskyWineVersion.plist) and fails closed on a
+[`WhiskyWineVersion.plist`](https://che3mz.github.io/whisky/WhiskyWineVersion.plist) and fails closed on a
 mismatch. These digests are not derived from `sources.yml`, so add a row whenever a runtime release
 is published.
 

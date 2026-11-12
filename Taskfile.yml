@@ -68,7 +68,6 @@ tasks:
     desc: Run sync operations
     cmds:
       - task: upstream
-      - cmd: bash scripts/runtime/sync.sh
   cliff:
     desc: Run git cliff
     silent: true
