@@ -105,6 +105,24 @@ warn() {
     fi
 }
 
+appcast_first_enclosure() {
+    grep -o 'url="[^"]*"' "$1" | head -n 1 | cut -d'"' -f2
+}
+
+appcast_download_reachable() {
+    local url="$1"
+    [ -n "$url" ] || return 1
+    case "$url" in
+        https://*) ;;
+        *) return 1 ;;
+    esac
+    if curl -fsIL --retry 3 --connect-timeout 15 "$url" >/dev/null 2>&1; then
+        return 0
+    fi
+    curl -fsL --range 0-0 --retry 3 --connect-timeout 15 \
+        -o /dev/null "$url" >/dev/null 2>&1
+}
+
 mirror_appcast() {
     if ! command -v gh >/dev/null 2>&1; then
         echo "error: gh not found; install GitHub CLI or use --no-appcast." >&2
@@ -140,14 +158,27 @@ mirror_appcast() {
         --pattern appcast.xml \
         --output "$SITE_DIR/appcast.xml"; then
         echo "Mirrored appcast.xml from release $tag"
-    elif curl -fsSL "$feed_url" --output "$SITE_DIR/appcast.xml"; then
-        warn "could not read the newest app release's appcast.xml; reusing $feed_url"
-    elif [ -z "$tag" ]; then
-        warn "no app releases or deployed feed found; /appcast.xml will be absent"
-    else
-        echo "error: latest app release $tag has no appcast.xml asset and no deployed feed to reuse." >&2
+        return
+    fi
+
+    # Fallback: reuse the deployed feed only when its newest download still
+    # resolves, so a stale feed pointing at deleted releases is not mirrored.
+    if curl -fsSL "$feed_url" --output "$SITE_DIR/appcast.xml"; then
+        local enclosure
+        enclosure="$(appcast_first_enclosure "$SITE_DIR/appcast.xml" || true)"
+        if appcast_download_reachable "$enclosure"; then
+            warn "could not read the newest app release's appcast.xml; reusing $feed_url"
+            return
+        fi
+        rm -f "$SITE_DIR/appcast.xml"
+        warn "deployed feed $feed_url has no reachable download; /appcast.xml will be absent"
+    fi
+
+    if [ -n "$tag" ]; then
+        echo "error: latest app release $tag has no appcast.xml asset and no reachable deployed feed to reuse." >&2
         exit 1
     fi
+    warn "no app releases or reachable deployed feed found; /appcast.xml will be absent"
 }
 
 cd "$PROJECT_DIR"

@@ -171,7 +171,7 @@ The printed `sparkle:edSignature` **and** the printed `length` must both exactly
 
 The release script injects `MARKETING_VERSION` from the requested version (the tag in CI) and a UTC-timestamp `CURRENT_PROJECT_VERSION` at archive time, so there is no version bump to commit. The checked-in project keeps the neutral development values (`MARKETING_VERSION = 0.0.0`). The injected build number is printed in the workflow run summary and written to `build/release/build-number.txt`; the release workflow passes it to `scripts/appcast.sh` for `sparkle:version`.
 
-> Releases published before this automation (for example `app-v3.7.0`) have no `appcast.xml` asset. Until the first release made by the updated workflow exists, `Documentation.yml` logs a warning and reuses the currently deployed feed, so Pages keeps serving updates without a gap.
+> Releases published before this automation (for example `app-v3.7.0`) have no `appcast.xml` asset. Until the first release made by the updated workflow exists, `Documentation.yml` reuses the currently deployed feed **only if its newest download URL still resolves**. A stale feed that points at deleted releases is dropped instead of mirrored, so Pages does not advertise downloads that no longer exist.
 
 ## Manual app release (fallback)
 
