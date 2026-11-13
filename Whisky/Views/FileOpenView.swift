@@ -90,7 +90,7 @@ struct FileOpenView: View {
                         LauncherFixes.detectAndApply(from: fileURL, for: bottle)
                     }
 
-                    if fileURL.pathExtension == "bat" {
+                    if Wine.isBatchFile(fileURL) {
                         try await Wine.runBatchFile(
                             url: fileURL,
                             bottle: bottle
