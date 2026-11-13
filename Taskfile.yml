@@ -32,6 +32,7 @@ tasks:
       - bash scripts/build.sh --full {{.CLI_ARGS}}
   clean:
     desc: Remove build artifacts and caches
+    ignore_error: true
     cmds:
       - cmd: bash scripts/clean.sh {{.CLI_ARGS}}
       - cmd: uvx ruff clean
@@ -94,12 +95,19 @@ tasks:
       - cmd: find scripts -type f -name '*.sh' -exec shellcheck {} +
       - cmd: uvx ruff check . --no-cache
       - cmd: uvx ruff format . --check --no-cache
+  check-actions:
+     desc: Lint actions
+     cmds:
+      - cmd: pinact run
+      - cmd: pinact run --update --check
+      - cmd: actionlint
   checks:
     desc: Run all checks
     ignore_error: true
     cmds:
       - task: check-links
       - task: check-scripts
+      - task: check-actions
   secrets:
     desc: Run secret scans
     ignore_error: true
