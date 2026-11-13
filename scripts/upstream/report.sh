@@ -24,7 +24,9 @@
 #
 # The prose (descriptions and the "how they connect" section) lives in this
 # script, keyed by each source's `id` field. Add a source to sources.yml and a
-# matching case here, or it is listed with a generic description.
+# matching case here, or it is listed with a generic description. Sources that
+# are not part of the runtime stack (such as the Sparkle app updater) are
+# skipped by documents_source().
 #
 # Usage: scripts/upstream/report.sh [--check] [OUTPUT_MD]
 
@@ -140,6 +142,15 @@ parse_sources() {
     '
 }
 
+# App-only sources are tracked in sources.yml so track.sh sees new releases,
+# but they are not part of the runtime stack this document describes.
+documents_source() {
+    case "$1" in
+        SPARKLE) return 1 ;;
+    esac
+    return 0
+}
+
 # Prints the "### name + description" block for one source, keyed by id.
 component_description() {
     case "$1" in
@@ -208,6 +219,7 @@ EOF
 
     while IFS="$SEP" read -r id name link commit release; do
         [ -n "$id$name" ] || continue
+        documents_source "$id" || continue
         component_description "$id" "$name" "$link"
     done < "$1"
 
@@ -273,6 +285,7 @@ EOF
 
     while IFS="$SEP" read -r id name link commit release; do
         [ -n "$id$name" ] || continue
+        documents_source "$id" || continue
         if [ -n "$release" ]; then
             pin=$release
         elif [ -n "$commit" ]; then
