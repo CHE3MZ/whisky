@@ -92,7 +92,7 @@ final class LocalizedCheckSummaryMoreTests: XCTestCase {
         XCTAssertEqual(result.summary, "2 missing DLL(s): xinput1_3.dll, msvcp140.dll")
     }
 
-    func testDependencyMissingListIgnoresBlankEntries() throws {
+    func testDependencyMissingListIgnoresBlankEntries() {
         let result = CheckResult(outcome: .fail, evidence: ["missing": "a.dll, ,b.dll,"], summary: "")
 
         XCTAssertEqual(
@@ -209,7 +209,7 @@ final class LocalizedCheckSummaryMoreTests: XCTestCase {
         XCTAssertEqual(result.summary, "2 missing verb(s): d3dx9, dotnet48")
     }
 
-    func testWinetricksWithoutACacheReportsASingleMissingVerb() async throws {
+    func testWinetricksWithoutACacheReportsASingleMissingVerb() async {
         let result = await WinetricksVerbCheck().run(params: ["verbs": "corefonts"], context: context())
 
         XCTAssertEqual(

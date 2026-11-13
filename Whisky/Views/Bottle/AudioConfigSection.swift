@@ -137,7 +137,11 @@ struct AudioConfigSection: View {
         }
         .confirmationDialog(
             AudioTroubleshootingEngine.fixDescription(for: "reset-audio-state"),
-            isPresented: Binding(get: { pendingFix != nil }, set: { if !$0 { pendingFix = nil } }),
+            isPresented: Binding(get: { pendingFix != nil }, set: {
+                if !$0 {
+                    pendingFix = nil
+                }
+            }),
             presenting: pendingFix
         ) { pending in
             Button("audio.troubleshoot.applyFix") {

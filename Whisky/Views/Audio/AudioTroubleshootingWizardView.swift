@@ -43,7 +43,9 @@ struct AudioTroubleshootingWizardView: View {
     private struct PendingFixConfirmation: Identifiable {
         let actionId: String
         let description: String
-        var id: String { actionId }
+        var id: String {
+            actionId
+        }
     }
 
     var body: some View {
@@ -76,7 +78,11 @@ struct AudioTroubleshootingWizardView: View {
         .frame(minWidth: 500, minHeight: 400)
         .confirmationDialog(
             pendingFix?.description ?? "",
-            isPresented: Binding(get: { pendingFix != nil }, set: { if !$0 { pendingFix = nil } }),
+            isPresented: Binding(get: { pendingFix != nil }, set: {
+                if !$0 {
+                    pendingFix = nil
+                }
+            }),
             presenting: pendingFix
         ) { pending in
             Button("audio.troubleshoot.applyFix") {

@@ -127,7 +127,7 @@ final class LocalizedLauncherBackendSummaryTests: XCTestCase {
         XCTAssertEqual(result.summary, "Backend is wined3d, expected dxvk")
     }
 
-    func testBackendKeepsAnUnrecognizedIdentifierAsIs() async throws {
+    func testBackendKeepsAnUnrecognizedIdentifierAsIs() async {
         let result = await GraphicsBackendCheck().run(
             params: ["expected": "metalfx"],
             context: makeCheckContext(graphicsBackend: "d3dMetal")

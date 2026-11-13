@@ -341,11 +341,21 @@ final class FixApplicatorLocalizationTests: XCTestCase {
         if let backend = settings.graphicsBackend {
             bottle.settings.graphicsBackend = GameConfigApplicator.effectiveBackend(backend)
         }
-        if let dxvk = settings.dxvk { bottle.settings.dxvk = dxvk }
-        if let dxvkAsync = settings.dxvkAsync { bottle.settings.dxvkAsync = dxvkAsync }
-        if let enhancedSync = settings.enhancedSync { bottle.settings.enhancedSync = enhancedSync }
-        if let shaderCache = settings.shaderCacheEnabled { bottle.settings.shaderCacheEnabled = shaderCache }
-        if let avx = settings.avxEnabled { bottle.settings.avxEnabled = avx }
+        if let dxvk = settings.dxvk {
+            bottle.settings.dxvk = dxvk
+        }
+        if let dxvkAsync = settings.dxvkAsync {
+            bottle.settings.dxvkAsync = dxvkAsync
+        }
+        if let enhancedSync = settings.enhancedSync {
+            bottle.settings.enhancedSync = enhancedSync
+        }
+        if let shaderCache = settings.shaderCacheEnabled {
+            bottle.settings.shaderCacheEnabled = shaderCache
+        }
+        if let avx = settings.avxEnabled {
+            bottle.settings.avxEnabled = avx
+        }
         XCTAssertTrue(GameConfigApplicator.previewChanges(variant: variant, bottle: bottle).isEmpty)
         let program = try makeProgram("Celeste/Celeste.exe")
 

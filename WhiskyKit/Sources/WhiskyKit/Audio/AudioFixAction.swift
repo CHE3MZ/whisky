@@ -128,6 +128,7 @@ public enum AudioFixAction: String, CaseIterable, Sendable {
     }
 }
 
+@MainActor
 public extension Wine {
     /// Applies an audio fix to a bottle.
     ///
@@ -136,7 +137,6 @@ public extension Wine {
     /// test sees the change and a value edited outside Whisky is corrected too.
     /// ``AudioFixAction/openSoundSettings`` changes nothing here; the app opens
     /// System Settings for it.
-    @MainActor
     static func applyAudioFix(_ action: AudioFixAction, bottle: Bottle) async throws {
         action.updateSettings(&bottle.settings)
         switch action {
