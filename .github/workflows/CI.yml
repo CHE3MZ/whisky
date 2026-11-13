@@ -86,6 +86,11 @@ jobs:
             echo "Run ./scripts/audit/british-english.py locally and commit the result."
             exit 1
           }
+      # A translation export can return the key itself as a "translated" value
+      # (es `audio.findings.fix` = "audio.findings.fix"). The build-time fill
+      # only adds missing keys, so such a cell shows the raw identifier.
+      - name: Check no translation is a placeholder key
+        run: ./scripts/audit/check-placeholder-translations.py
 
   # docs/misc/dependencies.md is generated from scripts/config/sources.yml by
   # report.sh; a stale file means a pin moved without refreshing the doc (or a
