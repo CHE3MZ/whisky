@@ -303,9 +303,11 @@ final class FixApplicatorLocalizationTests: XCTestCase {
         assertCatalogKey(fix.newValue)
         XCTAssertNotEqual(fix.currentValue, fix.newValue)
     }
+}
 
-    // MARK: - Game configuration
+// MARK: - Game configuration
 
+extension FixApplicatorLocalizationTests {
     private func defaultVariant(of entryId: String) throws -> (GameDBEntry, GameConfigVariant) {
         let entry = try XCTUnwrap(GameDBLoader.loadDefaults().first { $0.id == entryId }, entryId)
         return try (entry, XCTUnwrap(entry.defaultVariant, entryId))
