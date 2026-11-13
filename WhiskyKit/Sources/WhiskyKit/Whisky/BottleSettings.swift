@@ -543,8 +543,9 @@ public struct BottleSettings: Codable, Equatable {
 
     /// Locale override for launcher compatibility.
     ///
-    /// Steam and other Chromium-based launchers require `en_US.UTF-8`
-    /// to avoid steamwebhelper crashes (whisky-app/whisky#946, #1224, #1241).
+    /// Auto keeps the launcher preset's locale (US English for EA App, Epic
+    /// Games, Battle.net, and Rockstar) or the Mac's when the preset sets none,
+    /// as Steam's does (#330). Any other choice wins over the preset.
     public var launcherLocale: Locales {
         get { launcherConfig.launcherLocale }
         set { launcherConfig.launcherLocale = newValue }
@@ -599,6 +600,12 @@ public struct BottleSettings: Codable, Equatable {
     public var launcherBackendResetNotice: Bool {
         get { launcherConfig.backendResetNotice }
         set { launcherConfig.backendResetNotice = newValue }
+    }
+
+    /// The last ``LauncherLocaleMigration`` this bottle has been through.
+    var launcherLocaleMigration: Int {
+        get { launcherConfig.localeMigration }
+        set { launcherConfig.localeMigration = newValue }
     }
 
     /// Whether a launcher profile, not the user, switched this bottle from
@@ -983,7 +990,7 @@ public struct BottleSettings: Codable, Equatable {
     ///
     /// This method implements the dual-mode launcher compatibility system in this fork:
     /// - Merges launcher-specific environment overrides
-    /// - Applies locale fixes for steamwebhelper crashes
+    /// - Applies the bottle's explicit Locale Override over any preset locale
     /// - Configures GPU spoofing for launcher checks
     /// - Sets network timeouts for download reliability
     ///
@@ -1015,7 +1022,7 @@ public struct BottleSettings: Codable, Equatable {
             }
         }
 
-        // An explicit Locale Override replaces the preset's locale. The presets
+        // An explicit Locale Override replaces the preset's locale. Some presets
         // set LC_ALL to en_US for the launchers' web views, but every game a
         // launcher starts inherits it, and a game that takes its region or
         // language from the Windows locale needs the user's choice (#330).
