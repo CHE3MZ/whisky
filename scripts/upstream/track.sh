@@ -11,7 +11,7 @@
 # Usage: scripts/upstream/track.sh [--github] [SOURCES_YML]
 #
 # Set GITHUB_TOKEN (or GH_TOKEN) to raise the GitHub API rate limit.
-# With --github, the gh CLI token is reused when no environment token is set.
+# When no environment token is set, the gh CLI token is used if available.
 # Set NO_COLOR=1 to disable colors, or FORCE_COLOR=1 to keep them when piping.
 # Exits 0 when all lookups succeed (even if changes are found), 1 on errors.
 
@@ -114,6 +114,11 @@ if ! command -v curl >/dev/null 2>&1; then
     exit 1
 fi
 
+if [ -z "$TOKEN" ] && command -v gh >/dev/null 2>&1; then
+    TOKEN=$(gh auth token --hostname github.com 2>/dev/null || true)
+    TOKEN=$(printf '%s' "$TOKEN" | tr -d '\r\n')
+fi
+
 if [ "$GITHUB_ISSUES" -eq 1 ]; then
     if ! command -v gh >/dev/null 2>&1; then
         printf '%s%serror:%s the gh CLI is required for --github\n' \
@@ -130,9 +135,6 @@ if [ "$GITHUB_ISSUES" -eq 1 ]; then
             "$RED" "$BOLD" "$RESET" "$ISSUE_REPO" >&2
         exit 1
     fi
-    if [ -z "$TOKEN" ]; then
-        TOKEN=$(gh auth token 2>/dev/null || true)
-    fi
 fi
 
 if [ ! -f "$SOURCES_FILE" ]; then
@@ -143,11 +145,11 @@ fi
 
 api_curl() {
     if [ -n "$TOKEN" ]; then
-        curl --connect-timeout 15 --max-time 30 \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer $TOKEN" \
-            -H "User-Agent: whisky-source-check" \
-            "$@"
+        printf 'header = "Authorization: Bearer %s"\n' "$TOKEN" |
+            curl --config - --connect-timeout 15 --max-time 30 \
+                -H "Accept: application/vnd.github+json" \
+                -H "User-Agent: whisky-source-check" \
+                "$@"
     else
         curl --connect-timeout 15 --max-time 30 \
             -H "Accept: application/vnd.github+json" \
