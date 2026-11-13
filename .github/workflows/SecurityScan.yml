@@ -154,6 +154,72 @@ jobs:
         with:
           sarif_file: results.sarif
 
+  codeql:
+    name: CodeQL (${{ matrix.language }})
+    # Same as osv-scanner: fork PRs get a read-only token that cannot upload
+    # SARIF, so run on pushes, the weekly schedule, and manual runs.
+    if: github.event_name != 'pull_request'
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 60
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { language: swift, build-mode: manual, runner: macos-26 }
+          - { language: python, build-mode: none, runner: ubuntu-latest }
+          - { language: actions, build-mode: none, runner: ubuntu-latest }
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Xcode
+        if: matrix.language == 'swift'
+        uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
+        with:
+          xcode-version: latest-stable
+
+      - name: Cache SPM dependencies
+        if: matrix.language == 'swift'
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/Library/Developer/Xcode/DerivedData/*/SourcePackages
+          key: ${{ runner.os }}-codeql-spm-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: ${{ runner.os }}-codeql-spm-
+
+      # Resolving outside the tracer keeps the ~9 minute package fetch out of it.
+      - name: Resolve packages
+        if: matrix.language == 'swift'
+        run: xcodebuild -resolvePackageDependencies -project Whisky.xcodeproj -scheme Whisky
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: ${{ matrix.build-mode }}
+
+      # One architecture is enough to read the source; SwiftLint skips itself
+      # under CI, and signing and the index store are not needed for the analysis.
+      - name: Build
+        if: matrix.language == 'swift'
+        run: |
+          for scheme in Whisky WhiskyCmd WhiskyThumbnail; do
+            xcodebuild -project Whisky.xcodeproj -scheme "$scheme" \
+              -configuration Debug -disableAutomaticPackageResolution build \
+              ARCHS=arm64 ONLY_ACTIVE_ARCH=YES COMPILER_INDEX_STORE_ENABLE=NO \
+              CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+          done
+
+      - name: Analyze
+        uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4.39.3
+        with:
+          category: /language:${{ matrix.language }}
+
   runtime-config:
     name: Runtime config
     runs-on: ubuntu-latest
