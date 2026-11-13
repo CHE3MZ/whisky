@@ -28,3 +28,9 @@ sources:
     release: "v0.80"
     asset: "dxmt-v0.80-builtin.tar.gz"
     sha256: "8f260e36b5739e68f3bad613381441385c4dc7b85b78ba8de653d5a6a264529d"
+
+  - name: "Sparkle Updater"
+    id: "SPARKLE"
+    link: "https://github.com/sparkle-project/Sparkle"
+    commit: null
+    release: "2.10.1"
