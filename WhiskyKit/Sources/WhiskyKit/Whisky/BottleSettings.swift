@@ -543,8 +543,9 @@ public struct BottleSettings: Codable, Equatable {
 
     /// Locale override for launcher compatibility.
     ///
-    /// Steam and other Chromium-based launchers require `en_US.UTF-8`
-    /// to avoid steamwebhelper crashes (whisky-app/whisky#946, #1224, #1241).
+    /// Auto keeps the launcher preset's locale (US English for EA App, Epic
+    /// Games, Battle.net, and Rockstar) or the Mac's when the preset sets none,
+    /// as Steam's does (#330). Any other choice wins over the preset.
     public var launcherLocale: Locales {
         get { launcherConfig.launcherLocale }
         set { launcherConfig.launcherLocale = newValue }
@@ -599,6 +600,12 @@ public struct BottleSettings: Codable, Equatable {
     public var launcherBackendResetNotice: Bool {
         get { launcherConfig.backendResetNotice }
         set { launcherConfig.backendResetNotice = newValue }
+    }
+
+    /// The last ``LauncherLocaleMigration`` this bottle has been through.
+    var launcherLocaleMigration: Int {
+        get { launcherConfig.localeMigration }
+        set { launcherConfig.localeMigration = newValue }
     }
 
     /// Whether a launcher profile, not the user, switched this bottle from
@@ -983,7 +990,7 @@ public struct BottleSettings: Codable, Equatable {
     ///
     /// This method implements the dual-mode launcher compatibility system in this fork:
     /// - Merges launcher-specific environment overrides
-    /// - Applies locale fixes for steamwebhelper crashes
+    /// - Applies the bottle's explicit Locale Override over any preset locale
     /// - Configures GPU spoofing for launcher checks
     /// - Sets network timeouts for download reliability
     ///
@@ -1001,16 +1008,11 @@ public struct BottleSettings: Codable, Equatable {
 
         guard launcherCompatibilityMode else { return launcherDLLOverrides }
 
-        // Track whether the launcher preset provides a locale
-        var launcherProvidesLocale = false
-
         // Apply launcher-specific environment overrides if launcher detected
         if let launcher = detectedLauncher {
-            let fixDetails = launcher.fixDetails()
-            for detail in fixDetails {
+            for detail in launcher.fixDetails() {
                 builder.set(detail.key, detail.value, layer: .launcherManaged, reason: detail.reason)
             }
-            launcherProvidesLocale = fixDetails.contains { $0.key == "LC_ALL" }
 
             // Auto-enable DXVK DLL overrides if launcher requires it
             if autoEnableDXVK, launcher.requiresDXVK {
@@ -1020,18 +1022,22 @@ public struct BottleSettings: Codable, Equatable {
             }
         }
 
-        // Apply locale override if specified (not using launcher default)
-        // Defensive: Also check rawValue is not empty to prevent setting LC_ALL/LANG to ""
-        // Only apply if launcher preset didn't already set LC_ALL (preserves launcher optimization)
-        if launcherLocale != .auto, !launcherLocale.rawValue.isEmpty, !launcherProvidesLocale {
-            builder.set("LC_ALL", launcherLocale.rawValue, layer: .launcherManaged)
-            builder.set("LANG", launcherLocale.rawValue, layer: .launcherManaged)
+        // An explicit Locale Override replaces the preset's locale. Some presets
+        // set LC_ALL to en_US for the launchers' web views, but every game a
+        // launcher starts inherits it, and a game that takes its region or
+        // language from the Windows locale needs the user's choice (#330).
+        // Auto keeps the preset's value, or the Mac's when there is none.
+        // The rawValue check keeps LC_ALL/LANG from ever being set to "".
+        if launcherLocale != .auto, !launcherLocale.rawValue.isEmpty {
+            // The reason replaces the preset's, which would otherwise stay
+            // attached to the overridden value in provenance.
+            let reason = "Set by the bottle's Locale Override"
+            builder.set("LC_ALL", launcherLocale.rawValue, layer: .launcherManaged, reason: reason)
+            builder.set("LANG", launcherLocale.rawValue, layer: .launcherManaged, reason: reason)
             // Force C locale for date/time parsing to avoid ICU issues
             builder.set("LC_TIME", "C", layer: .launcherManaged)
             builder.set("LC_NUMERIC", "C", layer: .launcherManaged)
         }
-        // Note: If launcher preset already set LC_ALL (e.g., Steam sets "en_US.UTF-8"),
-        // we don't overwrite it. This preserves launcher-optimized locale strings.
 
         // Apply GPU spoofing if enabled
         if gpuSpoofing {

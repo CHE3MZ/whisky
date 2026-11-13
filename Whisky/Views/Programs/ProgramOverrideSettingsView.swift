@@ -144,14 +144,14 @@ struct ProgramOverrideSettingsView: View {
     // MARK: - Audio Troubleshooting Section
 
     private var audioTroubleshootingSection: some View {
-        Section("Audio") {
+        Section("config.title.audio") {
             Button("Troubleshoot Audio\u{2026}") {
                 NotificationCenter.default.post(
                     name: .openAudioTroubleshooting,
                     object: nil
                 )
             }
-            .help("Open audio diagnostics and troubleshooting for this bottle")
+            .help("program.overrides.audio.troubleshoot.help")
         }
     }
 
@@ -289,16 +289,23 @@ struct ProgramOverrideSettingsView: View {
                     Toggle("config.metal4", isOn: metal4Binding)
                 }
 
+                // Not gated on the backend: the Metal HUD is Apple's, and it
+                // draws over DXVK titles too. The bottle value covers every
+                // process in the prefix, launcher windows included, so this is
+                // how one title gets the HUD to itself.
+                Toggle("config.metalHud", isOn: metalHudBinding)
+
                 // "Takes effect next launch" note
                 Text("config.graphics.nextLaunch")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             } else {
+                // Resolved, or a bottle on Recommended reports "Recommended".
+                let backendName = resolvedBottleBackend.displayName
+                let asyncState = onOff(bottle.settings.dxvkAsync)
+                let hudState = hudDescription(bottle.settings.dxvkHud)
                 inheritedSummary(
-                    // Resolved, or a bottle on Recommended reports "Recommended".
-                    "\(resolvedBottleBackend.displayName), "
-                        + "DXVK Async \(bottle.settings.dxvkAsync ? "On" : "Off"), "
-                        + "HUD \(hudDescription(bottle.settings.dxvkHud))"
+                    String(localized: "program.overrides.graphics.summary \(backendName) \(asyncState) \(hudState)")
                 )
             }
         }
@@ -346,7 +353,11 @@ struct ProgramOverrideSettingsView: View {
             if hasPerformanceOverride {
                 performanceControls
             } else {
-                inheritedSummary("Shader Cache \(bottle.settings.shaderCacheEnabled ? "On" : "Off")")
+                inheritedSummary(
+                    String(
+                        localized: "program.overrides.performance.summary \(onOff(bottle.settings.shaderCacheEnabled))"
+                    )
+                )
             }
         }
     }
@@ -366,9 +377,10 @@ struct ProgramOverrideSettingsView: View {
             if hasInputOverride {
                 inputControls
             } else {
+                let compatState = onOff(bottle.settings.controllerCompatibilityMode)
+                let labelsState = onOff(bottle.settings.useButtonLabels)
                 inheritedSummary(
-                    "Controller Compat \(bottle.settings.controllerCompatibilityMode ? "On" : "Off"), "
-                        + "Native Labels \(bottle.settings.useButtonLabels ? "On" : "Off")"
+                    String(localized: "program.overrides.input.summary \(compatState) \(labelsState)")
                 )
             }
         }
@@ -401,7 +413,7 @@ struct ProgramOverrideSettingsView: View {
                             ? "\(bottle.settings.customResolutionWidth)x\(bottle.settings.customResolutionHeight)"
                             : String(localized: "config.virtualDesktop.matchDisplay.label"))
                     inheritedSummary(
-                        String(localized: "program.overrides.display.enabled") + " " + resText
+                        String(localized: "program.overrides.display.enabledSummary \(resText)")
                     )
                 } else {
                     inheritedSummary(String(localized: "config.virtualDesktop.off"))
@@ -461,8 +473,10 @@ struct ProgramOverrideSettingsView: View {
                 )
             } else {
                 inheritedSummary(
-                    "\(bottle.settings.dllOverrides.count) "
-                        + String(localized: "program.overrides.dll.customCount")
+                    String(
+                        format: String(localized: "program.overrides.dll.customCount"),
+                        bottle.settings.dllOverrides.count
+                    )
                 )
             }
         }
@@ -625,12 +639,14 @@ struct ProgramOverrideSettingsView: View {
                     program.settings.overrides?.dxvkAsync = bottle.settings.dxvkAsync
                     program.settings.overrides?.dxvkHud = bottle.settings.dxvkHud
                     program.settings.overrides?.metal4Enabled = bottle.settings.metal4Enabled
+                    program.settings.overrides?.metalHud = bottle.settings.metalHud
                 } else {
                     program.settings.overrides?.graphicsBackend = nil
                     program.settings.overrides?.dxvk = nil
                     program.settings.overrides?.dxvkAsync = nil
                     program.settings.overrides?.dxvkHud = nil
                     program.settings.overrides?.metal4Enabled = nil
+                    program.settings.overrides?.metalHud = nil
                 }
             }
         )
@@ -741,6 +757,13 @@ struct ProgramOverrideSettingsView: View {
         Binding(
             get: { program.settings.overrides?.metal4Enabled ?? bottle.settings.metal4Enabled },
             set: { program.settings.overrides?.metal4Enabled = $0 }
+        )
+    }
+
+    private var metalHudBinding: Binding<Bool> {
+        Binding(
+            get: { program.settings.overrides?.metalHud ?? bottle.settings.metalHud },
+            set: { program.settings.overrides?.metalHud = $0 }
         )
     }
 
@@ -866,19 +889,26 @@ struct ProgramOverrideSettingsView: View {
 
     private func hudDescription(_ hud: DXVKHUD) -> String {
         switch hud {
-        case .full: "Full"
-        case .partial: "Partial"
-        case .fps: "FPS"
-        case .off: "Off"
+        case .full: String(localized: "config.dxvkHud.full")
+        case .partial: String(localized: "config.dxvkHud.partial")
+        case .fps: String(localized: "config.dxvkHud.fps")
+        case .off: String(localized: "config.dxvkHud.off")
         }
     }
 
     private func syncDescription(_ sync: EnhancedSync) -> String {
         switch sync {
-        case .none: "None"
-        case .esync: "ESync"
-        case .msync: "MSync"
+        case .none: String(localized: "config.enhancedSync.none")
+        case .esync: String(localized: "config.enhancedSync.esync")
+        case .msync: String(localized: "config.enhancedSync.msync")
         }
+    }
+
+    /// "On" or "Off" for a bottle setting shown in an inherited summary.
+    private func onOff(_ value: Bool) -> String {
+        value
+            ? String(localized: "config.retinaMode.on")
+            : String(localized: "config.retinaMode.off")
     }
 }
 

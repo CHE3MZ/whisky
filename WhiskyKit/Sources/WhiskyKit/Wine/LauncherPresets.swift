@@ -35,6 +35,24 @@ public enum FixCategory: String, Codable, CaseIterable, Sendable {
     case threading
     /// General compatibility workarounds
     case compatibility
+
+    /// Localized name of the category for display in the UI.
+    public var displayName: String {
+        switch self {
+        case .locale:
+            String(localized: "locale.title")
+        case .sandbox:
+            String(localized: "launcher.fixCategory.sandbox")
+        case .graphics:
+            String(localized: "config.title.graphics")
+        case .network:
+            String(localized: "launcher.fixCategory.network")
+        case .threading:
+            String(localized: "launcher.fixCategory.threading")
+        case .compatibility:
+            String(localized: "launcher.fixCategory.compatibility")
+        }
+    }
 }
 
 /// Structured metadata for a single launcher-specific environment variable fix.
@@ -148,7 +166,7 @@ public enum LauncherType: String, Codable, CaseIterable, Sendable, Identifiable 
     /// Returns optimized environment variables for this launcher.
     ///
     /// These overrides address specific compatibility issues:
-    /// - **Steam**: Fixes steamwebhelper crashes (whisky-app/whisky#946, #1224, #1241) via locale and CEF sandbox
+    /// - **Steam**: Fixes steamwebhelper crashes by disabling its CEF sandbox
     /// - **Rockstar**: Requires DXVK for logo rendering (whisky-app/whisky#1335, #835)
     /// - **EA App/Epic**: Chromium-based, need sandbox and locale fixes
     /// - **Ubisoft**: DXVK async for Anno 1800 and other Ubisoft games (whisky-app/whisky#1004)
@@ -162,14 +180,10 @@ public enum LauncherType: String, Codable, CaseIterable, Sendable, Identifiable 
 
         switch self {
         case .steam:
-            // Steam-specific fixes for steamwebhelper crashes
-            // (whisky-app/whisky#946, #1224, #1241)
-            // The Chromium Embedded Framework in Steam requires specific locale
-            env["LC_ALL"] = "en_US.UTF-8"
-            env["LANG"] = "en_US.UTF-8"
-            // Force C locale for numeric/time to avoid ICU parsing errors
-            env["LC_TIME"] = "C"
-            env["LC_NUMERIC"] = "C"
+            // No locale: steamwebhelper starts and signs in under German and
+            // Japanese on both the stable and the beta engines, so Auto leaves
+            // the locale of Steam and its games to the Mac (#330). Steam's own
+            // interface language is its setting, picked from the locale on install.
 
             // Note: CEF_DISABLE_SANDBOX is set globally in MacOSCompatibility.swift
             // for all launchers. We only set Steam-specific variant here.
@@ -308,34 +322,35 @@ public enum LauncherType: String, Codable, CaseIterable, Sendable, Identifiable 
 
     /// The recommended locale for this launcher.
     ///
-    /// Most launchers work best with US English locale to avoid
-    /// date/time parsing issues in embedded web views.
+    /// EA App, Epic Games, and Battle.net keep US English for their embedded
+    /// web views. Steam needs none: its web helper runs under other locales
+    /// (#330).
     public var recommendedLocale: Locales {
         switch self {
-        case .steam, .eaApp, .epicGames, .battleNet:
+        case .eaApp, .epicGames, .battleNet:
             .english
         default:
             .auto
         }
     }
 
-    /// User-friendly description of common issues this preset fixes.
+    /// Localized description of common issues this preset fixes, for display in the UI.
     public var fixesDescription: String {
         switch self {
         case .steam:
-            "Fixes steamwebhelper crashes, download stalls, and connection issues"
+            String(localized: "launcher.fixes.description.steam")
         case .rockstar:
-            "Fixes logo freeze and launcher initialization failures"
+            String(localized: "launcher.fixes.description.rockstar")
         case .eaApp:
-            "Fixes black screen and GPU detection errors"
+            String(localized: "launcher.fixes.description.eaApp")
         case .epicGames:
-            "Fixes launcher UI rendering and web view issues"
+            String(localized: "launcher.fixes.description.epicGames")
         case .ubisoft:
-            "Improves launcher stability and game compatibility"
+            String(localized: "launcher.fixes.description.ubisoft")
         case .battleNet:
-            "Fixes authentication and launcher rendering issues"
+            String(localized: "launcher.fixes.description.battleNet")
         case .paradox:
-            "No launcher-specific fixes needed"
+            String(localized: "launcher.fixes.description.paradox")
         }
     }
 }

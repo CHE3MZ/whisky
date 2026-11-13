@@ -22,9 +22,25 @@ import Foundation
 /// A single setting change to be applied, shown in the preview diff.
 ///
 /// Groups changes by category (Graphics, Performance, DLL Overrides, etc.)
-/// with before/after values and an impact indicator.
+/// with before/after values and an impact indicator. The text fields are
+/// localized for display; match on ``kind`` instead of comparing them.
 public struct ConfigChange: Sendable, Equatable {
-    /// The category of the setting (e.g., "Graphics", "Performance").
+    /// What a change sets, independent of the display language.
+    public enum Kind: String, Sendable {
+        case graphicsBackend
+        case dxvk
+        case dxvkAsync
+        case enhancedSync
+        case shaderCache
+        case avx
+        case dllOverride
+        case environmentVariable
+        case winetricksVerb
+    }
+
+    /// What this change sets.
+    public let kind: Kind
+    /// The localized category of the setting (e.g., "Graphics", "Performance").
     public let category: String
     /// The display name of the setting.
     public let settingName: String
@@ -36,12 +52,14 @@ public struct ConfigChange: Sendable, Equatable {
     public let isHighImpact: Bool
 
     public init(
+        kind: Kind,
         category: String,
         settingName: String,
         currentValue: String,
         newValue: String,
         isHighImpact: Bool = false
     ) {
+        self.kind = kind
         self.category = category
         self.settingName = settingName
         self.currentValue = currentValue
@@ -91,6 +109,8 @@ public enum GameConfigApplicator {
     ///   - variant: The specific variant to apply.
     ///   - bottle: The target bottle whose settings will be mutated.
     ///   - programURL: Optional program URL for program-level settings snapshot.
+    ///   - isBackendAvailable: Whether this machine can run a backend; see
+    ///     ``effectiveBackend(_:isBackendAvailable:)``. Defaults to the installed runtime.
     /// - Returns: The snapshot created before applying changes.
     /// - Throws: An error if the snapshot cannot be encoded or saved.
     @MainActor
@@ -98,7 +118,8 @@ public enum GameConfigApplicator {
         entry: GameDBEntry,
         variant: GameConfigVariant,
         to bottle: Bottle,
-        programURL: URL? = nil
+        programURL: URL? = nil,
+        isBackendAvailable: (GraphicsBackend) -> Bool = WhiskyWineInstaller.isBackendAvailable
     ) throws -> GameConfigSnapshot {
         // 1. Snapshot current state
         let encoder = PropertyListEncoder()
@@ -125,7 +146,7 @@ public enum GameConfigApplicator {
         }
 
         // 3. Apply variant settings to bottle
-        applyVariantSettings(variant.settings, to: bottle)
+        applyVariantSettings(variant.settings, to: bottle, isBackendAvailable: isBackendAvailable)
 
         // 4. Apply DLL overrides (deduplicate by DLL name, prefer variant value)
         if let overrides = variant.dllOverrides, !overrides.isEmpty {
@@ -207,20 +228,30 @@ public enum GameConfigApplicator {
     /// - Parameters:
     ///   - variant: The variant to preview.
     ///   - bottle: The bottle whose current settings are compared.
+    ///   - isBackendAvailable: Whether this machine can run a backend, so the
+    ///     preview shows the backend ``apply(entry:variant:to:programURL:isBackendAvailable:)``
+    ///     will actually set. Defaults to the installed runtime.
     /// - Returns: An array of changes, with high-impact changes flagged.
     @MainActor
     public static func previewChanges(
         variant: GameConfigVariant,
-        bottle: Bottle
+        bottle: Bottle,
+        isBackendAvailable: (GraphicsBackend) -> Bool = WhiskyWineInstaller.isBackendAvailable
     ) -> [ConfigChange] {
         var changes: [ConfigChange] = []
         let settings = variant.settings
+        let graphics = String(localized: "gameConfig.detail.graphics")
+        let performance = String(localized: "gameConfig.detail.performance")
+        let notSet = String(localized: "gameConfig.preview.value.notSet")
 
         // Graphics settings
-        if let backend = settings.graphicsBackend, backend != bottle.settings.graphicsBackend {
+        if let wanted = settings.graphicsBackend,
+           case let backend = effectiveBackend(wanted, isBackendAvailable: isBackendAvailable),
+           backend != bottle.settings.graphicsBackend {
             changes.append(ConfigChange(
-                category: "Graphics",
-                settingName: "Graphics Backend",
+                kind: .graphicsBackend,
+                category: graphics,
+                settingName: String(localized: "config.graphics.backend"),
                 currentValue: bottle.settings.graphicsBackend.displayName,
                 newValue: backend.displayName,
                 isHighImpact: true
@@ -229,28 +260,31 @@ public enum GameConfigApplicator {
 
         if settings.graphicsBackend == nil, let dxvk = settings.dxvk, dxvk != bottle.settings.dxvk {
             changes.append(ConfigChange(
-                category: "Graphics",
+                kind: .dxvk,
+                category: graphics,
                 settingName: "DXVK",
-                currentValue: bottle.settings.dxvk ? "Enabled" : "Disabled",
-                newValue: dxvk ? "Enabled" : "Disabled",
+                currentValue: describeEnabled(bottle.settings.dxvk),
+                newValue: describeEnabled(dxvk),
                 isHighImpact: true
             ))
         }
 
         if let dxvkAsync = settings.dxvkAsync, dxvkAsync != bottle.settings.dxvkAsync {
             changes.append(ConfigChange(
-                category: "Graphics",
-                settingName: "DXVK Async",
-                currentValue: bottle.settings.dxvkAsync ? "Enabled" : "Disabled",
-                newValue: dxvkAsync ? "Enabled" : "Disabled"
+                kind: .dxvkAsync,
+                category: graphics,
+                settingName: String(localized: "config.dxvk.async"),
+                currentValue: describeEnabled(bottle.settings.dxvkAsync),
+                newValue: describeEnabled(dxvkAsync)
             ))
         }
 
         // Performance settings
         if let enhancedSync = settings.enhancedSync, enhancedSync != bottle.settings.enhancedSync {
             changes.append(ConfigChange(
-                category: "Performance",
-                settingName: "Enhanced Sync",
+                kind: .enhancedSync,
+                category: performance,
+                settingName: String(localized: "config.enhancedSync"),
                 currentValue: describeEnhancedSync(bottle.settings.enhancedSync),
                 newValue: describeEnhancedSync(enhancedSync)
             ))
@@ -258,19 +292,21 @@ public enum GameConfigApplicator {
 
         if let shaderCache = settings.shaderCacheEnabled, shaderCache != bottle.settings.shaderCacheEnabled {
             changes.append(ConfigChange(
-                category: "Performance",
-                settingName: "Shader Cache",
-                currentValue: bottle.settings.shaderCacheEnabled ? "Enabled" : "Disabled",
-                newValue: shaderCache ? "Enabled" : "Disabled"
+                kind: .shaderCache,
+                category: performance,
+                settingName: String(localized: "config.shaderCache"),
+                currentValue: describeEnabled(bottle.settings.shaderCacheEnabled),
+                newValue: describeEnabled(shaderCache)
             ))
         }
 
         if let avx = settings.avxEnabled, avx != bottle.settings.avxEnabled {
             changes.append(ConfigChange(
-                category: "Performance",
-                settingName: "AVX Support",
-                currentValue: bottle.settings.avxEnabled ? "Enabled" : "Disabled",
-                newValue: avx ? "Enabled" : "Disabled"
+                kind: .avx,
+                category: performance,
+                settingName: String(localized: "gameConfig.preview.setting.avx"),
+                currentValue: describeEnabled(bottle.settings.avxEnabled),
+                newValue: describeEnabled(avx)
             ))
         }
 
@@ -282,9 +318,10 @@ public enum GameConfigApplicator {
 
             for override in newOverrides {
                 changes.append(ConfigChange(
-                    category: "DLL Overrides",
+                    kind: .dllOverride,
+                    category: String(localized: "gameConfig.detail.dllOverrides"),
                     settingName: override.dllName,
-                    currentValue: "(not set)",
+                    currentValue: notSet,
                     newValue: override.mode.displayName,
                     isHighImpact: true
                 ))
@@ -296,7 +333,8 @@ public enum GameConfigApplicator {
                    }),
                    existing.mode != override.mode {
                     changes.append(ConfigChange(
-                        category: "DLL Overrides",
+                        kind: .dllOverride,
+                        category: String(localized: "gameConfig.detail.dllOverrides"),
                         settingName: override.dllName,
                         currentValue: existing.mode.displayName,
                         newValue: override.mode.displayName,
@@ -310,9 +348,10 @@ public enum GameConfigApplicator {
         if let envVars = variant.environmentVariables, !envVars.isEmpty {
             for (key, value) in envVars.sorted(by: { $0.key < $1.key }) {
                 changes.append(ConfigChange(
-                    category: "Environment Variables",
+                    kind: .environmentVariable,
+                    category: String(localized: "program.env"),
                     settingName: key,
-                    currentValue: "(not set)",
+                    currentValue: notSet,
                     newValue: value
                 ))
             }
@@ -322,10 +361,11 @@ public enum GameConfigApplicator {
         if let verbs = variant.winetricksVerbs, !verbs.isEmpty {
             for verb in verbs {
                 changes.append(ConfigChange(
-                    category: "Winetricks",
+                    kind: .winetricksVerb,
+                    category: String(localized: "gameConfig.detail.winetricks"),
                     settingName: verb,
-                    currentValue: "(not installed)",
-                    newValue: "Will be installed"
+                    currentValue: String(localized: "gameConfig.preview.value.notInstalled"),
+                    newValue: String(localized: "gameConfig.preview.value.willInstall")
                 ))
             }
         }
@@ -335,17 +375,45 @@ public enum GameConfigApplicator {
 
     // swiftlint:enable cyclomatic_complexity function_body_length
 
+    // MARK: - Backend Availability
+
+    /// The backend a variant's `graphicsBackend` puts the bottle on.
+    ///
+    /// A backend this machine can't run becomes ``GraphicsBackend/recommended``:
+    /// D3DMetal without the GPTK payload, or DXMT without the runtime's native
+    /// payload. Set as written, such a bottle falls back to WineD3D at launch,
+    /// which can't bring up D3D11 on current macOS (#146). Recommended resolves to
+    /// the best backend that is installed, which is D3DMetal itself whenever its
+    /// payload is present.
+    ///
+    /// - Parameters:
+    ///   - backend: The backend the variant asks for.
+    ///   - isBackendAvailable: Whether this machine can run a backend.
+    /// - Returns: `backend`, or `.recommended` when it isn't available.
+    public static func effectiveBackend(
+        _ backend: GraphicsBackend,
+        isBackendAvailable: (GraphicsBackend) -> Bool = WhiskyWineInstaller.isBackendAvailable
+    ) -> GraphicsBackend {
+        isBackendAvailable(backend) ? backend : .recommended
+    }
+
     // MARK: - Private Helpers
 
     /// Applies variant settings to the bottle's settings.
     @MainActor
-    private static func applyVariantSettings(_ settings: GameConfigVariantSettings, to bottle: Bottle) {
+    private static func applyVariantSettings(
+        _ settings: GameConfigVariantSettings,
+        to bottle: Bottle,
+        isBackendAvailable: (GraphicsBackend) -> Bool
+    ) {
         // `dxvk` is the legacy backend switch: its setter maps `false` back to
         // Recommended, so applying it after an explicit backend undid the
         // backend. An explicit backend wins; `dxvk` only speaks when there is
         // none.
         if let graphicsBackend = settings.graphicsBackend {
-            bottle.settings.graphicsBackend = graphicsBackend
+            bottle.settings.graphicsBackend = effectiveBackend(
+                graphicsBackend, isBackendAvailable: isBackendAvailable
+            )
         } else if let dxvk = settings.dxvk {
             bottle.settings.dxvk = dxvk
         }
@@ -390,16 +458,21 @@ public enum GameConfigApplicator {
         bottle.settings.dllOverrides = updatedOverrides
     }
 
-    /// Returns a human-readable description of an EnhancedSync value.
+    /// Returns a localized description of an EnhancedSync value.
     private static func describeEnhancedSync(_ sync: EnhancedSync) -> String {
         switch sync {
         case .none:
-            "None"
+            String(localized: "config.enhancedSync.none")
         case .esync:
-            "ESync"
+            String(localized: "config.enhancedSync.esync")
         case .msync:
-            "MSync"
+            String(localized: "config.enhancedSync.msync")
         }
+    }
+
+    /// Returns a localized description of an on/off setting.
+    private static func describeEnabled(_ isEnabled: Bool) -> String {
+        isEnabled ? String(localized: "config.retinaMode.on") : String(localized: "config.retinaMode.off")
     }
 }
 

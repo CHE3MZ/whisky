@@ -28,10 +28,10 @@ env:
 jobs:
   build-docs:
     name: Build Documentation
-    # macos-15, same as CI: latest-stable Xcode on macos-14 is a generation
+    # macos-26, same as CI: latest-stable Xcode on macos-14 is a generation
     # older, and its SDK predates Sendable annotations the kit now relies on
     # (NSImage in IconCache), so the docs build fails where CI passes.
-    runs-on: macos-15
+    runs-on: macos-26
     timeout-minutes: 45
     steps:
       - name: Checkout

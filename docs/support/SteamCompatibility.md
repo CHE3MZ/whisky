@@ -1,10 +1,9 @@
 # Steam Compatibility Guide
 
-**Feature:** Launcher Compatibility System
+**Feature:** Launcher Compatibility System (frankea/Whisky#41)
 **Last Updated:** January 12, 2026
 
-!!! note "Upstream issue references"
-    This documentation references issue numbers from the original upstream project (whisky-app/whisky). Upstream references are kept for historical context. Please report new issues to [this fork](https://github.com/CHE3MZ/whisky/issues).
+> **Note:** This documentation references issue numbers from both this fork (frankea/Whisky) and the original upstream project (whisky-app/whisky). Upstream references are kept for historical context. Please report new issues to [frankea/Whisky](https://github.com/frankea/Whisky/issues).
 
 ---
 
@@ -80,11 +79,13 @@ Steam is the most widely used game launcher in Whisky, but also has the most com
 
 2. **Check Critical Settings:**
    ```
-   LC_ALL = en_US.UTF-8          ✅ (prevents steamwebhelper crash)
    STEAM_DISABLE_CEF_SANDBOX = 1  ✅ (Wine compatibility)
    STEAM_RUNTIME = 0              ✅ (Wine compatibility)
    DXVK_ASYNC = 1                 ✅ (UI performance)
    ```
+   The Steam preset sets no locale. With Locale Override on **Auto**, no
+   `LC_ALL`/`LANG` appears, and Steam and its games get your Mac's language
+   and region.
 
 3. **Look for Warnings:**
    - ✅ "Configuration is optimal" → Good to go!
@@ -105,36 +106,35 @@ Steam is the most widely used game launcher in Whisky, but also has the most com
 - Steam UI completely unusable
 
 #### Root Cause:
-Steam's Chromium Embedded Framework (CEF) crashes when:
-- Locale doesn't specify UTF-8 encoding
-- ICU (International Components for Unicode) fails to initialize
-- Date/time parsing encounters unexpected format
+Steam's Chromium Embedded Framework (CEF) web helper can fail under Wine.
+Launcher Compatibility applies Steam-specific fixes such as disabling the CEF
+sandbox.
 
 #### Solution:
 
-**Critical Fix - Locale:**
 1. Config → Launcher Compatibility → Enable
-2. Locale Override → **English**
-3. Generate diagnostics → Verify `LC_ALL=en_US.UTF-8`
+2. Generate diagnostics → Verify `STEAM_DISABLE_CEF_SANDBOX=1`
 
-**Important:** The `.UTF-8` suffix is CRITICAL. `en_US` alone will still crash!
-
-#### Verification:
-```
-✅ LC_ALL=en_US.UTF-8 (correct)
-❌ LC_ALL=en_US (missing .UTF-8 - will crash!)
-```
+**Locale:** Earlier versions forced `LC_ALL=en_US.UTF-8` for Steam to avoid
+this crash. That crash did not reproduce in current testing: steamwebhelper
+started and the login page loaded under German and Japanese locales on both
+the stable and beta engines, the same as under English. The Steam preset now
+sets no locale. Leave Locale Override on **Auto** to give Steam and the games
+it starts your Mac's language and region, or pick another locale there.
+Steam's own interface language is a Steam setting (Steam > Settings >
+Interface). Bottles that older versions of Whisky set to English are put back
+on Auto once. If Steam's window fails to load under your locale, set Locale
+Override to English (en_US) and please report it.
 
 #### If Still Crashes:
 1. Delete Steam installation
 2. Recreate bottle with compatibility mode enabled FIRST
 3. Install Steam fresh
-4. Verify locale before first launch
 
 **Related Issues:**
 - whisky-app/whisky#946 (Primary issue - 30+ comments)
 - whisky-app/whisky#1224 (UI unusable)
-- whisky-app/whisky#1241 (Locale fix discovery)
+- whisky-app/whisky#1241 (Earlier locale workaround)
 
 ---
 
@@ -271,7 +271,7 @@ DXVK provides better GPU acceleration for Steam's UI rendering, reducing stutter
 
 **If Still Invisible:**
 - Delete Steam, reinstall fresh
-- Check ~/Library/Logs/Whisky/ for errors
+- Check ~/Library/Logs/com.franke.Whisky/ for errors
 
 **Related Issues:**
 - whisky-app/whisky#1183 (No UI)
@@ -405,7 +405,7 @@ For specific games launched through Steam:
 Before reporting Steam issues, verify:
 
 - [ ] Launcher Compatibility Mode enabled
-- [ ] Locale set to English (en_US.UTF-8)
+- [ ] Locale Override on Auto (or the language you want Steam in)
 - [ ] DXVK enabled
 - [ ] Network timeout at least 90 seconds
 - [ ] Sequoia Compat Mode (macOS 15+)
@@ -532,15 +532,17 @@ Before reporting Steam issues, verify:
 - https://help.steampowered.com/
 
 ### Whisky Resources:
-- Issue Tracking: https://github.com/CHE3MZ/whisky/issues
+- Issue Tracking: frankea/Whisky#41
 - Troubleshooting: [LauncherTroubleshooting.md](LauncherTroubleshooting.md)
+- Security Notes: [LauncherSecurityNotes.md](LauncherSecurityNotes.md)
 
 ### Community:
-- Upstream: https://github.com/whisky-app/whisky
+- GitHub Discussions: frankea/Whisky
+- Upstream: whisky-app/whisky
 
 ---
 
-## What users report
+## Success Stories
 
 ### What Users Report Working:
 
@@ -559,7 +561,7 @@ Before reporting Steam issues, verify:
 **Game Launches:**
 - ✅ Indie/2D games: Excellent
 - ✅ AA/AAA games (DX9-11): Good-Excellent
-- ⚠️ Modern AAA (DX12): Variable
+- ⚠️ Cutting-edge AAA (DX12): Variable
 - ⚠️ Competitive multiplayer: Anti-cheat dependent
 
 ---
@@ -632,7 +634,7 @@ Windows Version: Windows 10
 ```
 Mode: Enabled
 Detection: Automatic
-Locale: English (en_US.UTF-8)
+Locale: Auto (your Mac's language and region)
 GPU Spoofing: Enabled (NVIDIA)
 Network Timeout: 90 seconds
 DXVK for Rockstar: Yes
@@ -750,8 +752,21 @@ Based on upstream issue resolution:
 
 ---
 
-## Related pages
+## Conclusion
 
-- [Launcher troubleshooting](LauncherTroubleshooting.md)
-- [Launcher security notes](LauncherSecurityNotes.md)
-- [Report an issue](https://github.com/CHE3MZ/whisky/issues)
+Steam on Whisky with Launcher Compatibility Mode provides:
+- ✅ Reliable steam client operation
+- ✅ Stable downloads
+- ✅ Good game compatibility
+- ✅ Easy setup and maintenance
+
+The launcher compatibility system addresses the majority of Steam issues documented in 50+ upstream issues, making Steam on Whisky a viable gaming platform.
+
+---
+
+**For additional help, see:**
+- [LauncherTroubleshooting.md](LauncherTroubleshooting.md) - All launchers
+- [LauncherSecurityNotes.md](LauncherSecurityNotes.md) - Security info
+- GitHub: frankea/Whisky#41 - Report issues
+
+**Happy gaming on Steam via Whisky!** 🎮

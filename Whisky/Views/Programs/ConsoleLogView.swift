@@ -213,7 +213,7 @@ struct ConsoleLogView: View {
     private var logFooter: some View {
         if !isStillRunning, let exitCode = currentExitCode {
             HStack {
-                Text("console.exited \(exitCode)")
+                Text("console.exited \(Int(exitCode))")
                     .font(.caption)
                     .foregroundStyle(exitCode == 0 ? .green : .red)
                 Spacer()
@@ -275,7 +275,7 @@ struct ConsoleLogView: View {
     }
 
     private func exitCodeBadge(_ exitCode: Int32) -> some View {
-        Text("console.exitCode \(exitCode)")
+        Text("console.exitCode \(Int(exitCode))")
             .font(.caption)
             .padding(.horizontal, 6)
             .padding(.vertical, 2)
@@ -291,18 +291,7 @@ struct ConsoleLogView: View {
 
 extension ConsoleLogView {
     func formattedDuration(_ interval: TimeInterval) -> String {
-        let totalSeconds = Int(interval)
-        let hours = totalSeconds / 3_600
-        let minutes = (totalSeconds % 3_600) / 60
-        let seconds = totalSeconds % 60
-
-        if hours > 0 {
-            return "\(hours)h \(minutes)m"
-        } else if minutes > 0 {
-            return "\(minutes)m \(seconds)s"
-        } else {
-            return "\(seconds)s"
-        }
+        RunDurationFormatting.string(from: interval)
     }
 
     func loadLog() {

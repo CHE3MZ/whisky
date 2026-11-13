@@ -145,8 +145,8 @@ struct WhiskyWineInstallView: View {
             diagnostics.record("Invoking WhiskyWineInstaller.install(from:) in detached task")
             let outcome = await Self.performInstall(tarball: capturedTarURL)
             let isInstalled = outcome.installed
-            if case let .failure(message?) = outcome {
-                diagnostics.record("Install failed: \(message)")
+            if case let .failure(_, diagnosticMessage?) = outcome {
+                diagnostics.record("Install failed: \(diagnosticMessage)")
             }
             let installStatus = isInstalled ? "installed" : "not installed"
             diagnostics.record(
@@ -182,7 +182,7 @@ struct WhiskyWineInstallView: View {
         switch outcome {
         case .success:
             installError = nil
-        case let .failure(message):
+        case let .failure(message, _):
             if let message {
                 installError = String(
                     format: String(localized: "setup.whiskywine.error.installFailed.detail"),
@@ -195,10 +195,11 @@ struct WhiskyWineInstallView: View {
     }
 
     /// Outcome of an install attempt. The failure case carries an optional
-    /// user-facing message.
+    /// user-facing message and the same message in English for the
+    /// diagnostics report.
     private enum InstallOutcome {
         case success
-        case failure(message: String?)
+        case failure(message: String?, diagnosticMessage: String?)
 
         var installed: Bool {
             if case .success = self {
@@ -216,14 +217,16 @@ struct WhiskyWineInstallView: View {
                 try WhiskyWineInstaller.install(from: tarball)
                 guard WhiskyWineInstaller.isWhiskyWineInstalled() else {
                     // Extraction reported success but the runtime isn't usable.
-                    return .failure(message: nil)
+                    return .failure(message: nil, diagnosticMessage: nil)
                 }
                 // The install replaced Libraries, so any deployed GPTK payload
                 // went with it; the store outlives it and redeploys here.
                 GPTKImporter.deployStoredPayloadIfCapable()
                 return .success
             } catch {
-                return .failure(message: error.localizedDescription)
+                // Tar errors have an English form for the diagnostics report.
+                let diagnosticMessage = (error as? TarError)?.diagnosticMessage ?? error.localizedDescription
+                return .failure(message: error.localizedDescription, diagnosticMessage: diagnosticMessage)
             }
         }.value
     }

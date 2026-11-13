@@ -218,14 +218,15 @@ extension LauncherConfigSection {
                 }
             }
             .help("""
-            Steam and Chromium-based launchers require en_US locale \
-            to avoid steamwebhelper crashes
+            Sets the Windows locale for every program in this bottle, including games a launcher starts. \
+            Auto keeps the launcher's default: US English for EA App, Epic Games, Battle.net and Rockstar, \
+            and the Mac's own language and region otherwise.
             """)
 
             if bottle.settings.launcherLocale != .auto {
                 Text("""
-                Forces \(bottle.settings.launcherLocale.pretty()) locale \
-                to fix steamwebhelper crashes
+                Programs in this bottle, the launcher included, use \(bottle.settings.launcherLocale.pretty()). \
+                If the launcher's window stops working, set this back to Auto.
                 """)
                 .font(.caption)
                 .foregroundColor(.secondary)
@@ -315,7 +316,7 @@ private struct ActiveEnvironmentOverrides: View {
     @Binding var isExpanded: Bool
 
     var body: some View {
-        DisclosureGroup("Active Environment Overrides", isExpanded: $isExpanded) {
+        DisclosureGroup("launcher.config.activeOverrides", isExpanded: $isExpanded) {
             VStack(alignment: .leading, spacing: 12) {
                 if let launcher, !launcher.fixDetails().isEmpty {
                     launcherFixesSection(launcher)
@@ -383,14 +384,14 @@ private struct ActiveEnvironmentOverrides: View {
         provenance: String?
     ) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(categoryDisplayName(category))
+            Text(category.displayName)
                 .font(.caption2)
                 .fontWeight(.medium)
                 .foregroundColor(.secondary)
                 .textCase(.uppercase)
 
             ForEach(fixes, id: \.key) { fix in
-                fixRow(key: fix.key, value: fix.value, reason: fix.reason)
+                fixRow(key: fix.key, value: fix.value, reason: fix.localizedReason)
             }
         }
     }
@@ -400,7 +401,7 @@ private struct ActiveEnvironmentOverrides: View {
         fixes: [MacOSFix]
     ) -> some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text(categoryDisplayName(category))
+            Text(category.displayName)
                 .font(.caption2)
                 .fontWeight(.medium)
                 .foregroundColor(.secondary)
@@ -410,7 +411,7 @@ private struct ActiveEnvironmentOverrides: View {
                 fixRow(
                     key: fix.key,
                     value: fix.value,
-                    reason: "Applied because macOS >= \(fix.appliesFrom.description): \(fix.reason)"
+                    reason: platformReason(fix)
                 )
             }
         }
@@ -448,15 +449,14 @@ private struct ActiveEnvironmentOverrides: View {
 
     // MARK: - Helpers
 
-    private func categoryDisplayName(_ category: FixCategory) -> String {
-        switch category {
-        case .locale: "Locale"
-        case .sandbox: "Sandbox"
-        case .graphics: "Graphics"
-        case .network: "Network"
-        case .threading: "Threading"
-        case .compatibility: "Compatibility"
+    /// Why a platform fix is active. Universal fixes carry macOS 0.0.0, which
+    /// reads as nonsense when printed as a minimum version.
+    private func platformReason(_ fix: MacOSFix) -> String {
+        if fix.appliesFrom.major == 0 {
+            return String(localized: "launcher.config.provenance.allVersions \(fix.localizedReason)")
         }
+        let version = fix.appliesFrom.description
+        return String(localized: "launcher.config.provenance.platformReason \(version) \(fix.localizedReason)")
     }
 }
 

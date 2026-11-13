@@ -29,6 +29,7 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 python3 "$SCRIPT_DIR/british-english.py" --check
+python3 "$SCRIPT_DIR/check-placeholder-translations.py"
 
 REQUIREMENTS="$REPO_ROOT/.planning/milestones/v1.0-REQUIREMENTS.md"
 if [ -f "$REQUIREMENTS" ]; then
