@@ -125,6 +125,7 @@ struct AudioConfigSection: View {
         .sheet(item: $wizardPresentation) { presentation in
             AudioTroubleshootingWizardView(
                 engine: presentation.engine,
+                bottle: bottle,
                 onDismiss: {
                     wizardPresentation = nil
                 },

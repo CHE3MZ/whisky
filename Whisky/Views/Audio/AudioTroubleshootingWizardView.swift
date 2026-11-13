@@ -27,6 +27,7 @@ import WhiskyKit
 /// resolved, and escalation.
 struct AudioTroubleshootingWizardView: View {
     @ObservedObject var engine: AudioTroubleshootingEngine
+    @ObservedObject var bottle: Bottle
     var onDismiss: () -> Void
     var onOpenAdvanced: (() -> Void)?
     /// Applies the fix behind a wizard step, given its action id. Returns
@@ -36,6 +37,14 @@ struct AudioTroubleshootingWizardView: View {
     @State private var isApplyingFix = false
     /// Why the last Apply Fix failed; the step stays on screen to retry or skip.
     @State private var fixFailure: String?
+    /// A program-closing fix waiting for the user to confirm it.
+    @State private var pendingFix: PendingFixConfirmation?
+
+    private struct PendingFixConfirmation: Identifiable {
+        let actionId: String
+        let description: String
+        var id: String { actionId }
+    }
 
     var body: some View {
         NavigationStack {
@@ -65,6 +74,18 @@ struct AudioTroubleshootingWizardView: View {
             }
         }
         .frame(minWidth: 500, minHeight: 400)
+        .confirmationDialog(
+            pendingFix?.description ?? "",
+            isPresented: Binding(get: { pendingFix != nil }, set: { if !$0 { pendingFix = nil } }),
+            presenting: pendingFix
+        ) { pending in
+            Button("audio.troubleshoot.applyFix") {
+                Task { @MainActor in await performApplyFix(pending.actionId) }
+            }
+            Button("button.cancel", role: .cancel) {}
+        } message: { _ in
+            Text("audio.fix.closesPrograms")
+        }
     }
 
     // MARK: - Pick Symptom
@@ -297,15 +318,8 @@ extension AudioTroubleshootingWizardView {
             Spacer()
             VStack(spacing: 8) {
                 Button(String(localized: "audio.troubleshoot.applyFix")) {
-                    isApplyingFix = true
-                    fixFailure = nil
                     Task { @MainActor in
-                        fixFailure = await onApplyFix?(actionId)
-                        isApplyingFix = false
-                        // Only a fix that landed moves on to "Did that fix the problem?".
-                        if fixFailure == nil {
-                            engine.applyFix(actionId: actionId)
-                        }
+                        await requestApplyFix(actionId, description: fixDescription)
                     }
                 }
                 .buttonStyle(.borderedProminent).controlSize(.large)
@@ -324,5 +338,27 @@ extension AudioTroubleshootingWizardView {
             .padding(.bottom)
         }
         .padding()
+    }
+
+    /// Applies a fix, first asking for confirmation when it would close the
+    /// bottle's running programs. The same guard the findings list uses.
+    private func requestApplyFix(_ actionId: String, description: String) async {
+        if AudioFixAction(troubleshootingActionId: actionId)?.closesRunningPrograms == true,
+           await Wine.isWineserverRunning(for: bottle) {
+            pendingFix = PendingFixConfirmation(actionId: actionId, description: description)
+        } else {
+            await performApplyFix(actionId)
+        }
+    }
+
+    private func performApplyFix(_ actionId: String) async {
+        isApplyingFix = true
+        fixFailure = nil
+        fixFailure = await onApplyFix?(actionId)
+        isApplyingFix = false
+        // Only a fix that landed moves on to "Did that fix the problem?".
+        if fixFailure == nil {
+            engine.applyFix(actionId: actionId)
+        }
     }
 }
