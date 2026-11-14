@@ -268,6 +268,7 @@ mkdir -p "$DOCC_DIR"
 (
     cd "$PACKAGE_DIR"
     swift package \
+        --scratch-path "$PROJECT_DIR/build/WhiskyKit" \
         --allow-writing-to-directory ../build/docc \
         generate-documentation \
         --target WhiskyKit \

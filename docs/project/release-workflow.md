@@ -68,10 +68,10 @@ base64 -i certificate.p12 | pbcopy
 
 ### Sparkle EdDSA keys
 
-A keypair is needed to sign appcast entries. Sparkle's `generate_keys` tool ships with the Sparkle SPM package; after building Whisky once, find it at:
+A keypair is needed to sign appcast entries. Sparkle's `generate_keys` tool ships with the Sparkle SPM package; after building the app once with `task build` (or `scripts/build.sh`), find it under the repository's `build/` directory:
 
 ```
-~/Library/Developer/Xcode/DerivedData/Whisky-*/SourcePackages/artifacts/sparkle/Sparkle/bin/generate_keys
+build/SourcePackages/artifacts/sparkle/Sparkle/bin/generate_keys
 ```
 
 Run it once. The private key is stored automatically in your login keychain. The public key is printed to stdout. It is committed in `Whisky/Info.plist` under `SUPublicEDKey`. If you regenerate keys you will invalidate the existing public key in the bundled app and need to re-release.
@@ -82,7 +82,7 @@ Run it once. The private key is stored automatically in your login keychain. The
 The release workflow also needs the same key as the repository secret `SPARKLE_ED_PRIVATE_KEY`. Export it and copy the base64 to **Settings → Secrets and variables → Actions**:
 
 ```sh title="Export the Sparkle key for CI"
-SPARKLE_BIN=$(ls -dt ~/Library/Developer/Xcode/DerivedData/Whisky-*/SourcePackages/artifacts/sparkle/Sparkle/bin 2>/dev/null | head -1)
+SPARKLE_BIN=$(find build -path '*/SourcePackages/artifacts/sparkle/Sparkle/bin' -type d 2>/dev/null | head -1)
 "$SPARKLE_BIN/generate_keys" -x sparkle_ed25519_private.key
 base64 -i sparkle_ed25519_private.key | pbcopy
 rm sparkle_ed25519_private.key
@@ -105,11 +105,11 @@ Three secrets gate the release pipeline. Losing the Sparkle key is **unrecoverab
 1. Export the Sparkle private key (Keychain will prompt for access):
 
    ```sh
-   SPARKLE_BIN=$(ls -dt ~/Library/Developer/Xcode/DerivedData/Whisky-*/SourcePackages/artifacts/sparkle/Sparkle/bin 2>/dev/null | head -1)
+   SPARKLE_BIN=$(find build -path '*/SourcePackages/artifacts/sparkle/Sparkle/bin' -type d 2>/dev/null | head -1)
    "$SPARKLE_BIN/generate_keys" -x sparkle_ed25519_private.key
    ```
 
-   If several `Whisky-*` DerivedData directories exist this picks the most recently modified one.
+   If several Sparkle artifact directories exist under `build/`, this picks the first match.
 
 2. Export the Developer ID identity: **Keychain Access → My Certificates** → right-click *Developer ID Application: ...* → **Export** as `.p12` with a strong password.
 3. Encrypt both files before they leave the machine:
@@ -146,13 +146,13 @@ The printed `sparkle:edSignature` **and** the printed `length` must both exactly
 
 ### Recovery on a new machine
 
-0. Build Whisky once first so the Sparkle tools exist in DerivedData (see [Sparkle EdDSA keys](#sparkle-eddsa-keys) under One-time setup). `generate_keys` ships inside the Sparkle SPM artifact, not on `PATH`. Re-declare `SPARKLE_BIN` in this fresh shell (it is only set earlier in the Backup section):
+0. Build the app once first with `task build` (or `scripts/build.sh`) so the Sparkle tools exist under `build/` (see [Sparkle EdDSA keys](#sparkle-eddsa-keys) under One-time setup). `generate_keys` ships inside the Sparkle SPM artifact, not on `PATH`. Re-declare `SPARKLE_BIN` in this fresh shell (it is only set earlier in the Backup section):
 
    ```sh title="Locate the Sparkle tools"
-   SPARKLE_BIN=$(ls -dt ~/Library/Developer/Xcode/DerivedData/Whisky-*/SourcePackages/artifacts/sparkle/Sparkle/bin 2>/dev/null | head -1)
+   SPARKLE_BIN=$(find build -path '*/SourcePackages/artifacts/sparkle/Sparkle/bin' -type d 2>/dev/null | head -1)
    ```
 
-   If several `Whisky-*` DerivedData directories exist this picks the most recently modified one.
+   If several Sparkle artifact directories exist under `build/`, this picks the first match.
 1. Decrypt the backup (`age -d sparkle_ed25519_private.key.age > sparkle_ed25519_private.key`, entering the backup passphrase), then import the Sparkle key: `"$SPARKLE_BIN/generate_keys" -f sparkle_ed25519_private.key`. If an existing item named *Private key for signing Sparkle updates* is already in the login keychain, the import may fail until that item is removed via Keychain Access. Delete the decrypted plaintext key once the import succeeds.
 2. Open the `.p12` to install the Developer ID identity into the login keychain.
 3. Re-create the notary profile with `xcrun notarytool store-credentials AC_PASSWORD ...` (see [One-time setup](#one-time-setup)).

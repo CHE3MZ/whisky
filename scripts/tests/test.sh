@@ -24,22 +24,25 @@
 set -euo pipefail
 
 PROJECT_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
+BUILD_DIR="$PROJECT_DIR/build"
+RESULT_BUNDLE="$BUILD_DIR/TestResults.xcresult"
 cd "$PROJECT_DIR"
 
 bash "$PROJECT_DIR/scripts/build.sh" --full
 
 echo "==> Running WhiskyKit unit tests"
-swift test --package-path WhiskyKit
+swift test --package-path WhiskyKit --scratch-path "$BUILD_DIR/WhiskyKit"
 
 echo "==> Running WhiskyUITests"
-rm -rf TestResults.xcresult
+rm -rf "$RESULT_BUNDLE"
 xcodebuild \
     -project Whisky.xcodeproj \
     -scheme Whisky \
     -configuration Debug \
     -destination 'platform=macOS' \
+    -derivedDataPath build \
     -only-testing:WhiskyUITests \
-    -resultBundlePath TestResults.xcresult \
+    -resultBundlePath "$RESULT_BUNDLE" \
     -retry-tests-on-failure \
     -test-iterations 3 \
     test \
@@ -48,4 +51,4 @@ xcodebuild \
     CODE_SIGNING_ALLOWED=NO
 
 echo "==> Test results"
-xcresultparser TestResults.xcresult
+xcresultparser "$RESULT_BUNDLE"
