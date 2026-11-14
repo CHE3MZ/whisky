@@ -29,7 +29,10 @@
 # warning. If the GitHub CLI is authenticated, its token is used for the API
 # request that reads file modes, avoiding the unauthenticated rate limit. If
 # the patch does not apply cleanly, the script falls back to a partial apply
-# and leaves conflicted hunks in *.rej files.
+# and leaves conflicted hunks in *.rej files. File-level conflicts (deletes,
+# renames, copies, new files, and anything that is not a rejected hunk) abort
+# before any patch hunk is applied, so a move never leaves a duplicate or a
+# silently skipped change behind.
 #
 # Usage: scripts/upstream/pull.sh [-i COMMITSHA]
 #   (no options)   Prompt for the commit SHA.
@@ -176,7 +179,7 @@ while [ $# -gt 0 ]; do
     esac
 done
 
-for tool in git curl mktemp; do
+for tool in git curl cmp mktemp; do
     if ! command -v "$tool" >/dev/null 2>&1; then
         error "$tool is required"
         exit 1
@@ -330,7 +333,7 @@ apply_patch() {
 
 finish_success() {
     if [ "$skipped_count" -gt 0 ]; then
-        warn "commit $COMMIT_SHORT is incomplete; $skipped_count absent file(s) were not restored"
+        warn "commit $COMMIT_SHORT is incomplete; $skipped_count file(s) were skipped"
         exit 1
     fi
     ok "$1"
@@ -453,6 +456,42 @@ is_deleted_in_patch() {
     ' "$PATCH_FILE"
 }
 
+is_whole_file_entry() {
+    awk -v target="$1" '
+        /^diff --(git|cc) / {
+            path = $0
+            if (path ~ /^diff --git /) {
+                sub(/^diff --git a\//, "", path)
+                sub(/ b\/.*/, "", path)
+            } else {
+                sub(/^diff --cc /, "", path)
+            }
+            in_section = (path == target)
+        }
+        in_section && /^(deleted file mode|new file mode|rename from |rename to |copy from |copy to )/ { found = 1 }
+        END { exit(found ? 0 : 1) }
+    ' "$2"
+}
+
+whole_file_conflicts() {
+    {
+        # Any error that is not a rejected hunk is a file-level conflict.
+        sed -n \
+            -e '/^error: patch failed:/d' \
+            -e '/: patch does not apply$/d' \
+            -e 's/^error: //p' \
+            "$1"
+        # A rejected hunk is safe for --reject only when it is an ordinary
+        # edit; failed deletes, new files, renames, and copies abort instead.
+        sed -n 's/^error: \(.*\): patch does not apply$/\1/p' "$1" |
+            while IFS= read -r conflict_path; do
+                if is_whole_file_entry "$conflict_path" "$2"; then
+                    printf '%s\n' "$conflict_path"
+                fi
+            done
+    } | sort -u
+}
+
 load_tree() {
     if [ "$TREE_READY" -eq 1 ]; then
         return 0
@@ -503,6 +542,16 @@ mode_for_path() {
     ' "$TREE_FILE"
 }
 
+fetch_raw() {
+    url_path=$(printf '%s' "$1" |
+        sed -e 's/%/%25/g' -e 's/ /%20/g' -e 's/#/%23/g' -e 's/?/%3F/g')
+    raw_url="https://raw.githubusercontent.com/$UPSTREAM_REPO/$FULL_SHA/$url_path"
+
+    raw_status=0
+    raw_code=$(curl -sSL --retry 3 --connect-timeout 15 --max-time 120 \
+        -o "$RAW_FILE" -w '%{http_code}' "$raw_url" 2>/dev/null) || raw_status=$?
+}
+
 restore_missing_files() {
     : > "$RESTORED_LIST"
     : > "$SKIPPED_LIST"
@@ -519,25 +568,40 @@ restore_missing_files() {
 
         rename_target=$(rename_target_for "$path")
         if [ -n "$rename_target" ]; then
-            if [ -e "$rename_target" ] || [ -L "$rename_target" ]; then
-                note "$rename_target already exists; leaving it unchanged"
-                continue
-            fi
             if ! is_safe_path "$rename_target"; then
                 warn "refusing to restore unsafe path: $rename_target"
+                printf '%s\n' "$rename_target" >> "$SKIPPED_LIST"
+                continue
+            fi
+            if [ -e "$rename_target" ] || [ -L "$rename_target" ]; then
+                if [ -L "$rename_target" ] || [ -d "$rename_target" ]; then
+                    warn "$rename_target already exists and is not a regular file; skipping it"
+                    printf '%s\n' "$rename_target" >> "$SKIPPED_LIST"
+                    continue
+                fi
+                fetch_raw "$rename_target"
+                if [ "$raw_status" -ne 0 ]; then
+                    warn "could not verify existing $rename_target (curl exit $raw_status); skipping it"
+                    printf '%s\n' "$rename_target" >> "$SKIPPED_LIST"
+                    continue
+                fi
+                if [ "$raw_code" != '200' ]; then
+                    warn "could not verify existing $rename_target (HTTP $raw_code); skipping it"
+                    printf '%s\n' "$rename_target" >> "$SKIPPED_LIST"
+                    continue
+                fi
+                if cmp -s "$RAW_FILE" "$rename_target"; then
+                    note "$rename_target already matches upstream; leaving it unchanged"
+                    continue
+                fi
+                warn "$rename_target already exists with different content; not overwriting"
                 printf '%s\n' "$rename_target" >> "$SKIPPED_LIST"
                 continue
             fi
             path=$rename_target
         fi
 
-        url_path=$(printf '%s' "$path" |
-            sed -e 's/%/%25/g' -e 's/ /%20/g' -e 's/#/%23/g' -e 's/?/%3F/g')
-        raw_url="https://raw.githubusercontent.com/$UPSTREAM_REPO/$FULL_SHA/$url_path"
-
-        raw_status=0
-        raw_code=$(curl -sSL --retry 3 --connect-timeout 15 --max-time 120 \
-            -o "$RAW_FILE" -w '%{http_code}' "$raw_url" 2>/dev/null) || raw_status=$?
+        fetch_raw "$path"
 
         if [ "$raw_status" -ne 0 ]; then
             warn "could not restore $path (curl exit $raw_status); skipping it"
@@ -609,7 +673,7 @@ report_restored() {
     fi
 
     if [ "$skipped_count" -gt 0 ]; then
-        warn 'file(s) absent from this working tree could not be restored; skipping:'
+        warn 'file(s) could not be restored or verified; skipping:'
         print_list < "$SKIPPED_LIST"
     fi
 }
@@ -650,6 +714,14 @@ fi
 if [ -n "$unexpected_errors" ]; then
     warn "commit $COMMIT_SHORT does not apply cleanly:"
     printf '%s\n' "$unexpected_errors" | print_list
+fi
+
+conflicts=$(whole_file_conflicts "$APPLY_ERR" "$patch_to_apply")
+if [ -n "$conflicts" ]; then
+    error 'refusing to apply partially: the patch has file-level conflicts'
+    printf '%s\n' "$conflicts" | print_list
+    printf '  aborting before git apply --reject; no patch hunks were applied (restored files, if any, remain)\n' >&2
+    exit 1
 fi
 
 warn 'applying the remaining changes partially; rejected hunks are saved as *.rej files'
