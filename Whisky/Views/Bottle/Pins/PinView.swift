@@ -113,7 +113,11 @@ struct PinView: View {
         // Capture modifier flags synchronously before entering async context
         let useTerminal = NSEvent.modifierFlags.contains(.shift)
         Task {
-            let result = await program.launchWithUserMode(useTerminal: useTerminal)
+            let result = await program.launchWithUserMode(useTerminal: useTerminal) { contentType, sizeBytes in
+                withAnimation {
+                    toast = .clipboardCleared(contentType: contentType, sizeBytes: sizeBytes)
+                }
+            }
             withAnimation {
                 toast = result.toastData
             }
