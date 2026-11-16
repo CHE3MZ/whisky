@@ -99,7 +99,7 @@ Read from `sources.yml` by `report.sh`. Do not hand-edit.
 
 | Component | Pinned version | Upstream source |
 |-----------|----------------|-----------------|
-| Whisky Upstream | `42272ff51131` | [frankea/Whisky](https://github.com/frankea/Whisky) |
+| Whisky Upstream | `ea473b7fd4e4` | [frankea/Whisky](https://github.com/frankea/Whisky) |
 | Wine MacOS Builds | `11.0_1` | [Gcenx/macOS_Wine_builds](https://github.com/Gcenx/macOS_Wine_builds) |
 | DXVK MacOS | `v1.10.3-20230507-repack` | [Gcenx/DXVK-macOS](https://github.com/Gcenx/DXVK-macOS) |
 | DXMT MacOS | `v0.80` | [3Shain/dxmt](https://github.com/3Shain/dxmt) |
