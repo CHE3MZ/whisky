@@ -89,7 +89,7 @@ enum WineRegistryFile {
     }
 
     /// The `.reg` file that holds `key`, and the section header `key` has in it.
-    private static func contents(for key: String, bottleURL: URL) -> (text: String, sectionHeader: String)? {
+    static func contents(for key: String, bottleURL: URL) -> (text: String, sectionHeader: String)? {
         let regFileName: String
         if key.hasPrefix("HKCU") || key.hasPrefix("HKEY_CURRENT_USER") {
             regFileName = "user.reg"
@@ -118,7 +118,7 @@ enum WineRegistryFile {
 
     /// The name a `"name"=...` line sets, spelled as in the file, or `nil`
     /// for any other line. An escaped quote does not end the name.
-    private static func quotedName(in line: String) -> String? {
+    static func quotedName(in line: String) -> String? {
         guard line.hasPrefix("\"") else {
             return nil
         }
