@@ -2,7 +2,7 @@ sources:
   - name: "Whisky Upstream"
     id: "UPSTREAM"
     link: "https://github.com/frankea/Whisky"
-    commit: "e06c8bc150e6fd1239c083731eb61b94ce7a95ac"
+    commit: "1880b7f57edb26f3156bbb63a8f826dadf640166"
     release: null
 
   - name: "Wine MacOS Builds"
