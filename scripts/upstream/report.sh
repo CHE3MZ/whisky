@@ -293,7 +293,7 @@ EOF
         else
             pin='—'
         fi
-        slug=$(printf '%s' "$link" | sed -e 's#^https\?://github.com/##' -e 's#/*$##')
+        slug=$(printf '%s' "$link" | sed -E -e 's#^https?://github.com/##' -e 's#/*$##')
         [ -n "$slug" ] || slug=$link
         printf "| %s | \`%s\` | [%s](%s) |\n" "$name" "$pin" "$slug" "$link"
     done < "$1"

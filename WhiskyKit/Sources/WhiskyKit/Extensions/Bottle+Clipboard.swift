@@ -20,7 +20,6 @@ import AppKit
 import Foundation
 
 @MainActor
-@MainActor
 public extension Bottle {
     /// Checks the clipboard before launching a Wine program in this bottle, applying its policy.
     ///
