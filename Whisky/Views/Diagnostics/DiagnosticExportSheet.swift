@@ -115,7 +115,12 @@ extension DiagnosticExportSheet {
             }
 
             Toggle(isOn: $includeRemediationHistory) {
-                Text("Include remediation history")
+                VStack(alignment: .leading) {
+                    Text("Include remediation history")
+                    Text("diagnostics.export.includeRemediationHistory.detail")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             }
 
             Toggle(isOn: $includeFullLog) {
@@ -206,6 +211,7 @@ extension DiagnosticExportSheet {
                 diagnosis: diagnosis,
                 bottle: bottle,
                 program: program,
+                timeline: loadRemediationTimeline(),
                 options: exportOptions
             )
 
@@ -227,20 +233,8 @@ extension DiagnosticExportSheet {
 // MARK: - Helpers
 
 extension DiagnosticExportSheet {
-    private func loadDiagnosisHistory() -> DiagnosisHistory? {
-        let historyURL = bottle.url
-            .appending(path: "Program Settings")
-            .appending(path: program.name)
-            .appendingPathExtension("diagnosis-history.plist")
-        let history = DiagnosisHistory.load(from: historyURL)
-        return history.isEmpty ? nil : history
-    }
-
     private func loadRemediationTimeline() -> RemediationTimeline? {
-        let timelineURL = bottle.url
-            .appending(path: "Program Settings")
-            .appending(path: program.name)
-            .appendingPathExtension("remediation-timeline.plist")
+        let timelineURL = RemediationTimeline.url(forProgramAt: program.url, inBottleAt: bottle.url)
         let timeline = RemediationTimeline.load(from: timelineURL)
         return timeline.isEmpty ? nil : timeline
     }
