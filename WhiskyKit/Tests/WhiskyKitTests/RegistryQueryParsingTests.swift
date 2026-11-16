@@ -56,6 +56,15 @@ final class RegistryQueryParsingTests: XCTestCase {
         XCTAssertEqual(value, "0x90")
     }
 
+    func testBinaryValue() {
+        // Wine prints REG_BINARY data as contiguous uppercase hex.
+        let value = Wine.registryValue(
+            fromQueryOutput: output("    guid    REG_BINARY    53FAF8B304008E43900351A46E139BFC"),
+            type: .binary
+        )
+        XCTAssertEqual(value, "53FAF8B304008E43900351A46E139BFC")
+    }
+
     func testMissingValueIsNil() {
         XCTAssertNil(Wine.registryValue(
             fromQueryOutput: "\r\nHKEY_CURRENT_USER\\Software\\Wine\\Drivers\r\n",
@@ -79,5 +88,18 @@ final class RegistryQueryParsingTests: XCTestCase {
             type: .string
         )
         XCTAssertEqual(value, "data")
+    }
+
+    func testDpiResolutionParsesTheStoredValue() {
+        XCTAssertEqual(Wine.dpiResolution(fromRegistryData: "0x90"), 144)
+        XCTAssertEqual(Wine.dpiResolution(fromRegistryData: "0x60"), 96)
+    }
+
+    func testStoredZeroDpiCountsAsUnset() {
+        // Older config views wrote LogPixels=0 into bottles that had no key, and
+        // Wine falls back to 96 for it, so it must not show up as 0 DPI.
+        XCTAssertNil(Wine.dpiResolution(fromRegistryData: "0x0"))
+        XCTAssertNil(Wine.dpiResolution(fromRegistryData: "0x00000000"))
+        XCTAssertNil(Wine.dpiResolution(fromRegistryData: "garbage"))
     }
 }

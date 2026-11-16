@@ -62,19 +62,28 @@ public struct ExportOptions: Sendable {
 public enum DiagnosticExporter {
     // MARK: - ZIP Export
 
-    /// Exports a complete diagnostic report as a ZIP archive.
-    /// Creates a temporary directory containing all diagnostic files, then
-    /// compresses it via `/usr/bin/ditto`. The temporary directory is cleaned
-    /// up after compression.
+    /// Exports a complete diagnostic report as a ZIP archive at `destination`.
+    ///
+    /// Creates a temporary directory containing all diagnostic files,
+    /// compresses it via `/usr/bin/ditto`, and puts the archive at
+    /// `destination` with ``saveArchive(_:to:)``, so a file already there is
+    /// replaced only once the new archive is complete. The temporary files
+    /// are removed either way.
+    ///
+    /// - Throws: ``DiagnosticExportError`` when the archive cannot be built,
+    ///   or the file system's error when it cannot be saved. On failure
+    ///   anything already at `destination` is left as it was.
     @MainActor
+    // swiftlint:disable:next function_parameter_count
     public static func exportZIP(
         diagnosis: CrashDiagnosis,
         bottle: Bottle,
         program: Program,
         logFileURL: URL?,
         timeline: RemediationTimeline?,
-        options: ExportOptions = ExportOptions()
-    ) async -> URL {
+        options: ExportOptions = ExportOptions(),
+        to destination: URL
+    ) async throws {
         let context = ZIPExportContext(
             diagnosis: diagnosis,
             bottle: bottle,
@@ -84,7 +93,42 @@ public enum DiagnosticExporter {
             options: options
         )
 
-        return await buildZIPArchive(context: context)
+        let archive = try await buildZIPArchive(context: context)
+        defer { try? FileManager.default.removeItem(at: archive.deletingLastPathComponent()) }
+        try saveArchive(archive, to: destination)
+    }
+
+    /// Puts a finished archive at `destination`, replacing what is there only on success.
+    ///
+    /// The archive is first copied next to the destination under a hidden
+    /// temporary name; only then is it swapped in (or moved, when nothing is
+    /// there yet). A copy that fails leaves the existing file untouched and no
+    /// partial file behind.
+    ///
+    /// - Parameters:
+    ///   - archive: The finished archive. It is copied, not moved.
+    ///   - destination: Where the user chose to save it.
+    /// - Throws: ``DiagnosticExportError/archiveMissing`` when `archive` does
+    ///   not exist, or the file system's error.
+    static func saveArchive(_ archive: URL, to destination: URL) throws {
+        let fileManager = FileManager.default
+        guard fileManager.fileExists(atPath: archive.path(percentEncoded: false)) else {
+            throw DiagnosticExportError.archiveMissing
+        }
+        // Staged in the destination's folder so the swap stays on one volume.
+        let staged = destination.deletingLastPathComponent()
+            .appending(path: ".\(destination.lastPathComponent).\(UUID().uuidString).partial")
+        try fileManager.copyItem(at: archive, to: staged)
+        do {
+            if fileManager.fileExists(atPath: destination.path(percentEncoded: false)) {
+                _ = try fileManager.replaceItemAt(destination, withItemAt: staged)
+            } else {
+                try fileManager.moveItem(at: staged, to: destination)
+            }
+        } catch {
+            try? fileManager.removeItem(at: staged)
+            throw error
+        }
     }
 
     // MARK: - Markdown Export
@@ -93,19 +137,24 @@ public enum DiagnosticExporter {
     ///
     /// The report is always redacted (no sensitive details in clipboard copy).
     /// Includes system info, bottle config, diagnosis summary, matched patterns,
-    /// suggested remediations, and environment keys (keys only, no values).
+    /// suggested remediations, the remediation history, and environment keys
+    /// (keys only, no values).
     ///
     /// - Parameters:
     ///   - diagnosis: The crash diagnosis to report.
     ///   - bottle: The bottle that was analyzed.
     ///   - program: The program that was analyzed.
-    ///   - options: Export options (only `includeSensitiveDetails` is relevant; defaults to always-redacted).
+    ///   - timeline: The remediation cards already applied for `program`, if any.
+    ///   - options: Export options. `includeRemediationHistory` decides whether
+    ///     `timeline` is listed; `includeSensitiveDetails` and `includeFullLog`
+    ///     are ignored because the copy is always redacted.
     /// - Returns: A Markdown string ready for pasting.
     @MainActor
     public static func generateMarkdownReport(
         diagnosis: CrashDiagnosis,
         bottle: Bottle,
         program: Program,
+        timeline: RemediationTimeline? = nil,
         options: ExportOptions = ExportOptions()
     ) async -> String {
         // Markdown copy is always redacted regardless of options
@@ -119,6 +168,7 @@ public enum DiagnosticExporter {
             diagnosis: diagnosis,
             bottle: bottle,
             program: program,
+            timeline: timeline,
             options: redactedOptions
         )
     }
@@ -131,6 +181,7 @@ public enum DiagnosticExporter {
         diagnosis: CrashDiagnosis,
         bottle: Bottle,
         program: Program,
+        timeline: RemediationTimeline? = nil,
         options: ExportOptions
     ) -> String {
         var markdown = "## Whisky Diagnostic Report\n\n"
@@ -141,6 +192,7 @@ public enum DiagnosticExporter {
         markdown += generateDiagnosisSummarySection(diagnosis: diagnosis)
         markdown += generateMatchedPatternsSection(diagnosis: diagnosis)
         markdown += generateSuggestedRemediationsSection(diagnosis: diagnosis)
+        markdown += generateRemediationHistorySection(timeline: timeline, options: options)
         markdown += generateEnvironmentKeysSection(bottle: bottle)
 
         return markdown
@@ -236,6 +288,31 @@ public enum DiagnosticExporter {
         return section
     }
 
+    /// Lists the remediation cards already applied for the program, newest first.
+    ///
+    /// Empty unless ``ExportOptions/includeRemediationHistory`` is set and
+    /// `timeline` has entries.
+    static func generateRemediationHistorySection(
+        timeline: RemediationTimeline?,
+        options: ExportOptions
+    ) -> String {
+        guard options.includeRemediationHistory, let timeline, !timeline.isEmpty else { return "" }
+        let formatter = ISO8601DateFormatter()
+        var section = "### Remediation History\n\n"
+        for entry in exportedTimeline(timeline, options: options).entries.reversed() {
+            section += "- \(formatter.string(from: entry.timestamp)): **\(entry.actionTitle)** (`\(entry.actionId)`)"
+            switch (entry.beforeValue, entry.afterValue) {
+            case let (before?, after?): section += " \(before) -> \(after)"
+            case let (nil, after?): section += " \(after)"
+            case let (before?, nil): section += " \(before) -> unset"
+            case (nil, nil): break
+            }
+            section += "\n"
+        }
+        section += "\n"
+        return section
+    }
+
     @MainActor
     private static func generateEnvironmentKeysSection(bottle: Bottle) -> String {
         var section = "### Environment Keys\n\n"
@@ -312,8 +389,10 @@ public enum DiagnosticExporter {
 // MARK: - DiagnosticExporter ZIP Building
 
 extension DiagnosticExporter {
+    /// Builds the archive in a fresh temporary directory and returns its URL.
+    /// On failure the temporary directory is removed.
     @MainActor
-    fileprivate static func buildZIPArchive(context: ZIPExportContext) async -> URL {
+    fileprivate static func buildZIPArchive(context: ZIPExportContext) async throws -> URL {
         let bottleName = sanitizeName(context.bottle.settings.name)
         let programName = sanitizeName(context.program.name)
         let dateString = formatDateForFilename(Date())
@@ -329,11 +408,16 @@ extension DiagnosticExporter {
 
         let content = await prepareZIPContent(context: context)
 
-        await Task.detached(priority: .utility) {
-            writeZIPContent(content: content, contentDir: contentDir, context: context)
-            compressZIP(from: contentDir, to: zipURL)
-            try? FileManager.default.removeItem(at: contentDir)
-        }.value
+        do {
+            try await Task.detached(priority: .utility) {
+                defer { try? FileManager.default.removeItem(at: contentDir) }
+                writeZIPContent(content: content, contentDir: contentDir, context: context)
+                try compressZIP(from: contentDir, to: zipURL)
+            }.value
+        } catch {
+            try? FileManager.default.removeItem(at: tempDir)
+            throw error
+        }
 
         return zipURL
     }
@@ -345,6 +429,7 @@ extension DiagnosticExporter {
                 diagnosis: context.diagnosis,
                 bottle: context.bottle,
                 program: context.program,
+                timeline: context.timeline,
                 options: context.options
             ),
             bottleSummary: bottleSettingsSummary(bottle: context.bottle),
@@ -394,15 +479,39 @@ extension DiagnosticExporter {
             )
 
             if context.options.includeRemediationHistory, let timeline = context.timeline {
-                let timelineEncoder = JSONEncoder()
-                timelineEncoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-                timelineEncoder.dateEncodingStrategy = .iso8601
-                let timelineData = try timelineEncoder.encode(timeline)
-                try timelineData.write(to: contentDir.appendingPathComponent("remediation-history.json"))
+                try remediationHistoryJSON(exportedTimeline(timeline, options: context.options))
+                    .write(to: contentDir.appendingPathComponent("remediation-history.json"))
             }
         } catch {
             // Best effort
         }
+    }
+
+    /// The timeline as it goes into an export: before and after values pass
+    /// through ``Redactor`` like the logs do, unless sensitive details were
+    /// asked for. Values are recorded redacted already; this keeps an export
+    /// safe whatever a future remediation records.
+    static func exportedTimeline(_ timeline: RemediationTimeline, options: ExportOptions) -> RemediationTimeline {
+        guard !options.includeSensitiveDetails else { return timeline }
+        var redacted = RemediationTimeline()
+        for entry in timeline.entries {
+            redacted.record(RemediationTimelineEntry(
+                timestamp: entry.timestamp,
+                actionId: entry.actionId,
+                actionTitle: entry.actionTitle,
+                beforeValue: entry.beforeValue.map(Redactor.redactLogText),
+                afterValue: entry.afterValue.map(Redactor.redactLogText)
+            ))
+        }
+        return redacted
+    }
+
+    /// The `remediation-history.json` written into the ZIP.
+    static func remediationHistoryJSON(_ timeline: RemediationTimeline) throws -> Data {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+        encoder.dateEncodingStrategy = .iso8601
+        return try encoder.encode(timeline)
     }
 
     fileprivate static func writeLogFiles(contentDir: URL, context: ZIPExportContext) {
@@ -430,9 +539,18 @@ extension DiagnosticExporter {
         )
     }
 
-    fileprivate static func compressZIP(from contentDir: URL, to zipURL: URL) {
+    /// Compresses `contentDir` into `zipURL` with `ditto`.
+    ///
+    /// - Throws: ``DiagnosticExportError/compressionFailed(status:)`` when
+    ///   ditto exits nonzero, ``DiagnosticExportError/archiveMissing`` when it
+    ///   reports success without writing the archive, or the launch error.
+    static func compressZIP(
+        from contentDir: URL,
+        to zipURL: URL,
+        ditto: URL = URL(fileURLWithPath: "/usr/bin/ditto")
+    ) throws {
         let process = Process()
-        process.executableURL = URL(fileURLWithPath: "/usr/bin/ditto")
+        process.executableURL = ditto
         process.arguments = [
             "-c",
             "-k",
@@ -440,8 +558,14 @@ extension DiagnosticExporter {
             contentDir.path(percentEncoded: false),
             zipURL.path(percentEncoded: false)
         ]
-        try? process.run()
+        try process.run()
         process.waitUntilExit()
+        guard process.terminationStatus == 0 else {
+            throw DiagnosticExportError.compressionFailed(status: process.terminationStatus)
+        }
+        guard FileManager.default.fileExists(atPath: zipURL.path(percentEncoded: false)) else {
+            throw DiagnosticExportError.archiveMissing
+        }
     }
 
     fileprivate struct ZIPExportContext {

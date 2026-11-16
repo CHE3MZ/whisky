@@ -115,7 +115,10 @@ enum LauncherDetection {
             }
 
         case .rockstar:
-            if !bottle.settings.dxvk {
+            // Whether the launch really gets DXVK, not the bottle's backend
+            // alone: Recommended steers the launcher to DXVK, and the launcher
+            // auto-enable deploys it under any backend.
+            if !bottle.settings.deploysDXVK(whenLaunching: launcher) {
                 warnings.append(.rockstarDXVK)
             }
 
@@ -161,12 +164,11 @@ enum LauncherDetection {
 
         summary += "Compatibility Mode: \(bottle.settings.launcherCompatibilityMode ? "✅ Enabled" : "❌ Disabled")\n"
         summary += "Locale: \(bottle.settings.launcherLocale.pretty())\n"
-        summary += "DXVK: \(bottle.settings.dxvk ? "✅ Enabled" : "❌ Disabled")\n"
+        summary += "DXVK: \(bottle.settings.deploysDXVK(whenLaunching: launcher) ? "✅ Enabled" : "❌ Disabled")\n"
         let gpuStatus = bottle.settings.gpuSpoofing
             ? "✅ Enabled (\(bottle.settings.gpuVendor.rawValue))"
             : "❌ Disabled"
-        summary += "GPU Spoofing: \(gpuStatus)\n"
-        summary += "Network Timeout: \(bottle.settings.networkTimeout)ms\n\n"
+        summary += "GPU Spoofing: \(gpuStatus)\n\n"
 
         summary += "Fixes Applied:\n\(launcher.fixesDescription)\n\n"
 

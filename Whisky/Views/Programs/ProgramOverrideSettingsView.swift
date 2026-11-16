@@ -31,6 +31,9 @@ struct ProgramOverrideSettingsView: View {
     @ObservedObject var bottle: Bottle
     @ObservedObject var program: Program
     @Binding var isExpanded: Bool
+    /// Opens the bottle's configuration page, where the advanced audio
+    /// settings live. Without it the wizard does not offer to open them.
+    var onOpenBottleConfig: (() -> Void)?
 
     @State private var showResetConfirmation = false
     @State private var diagnosisPresentation: DiagnosisPresentation?
@@ -38,6 +41,20 @@ struct ProgramOverrideSettingsView: View {
     @State private var showGameConfigDetail: Bool = false
     @State private var recommendedDependencies: [DependencyDefinition] = []
     @State private var dependencyToInstall: DependencyDefinition?
+    /// The audio troubleshooting wizard for this program's bottle, while it is open.
+    @State private var audioWizard: AudioWizardPresentation?
+    @State private var audioMonitor = AudioDeviceMonitor()
+    /// Set when the wizard asked for the advanced audio settings; acted on
+    /// once its sheet is gone so the navigation is not lost to the dismissal.
+    @State private var openAdvancedAudioAfterWizard = false
+    @AppStorage("audioAdvancedMode") private var audioAdvancedMode = false
+    /// The bottle's virtual desktop as its registry has it, once read. The
+    /// bottle's setting only mirrors the registry and misses changes made
+    /// outside its Display section, such as in winecfg.
+    @State private var bottleVirtualDesktopInRegistry: (enabled: Bool, resolution: String?)?
+    /// Read from the runtime's version plist when the sync group appears, not
+    /// on every redraw, and assumed until then.
+    @State private var runtimeImplementsEnhancedSync = true
 
     var body: some View {
         dependencyBadgeSection
@@ -60,7 +77,7 @@ struct ProgramOverrideSettingsView: View {
             }
             .sheet(isPresented: $showGameConfigDetail) {
                 if let match = gameMatch {
-                    GameEntryDetailView(entry: match.entry, bottle: bottle)
+                    GameEntryDetailView(entry: match.entry, bottle: bottle, programURL: program.url)
                         .frame(minWidth: 600, minHeight: 500)
                 }
             }
@@ -74,7 +91,8 @@ struct ProgramOverrideSettingsView: View {
                     programName: program.name,
                     bottleName: bottle.settings.name,
                     timestamp: Date(),
-                    applyBottle: bottle
+                    applyBottle: bottle,
+                    applyProgramURL: program.url
                 )
                 .frame(minWidth: 600, minHeight: 400)
             }
@@ -146,13 +164,34 @@ struct ProgramOverrideSettingsView: View {
     private var audioTroubleshootingSection: some View {
         Section("config.title.audio") {
             Button("Troubleshoot Audio\u{2026}") {
-                NotificationCenter.default.post(
-                    name: .openAudioTroubleshooting,
-                    object: nil
-                )
+                audioWizard = .make(for: bottle, monitor: audioMonitor)
             }
             .help("program.overrides.audio.troubleshoot.help")
         }
+        .sheet(item: $audioWizard, onDismiss: openAdvancedAudioIfRequested) { presentation in
+            AudioTroubleshootingWizardView(
+                engine: presentation.engine,
+                bottle: bottle,
+                onDismiss: {
+                    audioWizard = nil
+                },
+                onOpenAdvanced: onOpenBottleConfig == nil ? nil : {
+                    openAdvancedAudioAfterWizard = true
+                },
+                onApplyFix: { actionId in
+                    await AudioWizardPresentation.applyFix(actionId, bottle: bottle).failureReason
+                }
+            )
+        }
+    }
+
+    /// Shows the bottle's audio settings in advanced mode on its configuration
+    /// page, after the wizard asked for them.
+    private func openAdvancedAudioIfRequested() {
+        guard openAdvancedAudioAfterWizard else { return }
+        openAdvancedAudioAfterWizard = false
+        audioAdvancedMode = true
+        onOpenBottleConfig?()
     }
 
     // MARK: - Dependency Badge
@@ -336,9 +375,17 @@ struct ProgramOverrideSettingsView: View {
                     Text("config.enhancedSync.esync").tag(EnhancedSync.esync)
                     Text("config.enhancedSync.msync").tag(EnhancedSync.msync)
                 }
+                if !runtimeImplementsEnhancedSync {
+                    Text("config.enhancedSync.runtimeUnsupported")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
             } else {
                 inheritedSummary(syncDescription(bottle.settings.enhancedSync))
             }
+        }
+        .task {
+            runtimeImplementsEnhancedSync = WhiskyWineInstaller.runtimeImplementsEnhancedSync()
         }
     }
 
@@ -406,20 +453,37 @@ struct ProgramOverrideSettingsView: View {
             if hasDisplayOverride {
                 displayControls
             } else {
-                if bottle.settings.virtualDesktopEnabled {
-                    let preset = bottle.settings.resolutionPreset
-                    let resText = preset.dimensions.map { "\($0.width)x\($0.height)" }
-                        ?? (preset == .custom
-                            ? "\(bottle.settings.customResolutionWidth)x\(bottle.settings.customResolutionHeight)"
-                            : String(localized: "config.virtualDesktop.matchDisplay.label"))
+                if bottleVirtualDesktopEnabled {
                     inheritedSummary(
-                        String(localized: "program.overrides.display.enabledSummary \(resText)")
+                        String(localized: "program.overrides.display.enabledSummary \(bottleVirtualDesktopSize)")
                     )
                 } else {
                     inheritedSummary(String(localized: "config.virtualDesktop.off"))
                 }
             }
         }
+        .task(id: bottle.url) {
+            bottleVirtualDesktopInRegistry = try? await Wine.virtualDesktop(bottle: bottle)
+        }
+    }
+
+    /// Whether the bottle runs its programs in a virtual desktop: the registry's
+    /// answer once read, the bottle's setting until then.
+    private var bottleVirtualDesktopEnabled: Bool {
+        bottleVirtualDesktopInRegistry?.enabled ?? bottle.settings.virtualDesktopEnabled
+    }
+
+    /// The size of the bottle's virtual desktop, from its settings, or from the
+    /// registry when the settings do not know it is on.
+    private var bottleVirtualDesktopSize: String {
+        if !bottle.settings.virtualDesktopEnabled, let resolution = bottleVirtualDesktopInRegistry?.resolution {
+            return resolution
+        }
+        let preset = bottle.settings.resolutionPreset
+        return preset.dimensions.map { "\($0.width)x\($0.height)" }
+            ?? (preset == .custom
+                ? "\(bottle.settings.customResolutionWidth)x\(bottle.settings.customResolutionHeight)"
+                : String(localized: "config.virtualDesktop.matchDisplay.label"))
     }
 
     @ViewBuilder
@@ -709,7 +773,7 @@ struct ProgramOverrideSettingsView: View {
             set: { isOn in
                 ensureOverrides()
                 if isOn {
-                    program.settings.overrides?.virtualDesktopEnabled = bottle.settings.virtualDesktopEnabled
+                    program.settings.overrides?.virtualDesktopEnabled = bottleVirtualDesktopEnabled
                     program.settings.overrides?.resolutionPreset = bottle.settings.resolutionPreset
                     program.settings.overrides?.customResolutionWidth = bottle.settings.customResolutionWidth
                     program.settings.overrides?.customResolutionHeight = bottle.settings.customResolutionHeight

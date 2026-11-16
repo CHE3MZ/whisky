@@ -89,7 +89,7 @@ enum WineRegistryFile {
     }
 
     /// The `.reg` file that holds `key`, and the section header `key` has in it.
-    private static func contents(for key: String, bottleURL: URL) -> (text: String, sectionHeader: String)? {
+    static func contents(for key: String, bottleURL: URL) -> (text: String, sectionHeader: String)? {
         let regFileName: String
         if key.hasPrefix("HKCU") || key.hasPrefix("HKEY_CURRENT_USER") {
             regFileName = "user.reg"
@@ -118,7 +118,7 @@ enum WineRegistryFile {
 
     /// The name a `"name"=...` line sets, spelled as in the file, or `nil`
     /// for any other line. An escaped quote does not end the name.
-    private static func quotedName(in line: String) -> String? {
+    static func quotedName(in line: String) -> String? {
         guard line.hasPrefix("\"") else {
             return nil
         }
@@ -267,10 +267,15 @@ public extension Wine {
             name: "LogPixels",
             type: .dword
         ) else { return nil }
+        return dpiResolution(fromRegistryData: output)
+    }
 
-        let noPrefix = output.replacingOccurrences(of: "0x", with: "")
-        let int = Int(noPrefix, radix: 16)
-        guard let int else { return nil }
+    /// Parses a `LogPixels` DWORD such as `0x90`. A stored 0 counts as unset:
+    /// Wine falls back to 96 DPI for it, and older versions of the config view
+    /// wrote 0 into bottles whose key was missing.
+    static func dpiResolution(fromRegistryData data: String) -> Int? {
+        let noPrefix = data.replacingOccurrences(of: "0x", with: "")
+        guard let int = Int(noPrefix, radix: 16), int > 0 else { return nil }
         return int
     }
 
@@ -285,19 +290,22 @@ public extension Wine {
     @discardableResult
     @MainActor
     static func control(bottle: Bottle) async throws -> String {
-        try await Wine.runWine(["control"], bottle: bottle)
+        Wine.noteUserLaunch(in: bottle)
+        return try await Wine.runWine(["control"], bottle: bottle)
     }
 
     @discardableResult
     @MainActor
     static func regedit(bottle: Bottle) async throws -> String {
-        try await Wine.runWine(["regedit"], bottle: bottle)
+        Wine.noteUserLaunch(in: bottle)
+        return try await Wine.runWine(["regedit"], bottle: bottle)
     }
 
     @discardableResult
     @MainActor
     static func cfg(bottle: Bottle) async throws -> String {
-        try await Wine.runWine(["winecfg"], bottle: bottle)
+        Wine.noteUserLaunch(in: bottle)
+        return try await Wine.runWine(["winecfg"], bottle: bottle)
     }
 
     @discardableResult

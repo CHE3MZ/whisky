@@ -110,74 +110,6 @@ extension Bottle {
         }
     }
 
-    @discardableResult
-    // swiftlint:disable:next function_body_length
-    func getStartMenuPrograms() -> [Program] {
-        let globalStartMenu = url
-            .appending(path: "drive_c")
-            .appending(path: "ProgramData")
-            .appending(path: "Microsoft")
-            .appending(path: "Windows")
-            .appending(path: "Start Menu")
-
-        let userStartMenu = url
-            .appending(path: "drive_c")
-            .appending(path: "users")
-            .appending(path: wineUsername)
-            .appending(path: "AppData")
-            .appending(path: "Roaming")
-            .appending(path: "Microsoft")
-            .appending(path: "Windows")
-            .appending(path: "Start Menu")
-
-        var startMenuPrograms: [Program] = []
-        var linkURLs: [URL] = []
-        let globalEnumerator = FileManager.default.enumerator(
-            at: globalStartMenu,
-            includingPropertiesForKeys: [.isRegularFileKey],
-            options: [.skipsHiddenFiles]
-        )
-        while let url = globalEnumerator?.nextObject() as? URL {
-            if url.pathExtension == "lnk" {
-                linkURLs.append(url)
-            }
-        }
-
-        let userEnumerator = FileManager.default.enumerator(
-            at: userStartMenu,
-            includingPropertiesForKeys: [.isRegularFileKey],
-            options: [.skipsHiddenFiles]
-        )
-        while let url = userEnumerator?.nextObject() as? URL {
-            if url.pathExtension == "lnk" {
-                linkURLs.append(url)
-            }
-        }
-
-        linkURLs.sort(by: { $0.lastPathComponent.lowercased() < $1.lastPathComponent.lowercased() })
-
-        for link in linkURLs {
-            do {
-                if let program = try ShellLinkHeader.getProgram(
-                    url: link,
-                    handle: FileHandle(forReadingFrom: link),
-                    bottle: self
-                ) {
-                    if !startMenuPrograms.contains(where: { $0.url == program.url }) {
-                        startMenuPrograms.append(program)
-                    }
-                    // Remove every shortcut to the program, not just the first one.
-                    // A leftover duplicate would be picked up again on the next scan.
-                    try FileManager.default.removeItem(at: link)
-                }
-            } catch {
-                Logger.wineKit.warning("Failed to process Start Menu shortcut: \(error.localizedDescription)")
-            }
-        }
-
-        return startMenuPrograms
-    }
-
     /// Rescans the bottle for installed programs and repopulates ``programs``.
     ///
     /// The expensive work — walking the `Program Files` trees and parsing each
@@ -228,9 +160,11 @@ extension Bottle {
     /// Thin adapter over `BottleOperations.move`, which owns the
     /// rewrite-before-move and rollback-on-failure semantics for pins and
     /// blocklist URLs.
+    ///
+    /// - Throws: The file move's error, so the caller can tell the user.
     @MainActor
-    func move(destination: URL) {
-        BottleOperations.move(bottleAt: url, to: destination, registry: BottleVM.shared)
+    func move(destination: URL) throws {
+        try BottleOperations.move(bottleAt: url, to: destination, registry: BottleVM.shared)
     }
 
     /// Exports the bottle as a gzip-compressed tar archive.
@@ -266,8 +200,14 @@ extension Bottle {
         )
     }
 
-    @MainActor
-    func remove(delete: Bool) async {
+    /// Removes the bottle from the list, optionally deleting its files, after
+    /// offering to stop any running processes.
+    ///
+    /// - Returns: `false` when the user cancels that prompt and nothing was
+    ///   removed.
+    /// - Throws: The deletion's error, so the caller can tell the user.
+    @MainActor @discardableResult
+    func remove(delete: Bool) async throws -> Bool {
         // Check for running processes before deletion
         let isRunning = await Wine.isWineserverRunning(for: self)
         let trackedCount = ProcessRegistry.shared.getProcessCount(for: self)
@@ -284,14 +224,15 @@ extension Bottle {
             alert.addButton(withTitle: String(localized: "bottle.remove.hasProcesses.cancel"))
 
             let response = alert.runModal()
-            guard response == .alertFirstButtonReturn else { return }
+            guard response == .alertFirstButtonReturn else { return false }
 
             Wine.killBottle(bottle: self)
             try? await Task.sleep(for: .seconds(2))
             ProcessRegistry.shared.clearRegistry(for: url)
         }
 
-        BottleOperations.remove(bottleAt: url, deleteFiles: delete, registry: BottleVM.shared)
+        try BottleOperations.remove(bottleAt: url, deleteFiles: delete, registry: BottleVM.shared)
+        return true
     }
 
     @MainActor

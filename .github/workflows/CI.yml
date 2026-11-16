@@ -57,7 +57,7 @@ jobs:
       - name: Install SwiftFormat
         run: |
           # Install SwiftFormat via pre-built binary
-          wget -q https://github.com/nicklockwood/SwiftFormat/releases/download/0.64.6/swiftformat_linux.zip
+          wget -q https://github.com/nicklockwood/SwiftFormat/releases/download/0.64.7/swiftformat_linux.zip
           unzip -q swiftformat_linux.zip
           chmod +x swiftformat_linux
           sudo mv swiftformat_linux /usr/local/bin/swiftformat
